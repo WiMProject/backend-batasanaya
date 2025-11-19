@@ -1,0 +1,853 @@
+# Lumen App Batasanaya - Hijaiyyah Learning Game API
+
+[![PHP](https://img.shields.io/badge/PHP-8.1+-blue.svg)](https://php.net)
+[![Lumen](https://img.shields.io/badge/Lumen-10.0-orange.svg)](https://lumen.laravel.com)
+[![JWT](https://img.shields.io/badge/JWT-Auth-green.svg)](https://github.com/tymondesigns/jwt-auth)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue.svg)](https://mysql.com)
+
+API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentikasi JWT, manajemen konten multimedia, admin dashboard, dan game pasang huruf interaktif.
+
+## 🚀 Features
+
+### 🔐 Authentication & Security
+- **Complete JWT Authentication** - Login, register, refresh token, logout
+- **OTP Verification** - 6-digit OTP dengan expiry 5 menit
+- **Role-Based Access Control** - Admin & User permissions
+- **Admin Login System** - Dedicated admin authentication
+- **UUID Primary Keys** - Better security & scalability
+
+### 📁 Content Management
+- **Asset Management** - Upload, download, batch download assets
+- **Song Management** - Upload audio files dengan thumbnail
+- **Video Management** - Upload dan streaming video files
+- **Background Management** - Upload background images
+- **Letter Pairs Management** - Upload huruf Hijaiyyah untuk game
+- **Asset Manifest** - Untuk sync game/app data dengan checksum
+
+### 🎮 Game Features
+- **Letter Matching Game** - Game pasang huruf Hijaiyyah
+- **Game Sessions** - Tracking progress dan scoring
+- **Difficulty Levels** - 5 level kesulitan berbeda
+- **Leaderboard System** - Ranking pemain terbaik
+- **Real-time Scoring** - Sistem poin berdasarkan akurasi dan kecepatan
+
+### 🎛️ Admin Dashboard
+- **Professional Admin Panel** - Web-based admin interface
+- **Statistics Dashboard** - Real-time stats dan analytics
+- **User Management** - CRUD operations untuk users
+- **Content Management** - Upload dan kelola semua konten
+- **Drag & Drop Upload** - Modern file upload interface
+- **Responsive Design** - Mobile-friendly admin panel
+
+### 🔧 Technical Features
+- **RESTful API Design** - Clean dan consistent endpoints
+- **File Validation** - Type, size, dan format validation
+- **Error Handling** - Comprehensive error responses
+- **CORS Support** - Cross-origin resource sharing
+- **Public & Protected Routes** - Flexible access control
+
+## 📋 Requirements
+
+- PHP 8.1+
+- MySQL 8.0+
+- Composer
+- Laravel Valet (optional)
+- Ngrok (untuk public testing)
+
+## 🛠️ Installation
+
+1. **Clone repository:**
+```bash
+git clone <repository-url>
+cd lumen_app_batasanaya
+```
+
+2. **Install dependencies:**
+```bash
+composer install
+```
+
+3. **Setup environment:**
+```bash
+cp .env.example .env
+# Edit .env dengan database credentials
+```
+
+4. **Run migrations & seeders:**
+```bash
+php artisan migrate
+php artisan db:seed --class=RoleSeeder
+```
+
+5. **Create upload folders:**
+```bash
+mkdir -p public/uploads/{assets,profiles,songs,thumbnails}
+chmod -R 755 public/uploads storage
+```
+
+6. **Run server:**
+```bash
+# Via Valet
+valet link
+
+# Via PHP built-in server
+php -S localhost:8000 -t public
+```
+
+## 🌐 Public Access (Ngrok)
+
+```bash
+# Install ngrok
+yay -S ngrok  # Arch Linux
+
+# Setup auth token
+ngrok config add-authtoken YOUR_TOKEN
+
+# Expose local server
+ngrok http lumen-app-batasanaya.test:80
+```
+
+## 📚 API Documentation
+
+### Base URL
+```
+Local: http://lumen-app-batasanaya.test
+Public: https://your-ngrok-url.ngrok.io
+```
+
+### Authentication
+
+#### Register
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+    "fullName": "John Doe",
+    "email": "john@example.com",
+    "phone_number": "081234567890",
+    "password": "password123"
+}
+```
+
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+    "token_type": "bearer",
+    "expires_in": 3600
+}
+```
+
+#### Protected Endpoints
+Semua endpoint yang membutuhkan autentikasi harus menyertakan header:
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### User Management
+
+#### Get Current User
+```http
+GET /api/auth/me
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+#### Update User
+```http
+PATCH /api/users/{id}
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+    "fullName": "Updated Name",
+    "email": "updated@example.com"
+}
+```
+
+#### Upload Profile Picture
+```http
+POST /api/user/profile-picture
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: multipart/form-data
+
+profile_picture: [file]
+```
+
+### Asset Management
+
+#### Upload Asset
+```http
+POST /api/assets
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: multipart/form-data
+
+file: [file]
+type: image|audio
+```
+
+#### Get Assets List
+```http
+GET /api/assets
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+#### Download Single Asset
+```http
+GET /api/assets/{id}/file
+# Public endpoint - no auth required
+```
+
+#### Download All Assets (ZIP)
+```http
+GET /api/assets/download-all
+# Public endpoint - no auth required
+# Optional: ?type=image or ?type=audio
+```
+
+#### Download Batch Assets (ZIP)
+```http
+POST /api/assets/download-batch
+# Public endpoint - no auth required
+Content-Type: application/json
+
+{
+    "asset_ids": ["uuid1", "uuid2", "uuid3"]
+}
+```
+
+#### Get Assets Manifest
+```http
+GET /api/assets/manifest?type=image
+# Public endpoint - no auth required
+```
+
+**Response:**
+```json
+{
+    "version": 1699123456,
+    "total_assets": 10,
+    "total_size": 5242880,
+    "assets": [
+        {
+            "id": "uuid",
+            "filename": "image.jpg",
+            "type": "image",
+            "size": 1024000,
+            "checksum": "md5hash",
+            "download_url": "https://your-url/api/assets/uuid/file",
+            "last_modified": 1699123456
+        }
+    ]
+}
+```
+
+### Song Management
+
+#### Upload Song
+```http
+POST /api/songs
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: multipart/form-data
+
+title: Song Title
+file: [audio file]
+thumbnail: [image file]
+```
+
+#### Get Song
+```http
+GET /api/songs/{id}
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+#### Stream Song
+```http
+GET /api/songs/{id}/file
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### OTP System
+
+#### Request OTP
+```http
+POST /api/auth/request-otp
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+#### Verify OTP
+```http
+POST /api/auth/verify-otp
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+    "otp": "123456"
+}
+```
+
+### Letter Matching Game API
+
+#### Upload Letter Pair (Admin Only)
+```http
+POST /api/letter-pairs
+Authorization: Bearer ADMIN_JWT_TOKEN
+Content-Type: multipart/form-data
+
+letter_name: alif
+outline_image: [kerangka_alif.png]
+complete_image: [huruf_alif.png]
+difficulty_level: 1
+```
+
+#### Get Letter Pairs
+```http
+GET /api/letter-pairs?difficulty_level=1
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Response:**
+```json
+[
+    {
+        "id": "uuid",
+        "letter_name": "alif",
+        "difficulty_level": 1,
+        "outline_url": "http://your-domain/api/letter-pairs/uuid/outline",
+        "complete_url": "http://your-domain/api/letter-pairs/uuid/complete"
+    }
+]
+```
+
+#### Start Game Session
+```http
+POST /api/game/start
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+    "difficulty_level": 1,
+    "total_pairs": 6
+}
+```
+
+**Response:**
+```json
+{
+    "game_session_id": "uuid",
+    "total_pairs": 6,
+    "difficulty_level": 1,
+    "letter_pairs": [
+        {
+            "pair_id": "uuid",
+            "letter_name": "alif",
+            "outline_url": "http://your-domain/api/letter-pairs/uuid/outline",
+            "complete_url": "http://your-domain/api/letter-pairs/uuid/complete"
+        }
+    ]
+}
+```
+
+#### Submit Match Answer
+```http
+POST /api/game/match
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+    "game_session_id": "uuid",
+    "letter_pair_id": "uuid",
+    "is_correct": true
+}
+```
+
+#### Finish Game
+```http
+POST /api/game/finish
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+    "game_session_id": "uuid",
+    "time_taken": 120
+}
+```
+
+**Response:**
+```json
+{
+    "message": "Game completed",
+    "final_score": 850,
+    "correct_matches": 5,
+    "wrong_matches": 1,
+    "time_taken": 120,
+    "accuracy": "83.33%"
+}
+```
+
+#### Get Leaderboard
+```http
+GET /api/game/leaderboard
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+**Response:**
+```json
+[
+    {
+        "user_name": "Ahmad",
+        "score": 950,
+        "accuracy": 100.0,
+        "time_taken": 90,
+        "completed_at": "2025-11-19 14:30:00"
+    }
+]
+```
+
+## 🎮 Game Integration
+
+### Letter Matching Game Flow
+1. **Admin uploads letter pairs** via admin dashboard
+2. **User starts game** dengan memilih difficulty level
+3. **Game generates random pairs** sesuai level kesulitan
+4. **User matches outline dengan complete image**
+5. **System tracks accuracy dan time**
+6. **Calculate final score** berdasarkan performance
+7. **Update leaderboard** dengan hasil terbaik
+
+### Scoring System
+- **Base Score:** `(Correct Matches / Total Pairs) * 100 * 10`
+- **Time Bonus:** `max(0, 300 - time_taken_seconds)`
+- **Final Score:** `Base Score + Time Bonus`
+- **Accuracy:** `(Correct Matches / Total Pairs) * 100%`
+
+### Game Difficulty Levels
+- **Level 1:** Huruf dasar (Alif, Ba, Ta)
+- **Level 2:** Huruf dengan titik (Tsa, Jim, Kha)
+- **Level 3:** Huruf kompleks (Sin, Shin, Sad)
+- **Level 4:** Huruf sulit (Dhad, Tha, Zha)
+- **Level 5:** Huruf expert (Ghain, Fa, Qaf)
+
+## 🗄️ Database Schema
+
+### Authentication Tables
+- `roles` - System roles (admin, user)
+- `users` - User data with role relations
+- `otps` - OTP verification system
+- `user_preferences` - User settings
+- `user_subscriptions` - Subscription data
+
+### Content Management Tables
+- `assets` - General file management
+- `songs` - Audio files with thumbnails
+- `videos` - Video files with thumbnails
+- `backgrounds` - Background images
+
+### Game Tables
+- `letter_pairs` - Hijaiyyah letter pairs (outline + complete)
+- `game_sessions` - Game sessions with scoring
+- `game_matches` - Individual match records
+
+### Key Relationships
+```sql
+-- Users have roles
+users.role_id -> roles.id
+
+-- Content belongs to users
+assets.created_by -> users.id
+songs.created_by -> users.id
+videos.created_by -> users.id
+backgrounds.created_by -> users.id
+
+-- Game sessions belong to users
+game_sessions.user_id -> users.id
+
+-- Game matches belong to sessions and letter pairs
+game_matches.game_session_id -> game_sessions.id
+game_matches.letter_pair_id -> letter_pairs.id
+```
+
+## 🔐 Security Features
+
+- JWT token authentication
+- Role-based access control
+- OTP verification system
+- File type validation
+- Password hashing (bcrypt)
+- CORS protection
+- UUID primary keys
+
+## 🎛️ Admin Dashboard
+
+### Access Admin Panel
+1. **Login URL:** `http://lumen-backend-batasanaya.test/admin/login`
+2. **Default Credentials:**
+   - Email: `admin@example.com`
+   - Password: `admin123`
+
+### Dashboard Features
+- **Statistics Overview** - Real-time stats cards
+- **User Management** - Create, edit, delete users
+- **Asset Management** - Upload dan kelola files
+- **Song Management** - Upload audio dengan thumbnail
+- **Video Management** - Upload dan streaming videos
+- **Background Management** - Upload background images
+- **Letter Pairs Management** - Upload huruf untuk game
+- **Drag & Drop Upload** - Modern file upload interface
+
+### Admin API Endpoints
+```http
+# Admin Login
+POST /api/auth/admin-login
+
+# Get Dashboard Stats
+GET /api/admin/stats
+Authorization: Bearer ADMIN_TOKEN
+
+# Get All Users
+GET /api/admin/users
+Authorization: Bearer ADMIN_TOKEN
+
+# Get All Assets
+GET /api/admin/assets
+Authorization: Bearer ADMIN_TOKEN
+
+# Bulk Delete Assets
+DELETE /api/admin/assets/bulk
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+
+{
+    "asset_ids": ["uuid1", "uuid2"]
+}
+```
+
+## 📁 File Structure
+
+```
+public/uploads/
+├── assets/        - General file uploads
+├── profiles/      - Profile pictures
+├── songs/         - Audio files
+├── thumbnails/    - Song thumbnails
+├── videos/        - Video files
+├── backgrounds/   - Background images
+└── letter_pairs/  - Hijaiyyah letter images
+
+resources/views/
+├── admin/
+│   ├── dashboard.php  - Admin panel interface
+│   └── login.php      - Admin login page
+├── docs/
+│   └── index.php      - API documentation
+└── layouts/
+    └── app.php        - Base layout template
+
+public/
+├── css/
+│   └── app.css        - Admin panel styles
+└── js/
+    └── app.js         - Admin panel JavaScript
+```
+
+## 🎮 Game/App Integration
+
+### Asset Sync Workflow
+1. App requests manifest: `GET /api/assets/manifest`
+2. Compare checksums with local files
+3. Download batch updates: `POST /api/assets/download-batch`
+4. Extract ZIP and replace files
+
+### Example Implementation
+```javascript
+// Frontend asset sync
+const API_BASE = 'https://your-ngrok-url.ngrok.io/api';
+
+// Get manifest
+const manifest = await fetch(`${API_BASE}/assets/manifest?type=image`);
+const data = await manifest.json();
+
+// Check for updates
+const outdatedAssets = data.assets.filter(asset => 
+    !localAssets[asset.id] || 
+    localAssets[asset.id].checksum !== asset.checksum
+);
+
+// Download batch
+if (outdatedAssets.length > 0) {
+    const response = await fetch(`${API_BASE}/assets/download-batch`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            asset_ids: outdatedAssets.map(a => a.id)
+        })
+    });
+    
+    const blob = await response.blob();
+    // Extract and update local files
+}
+```
+
+## 📱 Flutter Integration
+
+### Dependencies (pubspec.yaml)
+```yaml
+dependencies:
+  http: ^1.1.0
+  archive: ^3.4.0
+  path_provider: ^2.1.1
+```
+
+### Asset Download Service
+```dart
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:archive/archive.dart';
+import 'package:path_provider/path_provider.dart';
+
+class AssetDownloadService {
+  static const String baseUrl = 'https://your-ngrok-url.ngrok.io/api';
+  
+  // Download all assets (no auth required)
+  Future<void> downloadAllAssets({String? type}) async {
+    try {
+      // 1. Download ZIP
+      final zipUrl = '$baseUrl/assets/download-all${type != null ? '?type=$type' : ''}';
+      final response = await http.get(Uri.parse(zipUrl));
+      
+      if (response.statusCode == 200) {
+        // 2. Save ZIP to temporary
+        final tempDir = await getTemporaryDirectory();
+        final zipFile = File('${tempDir.path}/assets.zip');
+        await zipFile.writeAsBytes(response.bodyBytes);
+        
+        // 3. Extract ZIP to documents
+        await extractAssets(zipFile);
+        
+        // 4. Cleanup ZIP
+        await zipFile.delete();
+        
+        print('Assets downloaded successfully!');
+      }
+    } catch (e) {
+      print('Error downloading assets: $e');
+    }
+  }
+  
+  // Extract ZIP to documents folder
+  Future<void> extractAssets(File zipFile) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final assetsDir = Directory('${appDir.path}/assets');
+    
+    if (!await assetsDir.exists()) {
+      await assetsDir.create(recursive: true);
+    }
+    
+    final bytes = await zipFile.readAsBytes();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    
+    for (final file in archive) {
+      if (file.isFile) {
+        final data = file.content as List<int>;
+        final extractedFile = File('${assetsDir.path}/${file.name}');
+        await extractedFile.parent.create(recursive: true);
+        await extractedFile.writeAsBytes(data);
+      }
+    }
+  }
+  
+  // Load image from local storage
+  Future<ImageProvider> loadAssetImage(String filename) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final imagePath = '${appDir.path}/assets/image/$filename';
+    final imageFile = File(imagePath);
+    
+    if (await imageFile.exists()) {
+      return FileImage(imageFile);
+    }
+    
+    return AssetImage('assets/placeholder.png');
+  }
+}
+```
+
+### Usage in Flutter App
+```dart
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  final AssetDownloadService _downloadService = AssetDownloadService();
+  String _status = 'Checking assets...';
+  
+  @override
+  void initState() {
+    super.initState();
+    _initializeAssets();
+  }
+  
+  Future<void> _initializeAssets() async {
+    try {
+      setState(() => _status = 'Downloading Hijaiyyah assets...');
+      
+      // Download all image assets (no login required)
+      await _downloadService.downloadAllAssets(type: 'image');
+      
+      setState(() => _status = 'Assets ready!');
+      
+      // Navigate to main app
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainApp()),
+      );
+      
+    } catch (e) {
+      setState(() => _status = 'Error: $e');
+    }
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text(_status),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Asset Storage Locations
+```
+Android: /data/data/com.yourapp/app_flutter/documents/assets/image/
+iOS: /Documents/assets/image/
+Temp ZIP: /cache/assets.zip (deleted after extract)
+```
+
+## 📊 Complete API Endpoints Summary
+
+### Public Endpoints (No Auth Required)
+```
+GET  /                              - Home page
+GET  /docs                          - API documentation
+GET  /admin/login                   - Admin login page
+GET  /admin                         - Admin dashboard
+
+POST /api/auth/register             - User registration
+POST /api/auth/login                - User login
+POST /api/auth/admin-login          - Admin login
+POST /api/auth/refresh              - Refresh JWT token
+
+GET  /api/assets/{id}/file          - Download asset
+GET  /api/assets/download-all       - Download all assets (ZIP)
+GET  /api/assets/manifest           - Get assets manifest
+POST /api/assets/download-batch     - Download batch assets (ZIP)
+
+GET  /api/backgrounds/{id}/file     - Download background
+GET  /api/letter-pairs/{id}/outline - Download letter outline
+GET  /api/letter-pairs/{id}/complete - Download letter complete
+```
+
+### Protected Endpoints (Auth Required)
+```
+# User Management
+GET    /api/auth/me                 - Get current user
+POST   /api/auth/reset-password     - Reset password
+POST   /api/auth/request-otp        - Request OTP
+POST   /api/auth/verify-otp         - Verify OTP
+POST   /api/auth/logout             - Logout
+GET    /api/users/{id}              - Get user by ID
+PATCH  /api/users/{id}              - Update user
+POST   /api/user/profile-picture    - Upload profile picture
+
+# Asset Management
+POST   /api/assets                  - Upload asset
+POST   /api/assets/batch            - Upload multiple assets
+GET    /api/assets                  - Get assets list
+DELETE /api/assets/{id}             - Delete asset
+DELETE /api/assets/batch            - Delete multiple assets
+
+# Song Management
+POST   /api/songs                   - Upload song
+GET    /api/songs                   - Get songs list
+GET    /api/songs/{id}              - Get song details
+POST   /api/songs/{id}              - Update song
+GET    /api/songs/{id}/file         - Stream song
+DELETE /api/songs/{id}              - Delete song
+
+# Video Management
+POST   /api/videos                  - Upload video
+GET    /api/videos                  - Get videos list
+GET    /api/videos/{id}             - Get video details
+GET    /api/videos/{id}/file        - Stream video
+DELETE /api/videos/{id}             - Delete video
+
+# Background Management
+POST   /api/backgrounds             - Upload background
+GET    /api/backgrounds             - Get backgrounds list
+GET    /api/backgrounds/{id}        - Get background details
+DELETE /api/backgrounds/{id}        - Delete background
+
+# Game API
+GET    /api/letter-pairs            - Get letter pairs
+POST   /api/game/start              - Start game session
+POST   /api/game/match              - Submit match answer
+POST   /api/game/finish             - Finish game
+GET    /api/game/leaderboard        - Get leaderboard
+
+# User Preferences
+GET    /api/user/preference         - Get user preferences
+PATCH  /api/user/preference         - Update preferences
+```
+
+### Admin Only Endpoints
+```
+GET    /api/admin/stats             - Dashboard statistics
+GET    /api/admin/users             - Get all users
+GET    /api/admin/assets            - Get all assets
+DELETE /api/admin/assets/bulk       - Bulk delete assets
+
+POST   /api/users                   - Create user (admin)
+DELETE /api/users/{id}              - Delete user (admin)
+POST   /api/letter-pairs            - Upload letter pair (admin)
+DELETE /api/letter-pairs/{id}       - Delete letter pair (admin)
+```
+
+## 📝 Postman Collection
+
+Import `Hijaiyyah Auth API.postman_collection.json` untuk testing semua endpoints.
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Create Pull Request
+
+## 📄 License
+
+MIT License - see LICENSE file for details.

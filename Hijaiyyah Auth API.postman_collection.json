@@ -1,0 +1,969 @@
+{
+	"info": {
+		"_postman_id": "f0423d5a-1037-4b49-8bd8-25997c0bc80c",
+		"name": "Hijaiyyah Auth API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40579254"
+	},
+	"item": [
+		{
+			"name": "TB-17: REGISTER API",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"coba123\",\r\n    \"phone_number\": \"0810987654321\",\r\n    \"email\": \"coba@gmail.com\",\r\n    \"password\": \"coba123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://heterolytic-krysten-singly.ngrok-free.dev/api/auth/register",
+					"protocol": "https",
+					"host": [
+						"heterolytic-krysten-singly",
+						"ngrok-free",
+						"dev"
+					],
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-18: LOGIN API",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"aldo.test@example.com\",\r\n    \"password\": \"dodo123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://heterolytic-krysten-singly.ngrok-free.dev/api/auth/login",
+					"protocol": "https",
+					"host": [
+						"heterolytic-krysten-singly",
+						"ngrok-free",
+						"dev"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-19: RESET PASSWORD API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjExOTgyNTgsImV4cCI6MTc2MTIwMTg1OCwibmJmIjoxNzYxMTk4MjU4LCJqdGkiOiJ1NWZoZE5NVGwxVHZkSmZZIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.fJRGclJh7l5Avou_DKrSdyeDK_bFVeVm4MNYImC5nl4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"old_password\": \"123aldo\",\r\n    \"new_password\": \"dodo123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/auth/reset-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"reset-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-20: REQUEST NEW TOKEN API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjExOTgyNTgsImV4cCI6MTc2MTIwMTg1OCwibmJmIjoxNzYxMTk4MjU4LCJqdGkiOiJ1NWZoZE5NVGwxVHZkSmZZIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.fJRGclJh7l5Avou_DKrSdyeDK_bFVeVm4MNYImC5nl4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/auth/refresh",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-21a: REQUEST OTP API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjEyMDI0MzUsImV4cCI6MTc2MTIwNjAzNSwibmJmIjoxNzYxMjAyNDM1LCJqdGkiOiJFenZodUJGZzNrSkNnTzlnIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.R1y4jsqri7DW3i6Bnd74cWx0tG46nVV30y6TJxsBXaI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/auth/request-otp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"request-otp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-21b: VERIFY OTP API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjEyMDI0MzUsImV4cCI6MTc2MTIwNjAzNSwibmJmIjoxNzYxMjAyNDM1LCJqdGkiOiJFenZodUJGZzNrSkNnTzlnIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.R1y4jsqri7DW3i6Bnd74cWx0tG46nVV30y6TJxsBXaI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"otp\": \"154908\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/auth/verify-otp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"verify-otp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-22: LOGOUT API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjEyMDEzMDksImV4cCI6MTc2MTIwNDkwOSwibmJmIjoxNzYxMjAxMzA5LCJqdGkiOiJlR2FjSmhzZU1yVVdzajI3Iiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.H8ExfdGvi4aErTbsvU5b71zaKLMwCKjlxzSkrmVO82s",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/auth/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-23: Create User (Admin Only) API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjEzMDc4OTQsImV4cCI6MTc2MTMxMTQ5NCwibmJmIjoxNzYxMzA3ODk0LCJqdGkiOiI3Tzc1dGc3OFh3ZHoybGFBIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.WgZw9OoHf34ASryh_eo3vn6QYGBrcv5_g2LQ9SM3tsQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"Fakhri Habib Hawari\",\r\n    \"email\": \"fakhri@example.com\",\r\n    \"password\": \"fakhri123\",\r\n    \"role\": \"user\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-24: Get One User API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjEzMDc4OTQsImV4cCI6MTc2MTMxMTQ5NCwibmJmIjoxNzYxMzA3ODk0LCJqdGkiOiI3Tzc1dGc3OFh3ZHoybGFBIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.WgZw9OoHf34ASryh_eo3vn6QYGBrcv5_g2LQ9SM3tsQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/users/6a528609-c32c-431f-9ec0-45a115d4d626",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"6a528609-c32c-431f-9ec0-45a115d4d626"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-25: Create Assets APi",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjI5MjAxNjIsImV4cCI6MTc2MjkyMzc2MiwibmJmIjoxNzYyOTIwMTYyLCJqdGkiOiJzekdSQldSbG1PR2xPYUpPIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.0r2PpXf98LNVWPQdgqgQ9amV8XHJRwkZHbiYjSEksDI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "type",
+							"value": "image",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/USER/Pictures/carihijaiyah/za-pink.png"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/assets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"assets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Download Asset API",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE3OTE4NDcsImV4cCI6MTc2MTc5NTQ0NywibmJmIjoxNzYxNzkxODQ3LCJqdGkiOiJOenhQMVVKSWROS1Zhc1N4Iiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.6uqrZNXeqCeYni2soOCCe-lNUth8REC1J44IaqJUFoY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "https://heterolytic-krysten-singly.ngrok-free.dev/api/assets/8018465a-560b-4311-a11a-6f37a612430d/file",
+					"protocol": "https",
+					"host": [
+						"heterolytic-krysten-singly",
+						"ngrok-free",
+						"dev"
+					],
+					"path": [
+						"api",
+						"assets",
+						"8018465a-560b-4311-a11a-6f37a612430d",
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-26: Update User API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjEzNzc1ODEsImV4cCI6MTc2MTM4MTE4MSwibmJmIjoxNzYxMzc3NTgxLCJqdGkiOiJDQWZZZEVrUEFOaFBlcGVDIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.2OlVrX_Rby6f1s_Pn-OSubkzZpmqhQgphrIwR5PaRf4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"Reza bukan\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/users/8515f6fa-b606-436c-b709-04fc6cffabff",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"8515f6fa-b606-436c-b709-04fc6cffabff"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-27: Delete User (Admin Only) API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE1MzkxODMsImV4cCI6MTc2MTU0Mjc4MywibmJmIjoxNzYxNTM5MTgzLCJqdGkiOiJubHozY0FuT2FHWG5HNHNBIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.jYgO5aXsOGrD9u687GAFXT9yAtO4T3YJZD749iAN9ZE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"Reza bukan\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/users/75964126-fb57-4c50-ba57-13fb53aa8a3b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"75964126-fb57-4c50-ba57-13fb53aa8a3b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-28: Upload Profile Picture API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE1MzkxODMsImV4cCI6MTc2MTU0Mjc4MywibmJmIjoxNzYxNTM5MTgzLCJqdGkiOiJubHozY0FuT2FHWG5HNHNBIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.jYgO5aXsOGrD9u687GAFXT9yAtO4T3YJZD749iAN9ZE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "profile_picture",
+							"type": "file",
+							"src": "/H:/Dokumen penting/Pas photo kompres.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/user/profile-picture",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"profile-picture"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-29: Get Profile API",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE1MzkxODMsImV4cCI6MTc2MTU0Mjc4MywibmJmIjoxNzYxNTM5MTgzLCJqdGkiOiJubHozY0FuT2FHWG5HNHNBIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.jYgO5aXsOGrD9u687GAFXT9yAtO4T3YJZD749iAN9ZE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"fullName\": \"Reza bukan\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/auth/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auth",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-30 : Get User Preference API",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE2MTg1MDksImV4cCI6MTc2MTYyMjEwOSwibmJmIjoxNzYxNjE4NTA5LCJqdGkiOiJKbXdRNFdMcm5QSWpsVEIxIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.Z4YOp5qtFihvnAa79jE8CLtGkkW_EPDmpc_8alJRYSY",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/user/preference",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"preference"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-31: Update User Preference",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE2MTg5MTQsImV4cCI6MTc2MTYyMjUxNCwibmJmIjoxNzYxNjE4OTE0LCJqdGkiOiJXNFdFbzJ2UnBDeENnTnRGIiwic3ViIjoiNmE1Mjg2MDktYzMyYy00MzFmLTllYzAtNDVhMTE1ZDRkNjI2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.fnVF1EeF39YxXh2aR1j2CyV1UyfRL7933vl2NEwFbyg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"audio_enabled\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/user/preference",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"preference"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-32: Create Song API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE2MTk0NzYsImV4cCI6MTc2MTYyMzA3NiwibmJmIjoxNzYxNjE5NDc2LCJqdGkiOiJGcUVoS2ljbUFPa0JSMExIIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.kLjTtLlTOOaBS_RUkNi5f29bc8LHEaforEpuABXv9uE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "tes",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/USER/Downloads/tets lagu.mp3"
+						},
+						{
+							"key": "thumbnail",
+							"type": "file",
+							"src": "/H:/Dokumen penting/Transkrip-Nilai_page-0001.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/songs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"songs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-33: Get Song by ID API",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE3MjM0NjUsImV4cCI6MTc2MTcyNzA2NSwibmJmIjoxNzYxNzIzNDY2LCJqdGkiOiJEeEV3dXpiRUtERExoektXIiwic3ViIjoiYTAwMDZiZWMtZDA2Yy00OGI0LTlkZGEtMDdjYWViMDY4NGMzIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.Z6vh-kHd531eFfM5Rbbf8uBD9s8NpIufhou7TWCu9hg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "tes",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/USER/Downloads/tets lagu.mp3"
+						},
+						{
+							"key": "thumbnail",
+							"type": "file",
+							"src": "/H:/Dokumen penting/Transkrip-Nilai_page-0001.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/songs/44012d83-05d8-4926-880e-7f23545fc53c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"songs",
+						"44012d83-05d8-4926-880e-7f23545fc53c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-34: Update Song API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE3MzQ2ODIsImV4cCI6MTc2MTczODI4MiwibmJmIjoxNzYxNzM0NjgyLCJqdGkiOiJrTm00YmFpQ3d0TkZOMXFGIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.98m9wuDy-pR5uHg5MaJ_WAE1eqA-EB1xfMw4asN-Yjg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "title",
+							"value": "tes 2",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/USER/Downloads/test lagu 2.mp3"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/songs/44012d83-05d8-4926-880e-7f23545fc53c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"songs",
+						"44012d83-05d8-4926-880e-7f23545fc53c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-35: Get Song File API",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE3MzU2NzIsImV4cCI6MTc2MTczOTI3MiwibmJmIjoxNzYxNzM1NjcyLCJqdGkiOiJDajhwRHphVGZiSEZEbktyIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.i8K_1o_gxEF_6RDWFOYdvroR7nwOHEG1miEinfqAF4E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/songs/44012d83-05d8-4926-880e-7f23545fc53c/file",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"songs",
+						"44012d83-05d8-4926-880e-7f23545fc53c",
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-36: Delete Song API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjE3OTAyMjEsImV4cCI6MTc2MTc5MzgyMSwibmJmIjoxNzYxNzkwMjIxLCJqdGkiOiJla2ZhYVg0WGZ5TEcyMVduIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.7mvmKOkGy6smsU_PALzv5vz8nTiPO8NXZ4nYUfrGD7o",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/songs/44012d83-05d8-4926-880e-7f23545fc53c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"songs",
+						"44012d83-05d8-4926-880e-7f23545fc53c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-37: Get All Assets APi",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjI5MjQ5MDIsImV4cCI6MTc2MjkyODUwMiwibmJmIjoxNzYyOTI0OTAyLCJqdGkiOiJURFJlYXE5YjRwTWVyN1dtIiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.GjX3UxWK8DDsd5QlyWCW_T2uJMYwZfZqK0iJo2KLS6Q",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/assets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"assets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TB-38: Delete Asset API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vaGV0ZXJvbHl0aWMta3J5c3Rlbi1zaW5nbHkubmdyb2stZnJlZS5kZXYvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3NjI4NDQ2MDAsImV4cCI6MTc2Mjg0ODIwMSwibmJmIjoxNzYyODQ0NjAxLCJqdGkiOiJoVWFiNG9UWEpxQU5sRXZ4Iiwic3ViIjoiNzU5NjQxMjYtZmI1Ny00YzUwLWJhNTctMTNmYjUzYWE4YTNiIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.QbE5LGY2OLnG-xlPvWO6neii7dpmxZ6YHNITgIJiMfg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/assets/8018465a-560b-4311-a11a-6f37a612430d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"assets",
+						"8018465a-560b-4311-a11a-6f37a612430d"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

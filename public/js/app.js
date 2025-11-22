@@ -2,23 +2,51 @@
 let adminToken = localStorage.getItem('adminToken');
 let selectedAssets = [];
 
+// API Base URL - detect if using ngrok
+const API_BASE = window.location.hostname.includes('ngrok') 
+    ? window.location.origin + '/api'
+    : '/api';
+
+// Ngrok headers
+const NGROK_HEADERS = window.location.hostname.includes('ngrok') 
+    ? { 'ngrok-skip-browser-warning': 'true' }
+    : {};
+
+console.log('API Base URL:', API_BASE);
+console.log('Using ngrok:', window.location.hostname.includes('ngrok'));
+
+
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on admin page
-    if (window.location.pathname.includes('/admin')) {
+    if (window.location.pathname === '/admin') {
         initAdmin();
+    } else if (window.location.pathname === '/admin/login') {
+        // Don't initialize admin on login page
+        return;
     }
     
     // Initialize upload zones
     initAllUploadZones();
+    
+    // Add event listener for edit asset category change
+    const editCategorySelect = document.getElementById('editAssetCategory');
+    if (editCategorySelect) {
+        editCategorySelect.addEventListener('change', function() {
+            updateEditSubcategories(this.value);
+        });
+    }
 });
 
 // Admin initialization
 function initAdmin() {
+    console.log('Initializing admin, token:', adminToken ? 'exists' : 'missing');
+    
     // Check if user has valid token
     if (!adminToken) {
-        // Redirect to login page
-        window.location.href = '/admin/login';
+        console.log('No token, redirecting to login');
+        window.location.replace('/admin/login');
         return;
     }
     
@@ -29,6 +57,7 @@ function initAdmin() {
     document.querySelectorAll('#adminTabs a').forEach(tab => {
         tab.addEventListener('click', function() {
             const target = this.getAttribute('href').substring(1);
+            console.log('Loading tab:', target);
             loadTabContent(target);
         });
     });
@@ -36,6 +65,8 @@ function initAdmin() {
 
 // Verify token and load dashboard
 async function verifyTokenAndLoad() {
+    console.log('Verifying token...');
+    
     try {
         const response = await fetch('/api/auth/me', {
             headers: {
@@ -45,22 +76,28 @@ async function verifyTokenAndLoad() {
         
         if (response.ok) {
             const user = await response.json();
+            console.log('User role:', user.role?.name);
+            
             if (user.role?.name === 'admin') {
+                console.log('Admin verified, loading dashboard');
                 loadDashboardData();
             } else {
-                // Not admin, redirect to login
+                console.log('Not admin, clearing token');
                 localStorage.removeItem('adminToken');
-                window.location.href = '/admin/login';
+                adminToken = null;
+                window.location.replace('/admin/login');
             }
         } else {
-            // Token invalid, redirect to login
+            console.log('Token invalid, status:', response.status);
             localStorage.removeItem('adminToken');
-            window.location.href = '/admin/login';
+            adminToken = null;
+            window.location.replace('/admin/login');
         }
     } catch (error) {
-        // Network error, redirect to login
+        console.log('Network error:', error);
         localStorage.removeItem('adminToken');
-        window.location.href = '/admin/login';
+        adminToken = null;
+        window.location.replace('/admin/login');
     }
 }
 
@@ -118,9 +155,10 @@ async function ensureValidToken() {
 // Load dashboard data
 async function loadDashboardData() {
     try {
-        const response = await fetch('/api/admin/stats', {
+        const response = await fetch(`${API_BASE}/admin/stats`, {
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             }
         });
         
@@ -183,6 +221,7 @@ async function loadTabContent(tab) {
             break;
         case 'assets':
             await loadAssets();
+            initUploadZone();
             break;
         case 'songs':
             await loadSongs();
@@ -192,9 +231,6 @@ async function loadTabContent(tab) {
             break;
         case 'backgrounds':
             await loadBackgrounds();
-            break;
-        case 'letter-pairs':
-            await loadLetterPairs();
             break;
         case 'dashboard':
             await loadDashboardData();
@@ -215,14 +251,29 @@ async function loadUsers() {
         const tbody = document.querySelector('#usersTable tbody');
         
         if (data.data && data.data.length > 0) {
-            tbody.innerHTML = data.data.map(user => `
+            tbody.innerHTML = data.data.map(user => {
+                const progress = user.game_progress || {};
+                const completedLevels = progress.completed_levels || 0;
+                const totalLevels = progress.total_levels || 0;
+                const totalStars = progress.total_stars || 0;
+                
+                return `
                 <tr>
                     <td>${user.full_name}</td>
                     <td>${user.email}</td>
                     <td>${user.phone_number || '-'}</td>
                     <td><span class="badge bg-${user.role?.name === 'admin' ? 'danger' : 'primary'}">${user.role?.name || 'user'}</span></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">${completedLevels}/${totalLevels}</span>
+                            <span class="text-warning">⭐ ${totalStars}</span>
+                        </div>
+                    </td>
                     <td>${new Date(user.created_at).toLocaleDateString()}</td>
                     <td class="table-actions">
+                        <button class="btn btn-sm btn-outline-info me-1" onclick="viewGameProgress('${user.id}')" title="View Game Progress">
+                            <i class="fas fa-gamepad"></i>
+                        </button>
                         <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser('${user.id}')">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -231,19 +282,96 @@ async function loadUsers() {
                         </button>
                     </td>
                 </tr>
-            `).join('');
+                `;
+            }).join('');
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No users found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No users found</td></tr>';
         }
     } catch (error) {
         console.error('Failed to load users:', error);
     }
 }
 
-// Load assets
-async function loadAssets() {
+// View game progress
+async function viewGameProgress(userId) {
     try {
-        const response = await fetch('/api/admin/assets', {
+        const response = await fetch(`/api/admin/users/${userId}/game-progress`, {
+            headers: {
+                'Authorization': `Bearer ${adminToken}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        // Populate modal
+        document.getElementById('gameProgressUserName').textContent = data.user.full_name;
+        document.getElementById('gameProgressStats').innerHTML = `
+            <div class="row text-center">
+                <div class="col-3">
+                    <h4>${data.stats.total_completed}/17</h4>
+                    <small class="text-muted">Completed</small>
+                </div>
+                <div class="col-3">
+                    <h4 class="text-warning">⭐ ${data.stats.total_stars}</h4>
+                    <small class="text-muted">Stars</small>
+                </div>
+                <div class="col-3">
+                    <h4>${data.stats.total_score}</h4>
+                    <small class="text-muted">Total Score</small>
+                </div>
+                <div class="col-3">
+                    <h4>${Math.round(data.stats.avg_accuracy || 0)}%</h4>
+                    <small class="text-muted">Avg Accuracy</small>
+                </div>
+            </div>
+        `;
+        
+        // Progress table
+        const progressHtml = data.progress.map(p => `
+            <tr>
+                <td>Level ${p.level_number}</td>
+                <td><span class="badge bg-${p.is_unlocked ? 'success' : 'secondary'}">${p.is_unlocked ? 'Unlocked' : 'Locked'}</span></td>
+                <td><span class="badge bg-${p.is_completed ? 'primary' : 'secondary'}">${p.is_completed ? 'Completed' : 'Not Completed'}</span></td>
+                <td>${p.best_score || 0}</td>
+                <td>${p.best_time || '-'}s</td>
+                <td class="text-warning">${'⭐'.repeat(p.stars || 0)}</td>
+                <td>${p.attempts || 0}</td>
+            </tr>
+        `).join('');
+        document.getElementById('gameProgressLevels').innerHTML = progressHtml;
+        
+        // Recent sessions
+        const sessionsHtml = data.recent_sessions.map(s => {
+            const accuracy = ((s.correct_matches / (s.correct_matches + s.wrong_matches)) * 100).toFixed(1);
+            return `
+            <tr>
+                <td>Level ${s.level_number}</td>
+                <td>${s.score}</td>
+                <td>${s.time_taken}s</td>
+                <td>${s.correct_matches}/${s.correct_matches + s.wrong_matches}</td>
+                <td>${accuracy}%</td>
+                <td class="text-warning">${'⭐'.repeat(s.stars || 0)}</td>
+                <td>${new Date(s.completed_at).toLocaleString()}</td>
+            </tr>
+            `;
+        }).join('') || '<tr><td colspan="7" class="text-center text-muted">No sessions yet</td></tr>';
+        document.getElementById('gameProgressSessions').innerHTML = sessionsHtml;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('gameProgressModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Failed to load game progress:', error);
+        showAlert('Failed to load game progress', 'danger');
+    }
+}
+
+// Load assets
+let currentAssetsPage = 1;
+
+async function loadAssets(page = 1) {
+    try {
+        const response = await fetch(`/api/admin/assets?page=${page}`, {
             headers: {
                 'Authorization': `Bearer ${adminToken}`
             }
@@ -251,6 +379,8 @@ async function loadAssets() {
         
         const data = await response.json();
         const tbody = document.querySelector('#assetsTable tbody');
+        
+        currentAssetsPage = data.current_page;
         
         if (data.data && data.data.length > 0) {
             tbody.innerHTML = data.data.map(asset => `
@@ -263,11 +393,16 @@ async function loadAssets() {
                         }
                     </td>
                     <td>${asset.file_name}</td>
+                    <td><span class="badge bg-primary">${asset.category || 'general'}</span></td>
+                    <td><span class="badge bg-secondary">${asset.subcategory || '-'}</span></td>
                     <td><span class="badge bg-${asset.type === 'image' ? 'success' : 'info'}">${asset.type}</span></td>
                     <td>${formatFileSize(asset.size)}</td>
                     <td>${asset.created_by?.full_name || 'Unknown'}</td>
                     <td>${new Date(asset.created_at).toLocaleDateString()}</td>
                     <td class="table-actions">
+                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editAsset('${asset.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
                         <a href="/api/assets/${asset.id}/file" class="btn btn-sm btn-outline-primary me-1" target="_blank">
                             <i class="fas fa-download"></i>
                         </a>
@@ -291,20 +426,94 @@ async function loadAssets() {
                 updateSelectedAssets();
             });
             
+            // Render pagination
+            renderAssetsPagination(data);
+            
         } else {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No assets found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No assets found</td></tr>';
         }
     } catch (error) {
         console.error('Failed to load assets:', error);
     }
 }
 
+// Render pagination
+function renderAssetsPagination(data) {
+    const paginationInfo = document.getElementById('assetsPaginationInfo');
+    const pagination = document.getElementById('assetsPagination');
+    
+    // Info
+    paginationInfo.innerHTML = `Showing ${data.from || 0} to ${data.to || 0} of ${data.total || 0} assets`;
+    
+    // Pagination buttons
+    let paginationHTML = '';
+    
+    // Previous button
+    paginationHTML += `
+        <li class="page-item ${data.current_page === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadAssets(${data.current_page - 1}); return false;">Previous</a>
+        </li>
+    `;
+    
+    // Page numbers
+    for (let i = 1; i <= data.last_page; i++) {
+        if (i === 1 || i === data.last_page || (i >= data.current_page - 2 && i <= data.current_page + 2)) {
+            paginationHTML += `
+                <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadAssets(${i}); return false;">${i}</a>
+                </li>
+            `;
+        } else if (i === data.current_page - 3 || i === data.current_page + 3) {
+            paginationHTML += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    
+    // Next button
+    paginationHTML += `
+        <li class="page-item ${data.current_page === data.last_page ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadAssets(${data.current_page + 1}); return false;">Next</a>
+        </li>
+    `;
+    
+    pagination.innerHTML = paginationHTML;
+}
+
 // Initialize upload zone
 function initUploadZone() {
     const uploadZone = document.getElementById('uploadZone');
     const fileInput = document.getElementById('fileInput');
+    const categorySelect = document.getElementById('uploadCategory');
+    const subcategorySelect = document.getElementById('uploadSubcategory');
     
-    uploadZone.addEventListener('click', () => fileInput.click());
+    // Category options
+    const subcategories = {
+        hijaiyyah: ['huruf', 'angka', 'harakat'],
+        ui: ['button', 'icon', 'frame'],
+        sound_effects: ['feedback', 'ui', 'pronunciation']
+    };
+    
+    categorySelect.addEventListener('change', function() {
+        const category = this.value;
+        subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+        
+        if (category && subcategories[category]) {
+            subcategorySelect.disabled = false;
+            subcategories[category].forEach(sub => {
+                subcategorySelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+        } else {
+            subcategorySelect.disabled = true;
+        }
+    });
+    
+    uploadZone.addEventListener('click', () => {
+        const category = document.getElementById('uploadCategory')?.value;
+        if (!category) {
+            showAlert('Pilih kategori terlebih dahulu!', 'warning');
+            return;
+        }
+        fileInput.click();
+    });
     
     uploadZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -318,29 +527,65 @@ function initUploadZone() {
     uploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadZone.classList.remove('dragover');
+        
+        const category = document.getElementById('uploadCategory')?.value;
+        if (!category) {
+            showAlert('Pilih kategori terlebih dahulu!', 'warning');
+            return;
+        }
+        
         handleFiles(e.dataTransfer.files);
     });
     
     fileInput.addEventListener('change', (e) => {
+        const category = document.getElementById('uploadCategory')?.value;
+        if (!category) {
+            showAlert('Pilih kategori terlebih dahulu!', 'warning');
+            e.target.value = ''; // Reset file input
+            return;
+        }
+        
         handleFiles(e.target.files);
     });
 }
 
-// Handle file uploads
+// Handle file uploads (batch)
 async function handleFiles(files) {
-    for (let file of files) {
-        await uploadFile(file);
+    const category = document.getElementById('uploadCategory')?.value;
+    const subcategory = document.getElementById('uploadSubcategory')?.value;
+    
+    if (!category) {
+        showAlert('Pilih kategori terlebih dahulu sebelum upload!', 'warning');
+        return;
     }
-    loadAssets(); // Refresh assets list
-}
-
-// Upload single file
-async function uploadFile(file) {
+    
+    // Convert FileList to Array and limit to 50 files
+    const filesArray = Array.from(files).slice(0, 50);
+    
+    if (files.length > 50) {
+        showAlert('Maximum 50 files per upload. Only first 50 files will be uploaded.', 'warning');
+    }
+    
     const formData = new FormData();
-    formData.append('file', file);
+    
+    // Append each file with array notation
+    for (let i = 0; i < filesArray.length; i++) {
+        formData.append(`files[${i}]`, filesArray[i]);
+    }
+    
+    formData.append('category', category);
+    if (subcategory) formData.append('subcategory', subcategory);
+    
+    // Debug log
+    console.log('Uploading files:', filesArray.length);
+    console.log('Category:', category);
+    console.log('Subcategory:', subcategory);
+    console.log('FormData entries:', Array.from(formData.entries()).map(([k, v]) => k));
     
     try {
-        const response = await fetch('/api/assets', {
+        showAlert(`Uploading ${filesArray.length} file(s)...`, 'info');
+        
+        const response = await fetch('/api/assets/batch', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken}`
@@ -349,13 +594,22 @@ async function uploadFile(file) {
         });
         
         if (response.ok) {
-            showAlert(`${file.name} uploaded successfully`, 'success');
+            const result = await response.json();
+            showAlert(result.message, 'success');
+            loadAssets(); // Refresh assets list
         } else {
-            const error = await response.json();
-            showAlert(`Failed to upload ${file.name}: ${error.message || 'Unknown error'}`, 'danger');
+            const responseText = await response.text();
+            console.error('Upload error response:', responseText);
+            try {
+                const error = JSON.parse(responseText);
+                showAlert(`Failed to upload: ${JSON.stringify(error)}`, 'danger');
+            } catch (e) {
+                showAlert(`Failed to upload: ${responseText.substring(0, 200)}`, 'danger');
+            }
         }
     } catch (error) {
-        showAlert(`Failed to upload ${file.name}`, 'danger');
+        console.error('Upload exception:', error);
+        showAlert('Failed to upload files: ' + error.message, 'danger');
     }
 }
 
@@ -999,99 +1253,136 @@ function refreshStats() {
     showAlert('Statistics refreshed', 'success');
 }
 
-// Letter Pairs functions
-function showLetterPairModal() {
-    new bootstrap.Modal(document.getElementById('letterPairModal')).show();
-}
 
-function uploadLetterPair() {
-    const form = document.getElementById('letterPairForm');
-    const formData = new FormData(form);
 
-    fetch('/api/letter-pairs', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${adminToken}`
-        },
-        body: formData
+// Edit asset function
+function editAsset(assetId) {
+    fetch(`/api/admin/assets`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message) {
-            showAlert('Letter pair uploaded successfully!', 'success');
-            bootstrap.Modal.getInstance(document.getElementById('letterPairModal')).hide();
-            form.reset();
-            loadLetterPairs();
+        const asset = data.data.find(a => a.id === assetId);
+        if (asset) {
+            document.getElementById('editAssetId').value = asset.id;
+            document.getElementById('editAssetCategory').value = asset.category || '';
+            
+            // Update subcategory options
+            updateEditSubcategories(asset.category, asset.subcategory);
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAssetModal'));
+            modal.show();
+        }
+    })
+    .catch(error => {
+        showAlert('Failed to load asset data', 'danger');
+    });
+}
+
+// Update subcategories for edit modal
+function updateEditSubcategories(category, selectedSubcategory = '') {
+    const subcategorySelect = document.getElementById('editAssetSubcategory');
+    const subcategories = {
+        hijaiyyah: ['huruf', 'angka', 'harakat'],
+        ui: ['button', 'icon', 'frame'],
+        sound_effects: ['feedback', 'ui', 'pronunciation']
+    };
+    
+    subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+    
+    if (category && subcategories[category]) {
+        subcategorySelect.disabled = false;
+        subcategories[category].forEach(sub => {
+            const selected = sub === selectedSubcategory ? 'selected' : '';
+            subcategorySelect.innerHTML += `<option value="${sub}" ${selected}>${sub}</option>`;
+        });
+    } else {
+        subcategorySelect.disabled = true;
+    }
+}
+
+// Update asset function
+async function updateAsset() {
+    const assetId = document.getElementById('editAssetId').value;
+    const assetData = {
+        category: document.getElementById('editAssetCategory').value,
+        subcategory: document.getElementById('editAssetSubcategory').value
+    };
+    
+    try {
+        const response = await fetch(`/api/assets/${assetId}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${adminToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(assetData)
+        });
+        
+        if (response.ok) {
+            showAlert('Asset updated successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editAssetModal')).hide();
+            loadAssets();
         } else {
-            showAlert('Error uploading letter pair: ' + JSON.stringify(data), 'danger');
+            const error = await response.json();
+            showAlert('Failed to update asset: ' + (error.message || 'Unknown error'), 'danger');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('Error uploading letter pair', 'danger');
-    });
+    } catch (error) {
+        showAlert('Failed to update asset', 'danger');
+    }
 }
 
-function loadLetterPairs() {
-    fetch('/api/letter-pairs', {
-        headers: {
-            'Authorization': `Bearer ${adminToken}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const tbody = document.querySelector('#letterPairsTable tbody');
-        if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No letter pairs found</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = data.map(pair => `
-            <tr>
-                <td><strong>${pair.letter_name}</strong></td>
-                <td><img src="${pair.outline_url}" alt="Outline" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                <td><img src="${pair.complete_url}" alt="Complete" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                <td><span class="badge bg-info">Level ${pair.difficulty_level}</span></td>
-                <td><span class="badge bg-success">Active</span></td>
-                <td>
-                    <button class="btn btn-sm btn-danger" onclick="deleteLetterPair('${pair.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    })
-    .catch(error => {
-        console.error('Error loading letter pairs:', error);
-        document.querySelector('#letterPairsTable tbody').innerHTML = 
-            '<tr><td colspan="6" class="text-center text-danger">Error loading letter pairs</td></tr>';
-    });
-}
-
-function deleteLetterPair(id) {
-    if (!confirm('Are you sure you want to delete this letter pair?')) return;
-
-    fetch(`/api/letter-pairs/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${adminToken}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            showAlert('Letter pair deleted successfully!', 'success');
-            loadLetterPairs();
+// Delete asset function
+async function deleteAsset(assetId) {
+    if (!confirm('Delete this asset?')) return;
+    
+    try {
+        const response = await fetch(`/api/assets/${assetId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${adminToken}`
+            }
+        });
+        
+        if (response.ok) {
+            showAlert('Asset deleted successfully', 'success');
+            loadAssets();
         } else {
-            showAlert('Error deleting letter pair', 'danger');
+            showAlert('Failed to delete asset', 'danger');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('Error deleting letter pair', 'danger');
-    });
+    } catch (error) {
+        showAlert('Failed to delete asset', 'danger');
+    }
 }
 
-function getToken() {
-    return adminToken;
+// Delete user function
+async function deleteUser(userId) {
+    if (!confirm('Delete this user?')) return;
+    
+    try {
+        const response = await fetch(`/api/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${adminToken}`
+            }
+        });
+        
+        if (response.ok) {
+            showAlert('User deleted successfully', 'success');
+            loadUsers();
+        } else {
+            showAlert('Failed to delete user', 'danger');
+        }
+    } catch (error) {
+        showAlert('Failed to delete user', 'danger');
+    }
 }
+
+// Assign all functions to window for global access
+window.editAsset = editAsset;
+window.updateAsset = updateAsset;
+window.deleteAsset = deleteAsset;
+window.deleteUser = deleteUser;
+window.viewGameProgress = viewGameProgress;
+
+console.log('✅ All functions assigned to window object');

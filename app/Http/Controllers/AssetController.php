@@ -16,18 +16,18 @@ class AssetController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'file' => 'required|file|mimes:jpg,jpeg,png,mp3,wav|max:5120', // Maks 5MB
+            'file' => 'required|file|mimes:jpg,jpeg,png,mp3,wav|max:5120',
+            'category' => 'nullable|string|in:hijaiyyah,ui,sound_effects',
+            'subcategory' => 'nullable|string'
         ]);
 
         $file = $request->file('file');
         $fileName = time() . '_' . $file->getClientOriginalName();
         $fileSize = $file->getSize();
         
-        // Auto-detect type berdasarkan extension
         $extension = strtolower($file->getClientOriginalExtension());
         $type = in_array($extension, ['jpg', 'jpeg', 'png']) ? 'image' : 'audio';
 
-        // Pindahkan file ke folder public/uploads/assets
         $file->move(base_path('public/uploads/assets'), $fileName);
         $filePath = 'uploads/assets/' . $fileName;
 
@@ -37,6 +37,8 @@ class AssetController extends Controller
             'type' => $type,
             'file' => $filePath,
             'size' => $fileSize,
+            'category' => $request->category,
+            'subcategory' => $request->subcategory,
             'created_by_id' => Auth::id(),
         ]);
 
@@ -49,8 +51,10 @@ class AssetController extends Controller
     public function storeBatch(Request $request)
     {
         $this->validate($request, [
-            'files' => 'required|array|max:10', // Max 10 files
+            'files' => 'required|array|max:50', // Max 50 files
             'files.*' => 'required|file|mimes:jpg,jpeg,png,mp3,wav|max:5120',
+            'category' => 'nullable|string|in:hijaiyyah,ui,sound_effects',
+            'subcategory' => 'nullable|string'
         ]);
 
         $uploadedAssets = [];
@@ -74,6 +78,8 @@ class AssetController extends Controller
                 'type' => $type,
                 'file' => $filePath,
                 'size' => $fileSize,
+                'category' => $request->category,
+                'subcategory' => $request->subcategory,
                 'created_by_id' => Auth::id(),
             ]);
 
@@ -91,9 +97,36 @@ class AssetController extends Controller
      */
     public function index()
     {
-        $assets = Asset::with('createdBy')->latest()->paginate(15);
+        $assets = Asset::with('createdBy')->latest()->paginate(20);
 
         return response()->json($assets);
+    }
+
+    /**
+     * Update asset (category and subcategory)
+     */
+    public function update(Request $request, $id)
+    {
+        $asset = Asset::find($id);
+
+        if (!$asset) {
+            return response()->json(['error' => 'Asset tidak ditemukan.'], 404);
+        }
+
+        $this->validate($request, [
+            'category' => 'nullable|string|in:hijaiyyah,ui,sound_effects',
+            'subcategory' => 'nullable|string'
+        ]);
+
+        $asset->update([
+            'category' => $request->category,
+            'subcategory' => $request->subcategory
+        ]);
+
+        return response()->json([
+            'message' => 'Asset berhasil diupdate.',
+            'asset' => $asset->fresh()
+        ]);
     }
 
     /**

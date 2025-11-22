@@ -10,7 +10,7 @@ class Asset extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'file_name', 'type', 'file', 'size', 'created_by_id',
+        'id', 'file_name', 'type', 'category', 'subcategory', 'file', 'size', 'created_by_id',
     ];
 
     /**

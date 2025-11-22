@@ -213,7 +213,7 @@ public function resetPassword(Request $request)
     public function adminLogin(Request $request)
     {
         $credentials = [
-            'email' => 'admin@example.com',
+            'email' => 'admin@test.com',
             'password' => 'admin123'
         ];
 
@@ -221,7 +221,7 @@ public function resetPassword(Request $request)
             return response()->json(['error' => 'Admin credentials invalid.'], 401);
         }
 
-        $user = User::with('role')->where('email', 'admin@example.com')->first();
+        $user = User::with('role')->where('email', 'admin@test.com')->first();
         
         return response()->json([
             'message' => 'Admin login successful',

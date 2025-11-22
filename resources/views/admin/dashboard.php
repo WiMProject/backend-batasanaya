@@ -40,11 +40,7 @@ ob_start();
                             <i class="fas fa-image me-2"></i>Backgrounds
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#letter-pairs">
-                            <i class="fas fa-font me-2"></i>Letter Pairs
-                        </a>
-                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#settings">
                             <i class="fas fa-cog me-2"></i>Settings
@@ -174,13 +170,14 @@ ob_start();
                                         <th>Email</th>
                                         <th>Phone</th>
                                         <th>Role</th>
+                                        <th>Game Progress</th>
                                         <th>Created</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="6" class="text-center">Loading users...</td>
+                                        <td colspan="7" class="text-center">Loading users...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -192,22 +189,40 @@ ob_start();
                 <div class="tab-pane fade" id="assets">
                     <div class="admin-content p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3>Asset Management</h3>
-                            <div>
-                                <button class="btn btn-success me-2" onclick="uploadAsset()">
-                                    <i class="fas fa-upload me-1"></i>Upload
-                                </button>
-                                <button class="btn btn-danger" onclick="bulkDelete()" id="bulkDeleteBtn" disabled>
-                                    <i class="fas fa-trash me-1"></i>Delete Selected
-                                </button>
+                            <h3><i class="fas fa-images me-2"></i>Asset Management</h3>
+                            <button class="btn btn-danger" onclick="bulkDelete()" id="bulkDeleteBtn" disabled>
+                                <i class="fas fa-trash me-1"></i>Delete Selected
+                            </button>
+                        </div>
+
+                        <!-- Category Selection - Outside Upload Zone -->
+                        <div class="category-selector">
+                            <h6><i class="fas fa-tags me-2"></i>Select Category & Subcategory First</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="uploadCategory">
+                                        <option value="">-- Choose Category --</option>
+                                        <option value="hijaiyyah">🕌 Hijaiyyah</option>
+                                        <option value="ui">🎨 UI Elements</option>
+                                        <option value="sound_effects">🔊 Sound Effects</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Subcategory</label>
+                                    <select class="form-select" id="uploadSubcategory" disabled>
+                                        <option value="">-- Choose Subcategory --</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Upload Zone -->
                         <div class="upload-zone mb-4" id="uploadZone">
-                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                            <h5>Drag & Drop Files Here</h5>
-                            <p class="text-muted">or click to browse (Max 5MB, jpg/png/mp3/wav)</p>
+                            <i class="fas fa-cloud-upload-alt fa-4x mb-3" style="color: #667eea;"></i>
+                            <h4 class="mb-2">Drag & Drop Files Here</h4>
+                            <p class="text-muted mb-0">or click to browse</p>
+                            <small class="text-muted">Supported: JPG, PNG, MP3, WAV (Max 5MB)</small>
                             <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.mp3,.wav" style="display: none;">
                         </div>
                         
@@ -218,6 +233,8 @@ ob_start();
                                         <th><input type="checkbox" id="selectAll"></th>
                                         <th>Preview</th>
                                         <th>Filename</th>
+                                        <th>Category</th>
+                                        <th>Subcategory</th>
                                         <th>Type</th>
                                         <th>Size</th>
                                         <th>Uploaded By</th>
@@ -227,10 +244,18 @@ ob_start();
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="8" class="text-center">Loading assets...</td>
+                                        <td colspan="10" class="text-center">Loading assets...</td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div id="assetsPaginationInfo"></div>
+                            <nav>
+                                <ul class="pagination mb-0" id="assetsPagination"></ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
@@ -334,41 +359,6 @@ ob_start();
                     </div>
                 </div>
 
-                <!-- Letter Pairs Tab -->
-                <div class="tab-pane fade" id="letter-pairs">
-                    <div class="admin-content p-4">
-                        <h3 class="mb-4">Letter Pairs Management</h3>
-                        
-                        <!-- Upload Zone -->
-                        <div class="upload-zone mb-4" id="letterPairUploadZone">
-                            <i class="fas fa-font fa-3x text-muted mb-3"></i>
-                            <h5>Upload Letter Pairs</h5>
-                            <p class="text-muted">Upload outline and complete images for Hijaiyyah letters</p>
-                            <button class="btn btn-primary" onclick="showLetterPairModal()">
-                                <i class="fas fa-plus me-1"></i>Add Letter Pair
-                            </button>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="letterPairsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Letter Name</th>
-                                        <th>Outline</th>
-                                        <th>Complete</th>
-                                        <th>Difficulty</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="6" class="text-center">Loading letter pairs...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Settings Tab -->
                 <div class="tab-pane fade" id="settings">
                     <div class="admin-content p-4">
@@ -451,48 +441,6 @@ ob_start();
     </div>
 </div>
 
-<!-- Letter Pair Modal -->
-<div class="modal fade" id="letterPairModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Letter Pair</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="letterPairForm" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label class="form-label">Letter Name</label>
-                        <input type="text" class="form-control" name="letter_name" placeholder="e.g., alif, ba, ta" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Outline Image (Kerangka)</label>
-                        <input type="file" class="form-control" name="outline_image" accept=".jpg,.jpeg,.png" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Complete Image (Huruf Lengkap)</label>
-                        <input type="file" class="form-control" name="complete_image" accept=".jpg,.jpeg,.png" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Difficulty Level</label>
-                        <select class="form-select" name="difficulty_level">
-                            <option value="1">Level 1 (Easy)</option>
-                            <option value="2">Level 2</option>
-                            <option value="3">Level 3</option>
-                            <option value="4">Level 4</option>
-                            <option value="5">Level 5 (Hard)</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="uploadLetterPair()">Upload</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal" tabindex="-1">
     <div class="modal-dialog">
@@ -521,6 +469,109 @@ ob_start();
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="updateUser()">Update User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Game Progress Modal -->
+<div class="modal fade" id="gameProgressModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-gamepad me-2"></i>Game Progress - <span id="gameProgressUserName"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Stats Summary -->
+                <div class="card mb-4">
+                    <div class="card-body" id="gameProgressStats">
+                        Loading stats...
+                    </div>
+                </div>
+                
+                <!-- Level Progress -->
+                <h6 class="mb-3"><i class="fas fa-list me-2"></i>Level Progress (17 Levels)</h6>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Status</th>
+                                <th>Completion</th>
+                                <th>Best Score</th>
+                                <th>Best Time</th>
+                                <th>Stars</th>
+                                <th>Attempts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gameProgressLevels">
+                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Recent Sessions -->
+                <h6 class="mb-3"><i class="fas fa-history me-2"></i>Recent Sessions (Last 10)</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Score</th>
+                                <th>Time</th>
+                                <th>Matches</th>
+                                <th>Accuracy</th>
+                                <th>Stars</th>
+                                <th>Completed At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gameProgressSessions">
+                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Asset Modal -->
+<div class="modal fade" id="editAssetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Asset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAssetForm">
+                    <input type="hidden" id="editAssetId">
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="editAssetCategory">
+                            <option value="">Select Category</option>
+                            <option value="hijaiyyah">Hijaiyyah</option>
+                            <option value="ui">UI</option>
+                            <option value="sound_effects">Sound Effects</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subcategory</label>
+                        <select class="form-select" id="editAssetSubcategory">
+                            <option value="">Select Subcategory</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateAsset()">Update Asset</button>
             </div>
         </div>
     </div>

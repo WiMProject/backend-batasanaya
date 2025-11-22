@@ -33,9 +33,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // --- Rute Download Background Publik ---
     $router->get('backgrounds/{id}/file', 'BackgroundController@download');
     
-    // --- Rute Download Letter Pair Images Publik ---
-    $router->get('letter-pairs/{id}/outline', 'LetterPairController@getOutlineImage');
-    $router->get('letter-pairs/{id}/complete', 'LetterPairController@getCompleteImage');
+    // --- Rute Download Game Assets Publik ---
+    $router->get('game-pasangkan-huruf/{id}/asset/{assetType}', 'GamePasangkanHurufController@getAssetFile');
+    $router->get('game-cari-hijaiyyah/{id}/asset/{assetType}', 'GameCariHijaiyyahController@getAssetFile');
 
     // Rute yang membutuhkan otentikasi (login)
     $router->group(['middleware' => 'auth'], function () use ($router) {
@@ -62,6 +62,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('assets', 'AssetController@store');
         $router->post('assets/batch', 'AssetController@storeBatch');
         $router->get('assets', 'AssetController@index');
+        $router->patch('assets/{id}', 'AssetController@update');
         $router->delete('assets/batch', 'AssetController@destroyBatch');
         $router->delete('assets/{id}', 'AssetController@destroy');
 
@@ -90,20 +91,17 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('backgrounds/{id}', 'BackgroundController@show');
         $router->delete('backgrounds/{id}', 'BackgroundController@destroy');
 
-        // --- Rute Game Pasang Huruf Hijaiyyah ---
-        $router->post('letter-pairs', ['middleware' => 'role:admin', 'uses' => 'LetterPairController@store']);
-        $router->get('letter-pairs', 'LetterPairController@index');
-        $router->delete('letter-pairs/{id}', ['middleware' => 'role:admin', 'uses' => 'LetterPairController@destroy']);
-        
-        $router->post('game/start', 'GameController@startGame');
-        $router->post('game/match', 'GameController@submitMatch');
-        $router->post('game/finish', 'GameController@finishGame');
-        $router->get('game/leaderboard', 'GameController@getLeaderboard');
+        // --- Rute Game Cari Hijaiyyah ---
+        $router->get('carihijaiyah/progress', 'CariHijaiyyahController@getProgress');
+        $router->post('carihijaiyah/start', 'CariHijaiyyahController@startGame');
+        $router->post('carihijaiyah/finish', 'CariHijaiyyahController@finishGame');
+        $router->get('carihijaiyah/stats', 'CariHijaiyyahController@getStats');
 
         // --- Rute Admin Only ---
         $router->group(['middleware' => 'role:admin', 'prefix' => 'admin'], function () use ($router) {
             $router->get('dashboard', 'AdminController@dashboard');
             $router->get('users', 'AdminController@getAllUsers');
+            $router->get('users/{userId}/game-progress', 'AdminController@getUserGameProgress');
             $router->get('assets', 'AdminController@getAllAssets');
             $router->delete('assets/bulk', 'AdminController@bulkDeleteAssets');
         });

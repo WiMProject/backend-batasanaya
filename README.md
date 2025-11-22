@@ -25,17 +25,19 @@ API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentik
 - **Asset Manifest** - Untuk sync game/app data dengan checksum
 
 ### 🎮 Game Features
-- **Letter Matching Game** - Game pasang huruf Hijaiyyah
-- **Game Sessions** - Tracking progress dan scoring
-- **Difficulty Levels** - 5 level kesulitan berbeda
-- **Leaderboard System** - Ranking pemain terbaik
-- **Real-time Scoring** - Sistem poin berdasarkan akurasi dan kecepatan
+- **Game Cari Hijaiyyah** - Game mencari huruf Hijaiyyah dengan 17 level
+- **Progress Tracking** - Tracking progress per level dengan unlock system
+- **Session History** - Menyimpan history setiap gameplay
+- **Stars & Scoring** - Sistem bintang (0-3) dan scoring berdasarkan performa
+- **Admin Monitoring** - Admin dapat melihat progress semua user
 
 ### 🎛️ Admin Dashboard
 - **Professional Admin Panel** - Web-based admin interface
 - **Statistics Dashboard** - Real-time stats dan analytics
-- **User Management** - CRUD operations untuk users
+- **User Management** - CRUD operations untuk users dengan game progress
+- **Game Progress Monitoring** - Lihat detail progress game setiap user
 - **Content Management** - Upload dan kelola semua konten
+- **Batch Upload** - Upload sampai 50 files sekaligus dengan category/subcategory
 - **Drag & Drop Upload** - Modern file upload interface
 - **Responsive Design** - Mobile-friendly admin panel
 
@@ -297,23 +299,11 @@ Content-Type: application/json
 }
 ```
 
-### Letter Matching Game API
+### Game Cari Hijaiyyah API
 
-#### Upload Letter Pair (Admin Only)
+#### Get Progress (17 Levels)
 ```http
-POST /api/letter-pairs
-Authorization: Bearer ADMIN_JWT_TOKEN
-Content-Type: multipart/form-data
-
-letter_name: alif
-outline_image: [kerangka_alif.png]
-complete_image: [huruf_alif.png]
-difficulty_level: 1
-```
-
-#### Get Letter Pairs
-```http
-GET /api/letter-pairs?difficulty_level=1
+GET /api/carihijaiyah/progress
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
@@ -321,66 +311,50 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ```json
 [
     {
-        "id": "uuid",
-        "letter_name": "alif",
-        "difficulty_level": 1,
-        "outline_url": "http://your-domain/api/letter-pairs/uuid/outline",
-        "complete_url": "http://your-domain/api/letter-pairs/uuid/complete"
+        "level_number": 1,
+        "is_unlocked": true,
+        "is_completed": true,
+        "best_score": 850,
+        "best_time": 45,
+        "stars": 3,
+        "attempts": 2
     }
 ]
 ```
 
-#### Start Game Session
+#### Start Game
 ```http
-POST /api/game/start
+POST /api/carihijaiyah/start
 Authorization: Bearer YOUR_JWT_TOKEN
 Content-Type: application/json
 
 {
-    "difficulty_level": 1,
-    "total_pairs": 6
+    "level_number": 1
 }
 ```
 
 **Response:**
 ```json
 {
-    "game_session_id": "uuid",
-    "total_pairs": 6,
-    "difficulty_level": 1,
-    "letter_pairs": [
-        {
-            "pair_id": "uuid",
-            "letter_name": "alif",
-            "outline_url": "http://your-domain/api/letter-pairs/uuid/outline",
-            "complete_url": "http://your-domain/api/letter-pairs/uuid/complete"
-        }
-    ]
-}
-```
-
-#### Submit Match Answer
-```http
-POST /api/game/match
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: application/json
-
-{
-    "game_session_id": "uuid",
-    "letter_pair_id": "uuid",
-    "is_correct": true
+    "message": "Game started",
+    "level_number": 1,
+    "attempts": 3
 }
 ```
 
 #### Finish Game
 ```http
-POST /api/game/finish
+POST /api/carihijaiyah/finish
 Authorization: Bearer YOUR_JWT_TOKEN
 Content-Type: application/json
 
 {
-    "game_session_id": "uuid",
-    "time_taken": 120
+    "level_number": 1,
+    "score": 850,
+    "time_taken": 45,
+    "correct_matches": 6,
+    "wrong_matches": 0,
+    "stars": 3
 }
 ```
 
@@ -388,56 +362,51 @@ Content-Type: application/json
 ```json
 {
     "message": "Game completed",
-    "final_score": 850,
-    "correct_matches": 5,
-    "wrong_matches": 1,
-    "time_taken": 120,
-    "accuracy": "83.33%"
+    "is_new_best_score": true,
+    "next_level_unlocked": true
 }
 ```
 
-#### Get Leaderboard
+#### Get Stats
 ```http
-GET /api/game/leaderboard
+GET /api/carihijaiyah/stats
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
 **Response:**
 ```json
-[
-    {
-        "user_name": "Ahmad",
-        "score": 950,
-        "accuracy": 100.0,
-        "time_taken": 90,
-        "completed_at": "2025-11-19 14:30:00"
-    }
-]
+{
+    "total_completed": 5,
+    "total_stars": 12,
+    "total_score": 4500
+}
 ```
 
 ## 🎮 Game Integration
 
-### Letter Matching Game Flow
-1. **Admin uploads letter pairs** via admin dashboard
-2. **User starts game** dengan memilih difficulty level
-3. **Game generates random pairs** sesuai level kesulitan
-4. **User matches outline dengan complete image**
-5. **System tracks accuracy dan time**
-6. **Calculate final score** berdasarkan performance
-7. **Update leaderboard** dengan hasil terbaik
+### Game Cari Hijaiyyah Flow
+1. **User requests progress** - GET /api/carihijaiyah/progress
+2. **Check unlocked levels** - Level 1 auto-unlocked, others unlock after completing previous
+3. **Start game** - POST /api/carihijaiyah/start dengan level_number
+4. **Play game** - Game logic handled by mobile app (matching, validation)
+5. **Finish game** - POST /api/carihijaiyah/finish dengan score, time, matches, stars
+6. **Backend updates** - Save session, update best score/time, unlock next level
+7. **Admin monitors** - Admin dapat lihat progress semua user via dashboard
 
-### Scoring System
-- **Base Score:** `(Correct Matches / Total Pairs) * 100 * 10`
-- **Time Bonus:** `max(0, 300 - time_taken_seconds)`
-- **Final Score:** `Base Score + Time Bonus`
-- **Accuracy:** `(Correct Matches / Total Pairs) * 100%`
+### Game Features
+- **17 Levels** - Progressive difficulty
+- **Unlock System** - Complete level to unlock next
+- **Stars** - 0-3 stars based on performance
+- **Best Score Tracking** - Automatically saves best score & time
+- **Session History** - All gameplay sessions saved
+- **Attempts Counter** - Track how many times user tried each level
 
-### Game Difficulty Levels
-- **Level 1:** Huruf dasar (Alif, Ba, Ta)
-- **Level 2:** Huruf dengan titik (Tsa, Jim, Kha)
-- **Level 3:** Huruf kompleks (Sin, Shin, Sad)
-- **Level 4:** Huruf sulit (Dhad, Tha, Zha)
-- **Level 5:** Huruf expert (Ghain, Fa, Qaf)
+### Admin Monitoring
+- View all users with game progress summary
+- Click user to see detailed 17 level progress
+- View recent 10 gameplay sessions
+- See stats: completion rate, stars, score, accuracy
+- Identify stuck users and difficult levels
 
 ## 🗄️ Database Schema
 
@@ -455,9 +424,8 @@ Authorization: Bearer YOUR_JWT_TOKEN
 - `backgrounds` - Background images
 
 ### Game Tables
-- `letter_pairs` - Hijaiyyah letter pairs (outline + complete)
-- `game_sessions` - Game sessions with scoring
-- `game_matches` - Individual match records
+- `carihijaiyah_progress` - Progress tracking per level per user (17 levels)
+- `carihijaiyah_sessions` - History setiap gameplay session
 
 ### Key Relationships
 ```sql
@@ -470,12 +438,11 @@ songs.created_by -> users.id
 videos.created_by -> users.id
 backgrounds.created_by -> users.id
 
--- Game sessions belong to users
-game_sessions.user_id -> users.id
+-- Game progress belongs to users
+carihijaiyah_progress.user_id -> users.id
 
--- Game matches belong to sessions and letter pairs
-game_matches.game_session_id -> game_sessions.id
-game_matches.letter_pair_id -> letter_pairs.id
+-- Game sessions belong to users
+carihijaiyah_sessions.user_id -> users.id
 ```
 
 ## 🔐 Security Features
@@ -498,12 +465,13 @@ game_matches.letter_pair_id -> letter_pairs.id
 
 ### Dashboard Features
 - **Statistics Overview** - Real-time stats cards
-- **User Management** - Create, edit, delete users
-- **Asset Management** - Upload dan kelola files
+- **User Management** - Create, edit, delete users dengan game progress monitoring
+- **Game Progress Modal** - View detailed 17 level progress + session history per user
+- **Asset Management** - Upload dan kelola files dengan category/subcategory
+- **Batch Upload** - Upload sampai 50 files sekaligus
 - **Song Management** - Upload audio dengan thumbnail
 - **Video Management** - Upload dan streaming videos
 - **Background Management** - Upload background images
-- **Letter Pairs Management** - Upload huruf untuk game
 - **Drag & Drop Upload** - Modern file upload interface
 
 ### Admin API Endpoints
@@ -515,8 +483,12 @@ POST /api/auth/admin-login
 GET /api/admin/stats
 Authorization: Bearer ADMIN_TOKEN
 
-# Get All Users
+# Get All Users (with game progress)
 GET /api/admin/users
+Authorization: Bearer ADMIN_TOKEN
+
+# Get User Game Progress Detail
+GET /api/admin/users/{userId}/game-progress
 Authorization: Bearer ADMIN_TOKEN
 
 # Get All Assets
@@ -811,12 +783,11 @@ GET    /api/backgrounds             - Get backgrounds list
 GET    /api/backgrounds/{id}        - Get background details
 DELETE /api/backgrounds/{id}        - Delete background
 
-# Game API
-GET    /api/letter-pairs            - Get letter pairs
-POST   /api/game/start              - Start game session
-POST   /api/game/match              - Submit match answer
-POST   /api/game/finish             - Finish game
-GET    /api/game/leaderboard        - Get leaderboard
+# Game Cari Hijaiyyah API
+GET    /api/carihijaiyah/progress   - Get user progress (17 levels)
+POST   /api/carihijaiyah/start      - Start game session
+POST   /api/carihijaiyah/finish     - Finish game & save session
+GET    /api/carihijaiyah/stats      - Get user stats
 
 # User Preferences
 GET    /api/user/preference         - Get user preferences
@@ -825,20 +796,20 @@ PATCH  /api/user/preference         - Update preferences
 
 ### Admin Only Endpoints
 ```
-GET    /api/admin/stats             - Dashboard statistics
-GET    /api/admin/users             - Get all users
-GET    /api/admin/assets            - Get all assets
-DELETE /api/admin/assets/bulk       - Bulk delete assets
+GET    /api/admin/stats                      - Dashboard statistics
+GET    /api/admin/users                      - Get all users with game progress
+GET    /api/admin/users/{userId}/game-progress - Get detailed user game progress
+GET    /api/admin/assets                     - Get all assets
+DELETE /api/admin/assets/bulk                - Bulk delete assets
 
-POST   /api/users                   - Create user (admin)
-DELETE /api/users/{id}              - Delete user (admin)
-POST   /api/letter-pairs            - Upload letter pair (admin)
-DELETE /api/letter-pairs/{id}       - Delete letter pair (admin)
+POST   /api/users                            - Create user (admin)
+DELETE /api/users/{id}                       - Delete user (admin)
 ```
 
-## 📝 Postman Collection
+## 📝 Documentation
 
-Import `Hijaiyyah Auth API.postman_collection.json` untuk testing semua endpoints.
+- **API Documentation**: Import `BaTaTsaNaYa API.postman_collection.json` untuk testing endpoints
+- **Game Admin Features**: Lihat `GAME_ADMIN_FEATURES.md` untuk detail fitur monitoring game
 
 ## 🤝 Contributing
 

@@ -25,19 +25,21 @@ API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentik
 - **Asset Manifest** - Untuk sync game/app data dengan checksum
 
 ### 🎮 Game Features
-- **Game Cari Hijaiyyah** - Game mencari huruf Hijaiyyah dengan 17 level
+- **Game Cari Hijaiyyah** - Game mencari huruf Hijaiyyah dengan 15 level
+- **Game Pasangkan Huruf** - Game pasangkan huruf Hijaiyyah dengan 15 level
 - **Progress Tracking** - Tracking progress per level dengan unlock system
 - **Session History** - Menyimpan history setiap gameplay
-- **Stars & Scoring** - Sistem bintang (0-3) dan scoring berdasarkan performa
-- **Admin Monitoring** - Admin dapat melihat progress semua user
+- **Stars & Scoring** - Sistem bintang (1-3) dan scoring berdasarkan performa
+- **Admin Monitoring** - Admin dapat melihat progress kedua game untuk semua user
 
 ### 🎛️ Admin Dashboard
 - **Professional Admin Panel** - Web-based admin interface
 - **Statistics Dashboard** - Real-time stats dan analytics
 - **User Management** - CRUD operations untuk users dengan game progress
-- **Game Progress Monitoring** - Lihat detail progress game setiap user
+- **Game Progress Monitoring** - Lihat detail progress kedua game (Cari Hijaiyyah & Pasangkan Huruf) dengan tabs
 - **Content Management** - Upload dan kelola semua konten
-- **Batch Upload** - Upload sampai 50 files sekaligus dengan category/subcategory
+- **Batch Upload** - Upload sampai 50 files sekaligus (max 100MB per file)
+- **Background Status** - Active/Inactive status untuk backgrounds
 - **Drag & Drop Upload** - Modern file upload interface
 - **Responsive Design** - Mobile-friendly admin panel
 
@@ -50,9 +52,12 @@ API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentik
 
 ## 📋 Requirements
 
-- PHP 8.1+
+- PHP 8.1+ (8.4 recommended)
 - MySQL 8.0+
 - Composer
+- Nginx/Apache
+- PHP Extensions: php-fpm, php-mysql, php-mbstring, php-xml
+- PHP Settings: upload_max_filesize=100M, post_max_size=100M, max_file_uploads=50
 - Laravel Valet (optional)
 - Ngrok (untuk public testing)
 
@@ -301,7 +306,7 @@ Content-Type: application/json
 
 ### Game Cari Hijaiyyah API
 
-#### Get Progress (17 Levels)
+#### Get Progress (15 Levels)
 ```http
 GET /api/carihijaiyah/progress
 Authorization: Bearer YOUR_JWT_TOKEN
@@ -394,7 +399,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 7. **Admin monitors** - Admin dapat lihat progress semua user via dashboard
 
 ### Game Features
-- **17 Levels** - Progressive difficulty
+- **15 Levels** - Progressive difficulty (both games)
 - **Unlock System** - Complete level to unlock next
 - **Stars** - 0-3 stars based on performance
 - **Best Score Tracking** - Automatically saves best score & time
@@ -402,10 +407,10 @@ Authorization: Bearer YOUR_JWT_TOKEN
 - **Attempts Counter** - Track how many times user tried each level
 
 ### Admin Monitoring
-- View all users with game progress summary
-- Click user to see detailed 17 level progress
-- View recent 10 gameplay sessions
-- See stats: completion rate, stars, score, accuracy
+- View all users with both games progress summary
+- Click user to see detailed progress with tabs (Cari Hijaiyyah & Pasangkan Huruf)
+- Each tab shows 15 levels progress + recent 10 sessions
+- See stats: completion rate, stars, score, accuracy per game
 - Identify stuck users and difficult levels
 
 ## 🗄️ Database Schema
@@ -424,8 +429,10 @@ Authorization: Bearer YOUR_JWT_TOKEN
 - `backgrounds` - Background images
 
 ### Game Tables
-- `carihijaiyah_progress` - Progress tracking per level per user (17 levels)
+- `carihijaiyah_progress` - Progress tracking per level per user (15 levels)
 - `carihijaiyah_sessions` - History setiap gameplay session
+- `pasangkanhuruf_progress` - Progress tracking per level per user (15 levels)
+- `pasangkanhuruf_sessions` - History setiap gameplay session
 
 ### Key Relationships
 ```sql
@@ -440,9 +447,11 @@ backgrounds.created_by -> users.id
 
 -- Game progress belongs to users
 carihijaiyah_progress.user_id -> users.id
+pasangkanhuruf_progress.user_id -> users.id
 
 -- Game sessions belong to users
 carihijaiyah_sessions.user_id -> users.id
+pasangkanhuruf_sessions.user_id -> users.id
 ```
 
 ## 🔐 Security Features
@@ -781,13 +790,20 @@ DELETE /api/videos/{id}             - Delete video
 POST   /api/backgrounds             - Upload background
 GET    /api/backgrounds             - Get backgrounds list
 GET    /api/backgrounds/{id}        - Get background details
+PATCH  /api/backgrounds/{id}        - Update background (name, is_active)
 DELETE /api/backgrounds/{id}        - Delete background
 
 # Game Cari Hijaiyyah API
-GET    /api/carihijaiyah/progress   - Get user progress (17 levels)
+GET    /api/carihijaiyah/progress   - Get user progress (15 levels)
 POST   /api/carihijaiyah/start      - Start game session
 POST   /api/carihijaiyah/finish     - Finish game & save session
 GET    /api/carihijaiyah/stats      - Get user stats
+
+# Game Pasangkan Huruf API
+GET    /api/pasangkanhuruf/progress - Get user progress (15 levels)
+POST   /api/pasangkanhuruf/start    - Start game session
+POST   /api/pasangkanhuruf/finish   - Finish game & save session
+GET    /api/pasangkanhuruf/stats    - Get user stats
 
 # User Preferences
 GET    /api/user/preference         - Get user preferences
@@ -809,7 +825,8 @@ DELETE /api/users/{id}                       - Delete user (admin)
 ## 📝 Documentation
 
 - **API Documentation**: Import `BaTaTsaNaYa API.postman_collection.json` untuk testing endpoints
-- **Game Admin Features**: Lihat `GAME_ADMIN_FEATURES.md` untuk detail fitur monitoring game
+- **Game Cari Hijaiyyah**: Import `Game_Cari_Hijaiyyah_API.postman_collection.json` untuk testing game endpoints
+- **Admin Dashboard**: Access via `/admin` with credentials admin@example.com / admin123
 
 ## 🤝 Contributing
 

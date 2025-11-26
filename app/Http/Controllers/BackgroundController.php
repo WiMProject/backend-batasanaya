@@ -14,7 +14,7 @@ class BackgroundController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string|max:255',
-            'file' => 'required|file|mimes:jpeg,jpg,png|max:5120', // Max 5MB
+            'file' => 'required|file|mimes:jpeg,jpg,png|max:20480', // Max 20MB
         ]);
 
         $file = $request->file('file');
@@ -63,6 +63,22 @@ class BackgroundController extends Controller
         }
 
         return response()->file($filePath);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $background = Background::find($id);
+        if (!$background) {
+            return response()->json(['error' => 'Background not found'], 404);
+        }
+
+        $this->validate($request, [
+            'name' => 'sometimes|string|max:255',
+            'is_active' => 'sometimes|boolean',
+        ]);
+
+        $background->update($request->only(['name', 'is_active']));
+        return response()->json(['message' => 'Background updated successfully', 'background' => $background]);
     }
 
     public function destroy($id)

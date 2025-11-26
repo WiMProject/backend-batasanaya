@@ -1,0 +1,270 @@
+{
+	"info": {
+		"_postman_id": "game-cari-hijaiyyah-api",
+		"name": "Game Cari Hijaiyyah API",
+		"description": "API Collection untuk Game Cari Hijaiyyah - 17 Levels",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"token\", jsonData.access_token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"hehe@mail.com\",\n    \"password\": \"545832\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "Login untuk mendapatkan JWT token"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Progress (17 Levels)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/progress",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"carihijaiyah",
+						"progress"
+					]
+				},
+				"description": "Ambil progress semua 17 level user"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Start Game - Level 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"session_id\", jsonData.session_id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"level_number\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/start",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"carihijaiyah",
+						"start"
+					]
+				},
+				"description": "Mulai game level 1"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Finish Game - Level 1 (3 Stars)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 1,\n    \"score\": 850,\n    \"time_taken\": 45,\n    \"correct_matches\": 6,\n    \"wrong_matches\": 0,\n    \"stars\": 3\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/finish",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"carihijaiyah",
+						"finish"
+					]
+				},
+				"description": "Selesaikan game level 1 dengan 3 bintang"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Start Game - Level 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"session_id\", jsonData.session_id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"level_number\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/start",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"carihijaiyah",
+						"start"
+					]
+				},
+				"description": "Mulai game level 2 (unlock setelah level 1 selesai)"
+			},
+			"response": []
+		},
+		{
+			"name": "6. Finish Game - Level 2 (2 Stars)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 2,\n    \"score\": 650,\n    \"time_taken\": 60,\n    \"correct_matches\": 5,\n    \"wrong_matches\": 1,\n    \"stars\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/finish",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"carihijaiyah",
+						"finish"
+					]
+				},
+				"description": "Selesaikan game level 2 dengan 2 bintang"
+			},
+			"response": []
+		},
+		{
+			"name": "7. Get Stats",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/stats",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"carihijaiyah",
+						"stats"
+					]
+				},
+				"description": "Ambil statistik total user (completed levels, stars, score, sessions)"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://lumen-backend-batasanaya.test",
+			"type": "string"
+		}
+	]
+}

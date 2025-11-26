@@ -17,12 +17,22 @@ class AssetController extends Controller
     {
         $this->validate($request, [
             'file' => 'required|file|mimes:jpg,jpeg,png,mp3,wav|max:5120',
-            'category' => 'nullable|string|in:hijaiyyah,ui,sound_effects',
+            'category' => 'nullable|string',
             'subcategory' => 'nullable|string'
         ]);
 
         $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
+        $originalName = $file->getClientOriginalName();
+        
+        // Simpan dengan nama asli, tambah counter jika duplicate
+        $fileName = $originalName;
+        $counter = 1;
+        while (file_exists(base_path('public/uploads/assets/' . $fileName))) {
+            $info = pathinfo($originalName);
+            $fileName = $info['filename'] . '_' . $counter . '.' . $info['extension'];
+            $counter++;
+        }
+        
         $fileSize = $file->getSize();
         
         $extension = strtolower($file->getClientOriginalExtension());
@@ -53,15 +63,42 @@ class AssetController extends Controller
         $this->validate($request, [
             'files' => 'required|array|max:50', // Max 50 files
             'files.*' => 'required|file|mimes:jpg,jpeg,png,mp3,wav|max:5120',
-            'category' => 'nullable|string|in:hijaiyyah,ui,sound_effects',
+            'category' => 'nullable|string',
             'subcategory' => 'nullable|string'
         ]);
 
         $uploadedAssets = [];
+        $skippedFiles = [];
         $files = $request->file('files');
+        $usedFileNames = []; // Track filenames dalam batch ini
 
         foreach ($files as $file) {
-            $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+            // Validasi per file
+            $fileSize = $file->getSize();
+            $extension = strtolower($file->getClientOriginalExtension());
+            $allowedExts = ['jpg', 'jpeg', 'png', 'mp3', 'wav'];
+            
+            // Skip jika tidak valid
+            if (!in_array($extension, $allowedExts) || $fileSize > 5120 * 1024) {
+                $skippedFiles[] = [
+                    'name' => $file->getClientOriginalName(),
+                    'reason' => !in_array($extension, $allowedExts) ? 'Invalid format' : 'File too large (max 5MB)'
+                ];
+                continue;
+            }
+            $originalName = $file->getClientOriginalName();
+            
+            // Simpan dengan nama asli, tambah counter jika duplicate
+            $fileName = $originalName;
+            $counter = 1;
+            while (file_exists(base_path('public/uploads/assets/' . $fileName)) || in_array($fileName, $usedFileNames)) {
+                $info = pathinfo($originalName);
+                $fileName = $info['filename'] . '_' . $counter . '.' . $info['extension'];
+                $counter++;
+            }
+            
+            $usedFileNames[] = $fileName; // Tandai filename sudah dipakai
+            
             $fileSize = $file->getSize();
             
             // Auto-detect type berdasarkan extension
@@ -86,10 +123,18 @@ class AssetController extends Controller
             $uploadedAssets[] = $asset;
         }
 
-        return response()->json([
+        $response = [
             'message' => count($uploadedAssets) . ' assets berhasil di-upload.',
+            'uploaded_count' => count($uploadedAssets),
             'assets' => $uploadedAssets
-        ], 201);
+        ];
+        
+        if (!empty($skippedFiles)) {
+            $response['skipped_count'] = count($skippedFiles);
+            $response['skipped_files'] = $skippedFiles;
+        }
+        
+        return response()->json($response, 201);
     }
 
     /**
@@ -114,7 +159,7 @@ class AssetController extends Controller
         }
 
         $this->validate($request, [
-            'category' => 'nullable|string|in:hijaiyyah,ui,sound_effects',
+            'category' => 'nullable|string',
             'subcategory' => 'nullable|string'
         ]);
 
@@ -178,7 +223,16 @@ class AssetController extends Controller
         foreach ($assets as $asset) {
             $filePath = base_path('public/' . $asset->file);
             if (File::exists($filePath)) {
-                $zip->addFile($filePath, $asset->file_name);
+                // Buat path dengan category/subcategory
+                $folderPath = '';
+                if ($asset->category) {
+                    $folderPath .= $asset->category . '/';
+                    if ($asset->subcategory) {
+                        $folderPath .= $asset->subcategory . '/';
+                    }
+                }
+                
+                $zip->addFile($filePath, $folderPath . $asset->file_name);
             }
         }
         
@@ -218,9 +272,16 @@ class AssetController extends Controller
         foreach ($assets as $asset) {
             $filePath = base_path('public/' . $asset->file);
             if (File::exists($filePath)) {
-                // Buat folder berdasarkan type di dalam ZIP
-                $folderName = $asset->type . '/';
-                $zip->addFile($filePath, $folderName . $asset->file_name);
+                // Buat path dengan category/subcategory
+                $folderPath = '';
+                if ($asset->category) {
+                    $folderPath .= $asset->category . '/';
+                    if ($asset->subcategory) {
+                        $folderPath .= $asset->subcategory . '/';
+                    }
+                }
+                
+                $zip->addFile($filePath, $folderPath . $asset->file_name);
             }
         }
         

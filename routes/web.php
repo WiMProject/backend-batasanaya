@@ -89,6 +89,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('backgrounds', 'BackgroundController@store');
         $router->get('backgrounds', 'BackgroundController@index');
         $router->get('backgrounds/{id}', 'BackgroundController@show');
+        $router->patch('backgrounds/{id}', 'BackgroundController@update');
         $router->delete('backgrounds/{id}', 'BackgroundController@destroy');
 
         // --- Rute Game Cari Hijaiyyah ---
@@ -96,6 +97,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('carihijaiyah/start', 'CariHijaiyyahController@startGame');
         $router->post('carihijaiyah/finish', 'CariHijaiyyahController@finishGame');
         $router->get('carihijaiyah/stats', 'CariHijaiyyahController@getStats');
+
+        // --- Rute Game Pasangkan Huruf ---
+        $router->get('pasangkanhuruf/progress', 'PasangkanHurufController@getProgress');
+        $router->post('pasangkanhuruf/start', 'PasangkanHurufController@startGame');
+        $router->post('pasangkanhuruf/finish', 'PasangkanHurufController@finishGame');
+        $router->get('pasangkanhuruf/stats', 'PasangkanHurufController@getStats');
 
         // --- Rute Admin Only ---
         $router->group(['middleware' => 'role:admin', 'prefix' => 'admin'], function () use ($router) {

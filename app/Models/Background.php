@@ -10,7 +10,11 @@ class Background extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'name', 'file', 'size', 'created_by_id',
+        'id', 'name', 'file', 'size', 'is_active', 'created_by_id',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function createdBy()

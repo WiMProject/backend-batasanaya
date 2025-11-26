@@ -6,6 +6,8 @@ use App\Models\Asset;
 use App\Models\User;
 use App\Models\CariHijaiyyahProgress;
 use App\Models\CariHijaiyyahSession;
+use App\Models\PasangkanHurufProgress;
+use App\Models\PasangkanHurufSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,20 +46,31 @@ class AdminController extends Controller
         
         // Tambahkan game progress summary untuk setiap user
         $users->getCollection()->transform(function ($user) {
-            $progress = CariHijaiyyahProgress::where('user_id', $user->id)
+            // Cari Hijaiyyah Progress
+            $cariProgress = CariHijaiyyahProgress::where('user_id', $user->id)
                 ->select(
-                    DB::raw('COUNT(*) as total_levels'),
                     DB::raw('SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END) as completed_levels'),
-                    DB::raw('SUM(stars) as total_stars'),
-                    DB::raw('SUM(best_score) as total_score')
+                    DB::raw('SUM(stars) as total_stars')
+                )
+                ->first();
+            
+            // Pasangkan Huruf Progress
+            $pasangkanProgress = PasangkanHurufProgress::where('user_id', $user->id)
+                ->select(
+                    DB::raw('SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END) as completed_levels'),
+                    DB::raw('SUM(stars) as total_stars')
                 )
                 ->first();
             
             $user->game_progress = [
-                'completed_levels' => $progress->completed_levels ?? 0,
-                'total_levels' => $progress->total_levels ?? 0,
-                'total_stars' => $progress->total_stars ?? 0,
-                'total_score' => $progress->total_score ?? 0
+                'carihijaiyah' => [
+                    'completed' => $cariProgress->completed_levels ?? 0,
+                    'stars' => $cariProgress->total_stars ?? 0
+                ],
+                'pasangkanhuruf' => [
+                    'completed' => $pasangkanProgress->completed_levels ?? 0,
+                    'stars' => $pasangkanProgress->total_stars ?? 0
+                ]
             ];
             
             return $user;
@@ -73,25 +86,37 @@ class AdminController extends Controller
     {
         $user = User::findOrFail($userId);
         
-        // Get all 17 levels progress
-        $progress = CariHijaiyyahProgress::where('user_id', $userId)
+        // Cari Hijaiyyah
+        $cariProgress = CariHijaiyyahProgress::where('user_id', $userId)
             ->orderBy('level_number')
             ->get();
-        
-        // Get recent sessions (last 10)
-        $sessions = CariHijaiyyahSession::where('user_id', $userId)
+        $cariSessions = CariHijaiyyahSession::where('user_id', $userId)
             ->orderBy('completed_at', 'desc')
             ->limit(10)
             ->get();
+        $cariStats = [
+            'total_completed' => $cariProgress->where('is_completed', true)->count(),
+            'total_stars' => $cariProgress->sum('stars'),
+            'total_score' => $cariProgress->sum('best_score'),
+            'avg_accuracy' => $cariSessions->avg(function($s) {
+                $total = $s->correct_matches + $s->wrong_matches;
+                return $total > 0 ? ($s->correct_matches / $total) * 100 : 0;
+            })
+        ];
         
-        // Calculate stats
-        $stats = [
-            'total_completed' => $progress->where('is_completed', true)->count(),
-            'total_stars' => $progress->sum('stars'),
-            'total_score' => $progress->sum('best_score'),
-            'total_attempts' => $progress->sum('attempts'),
-            'total_sessions' => CariHijaiyyahSession::where('user_id', $userId)->count(),
-            'avg_accuracy' => $sessions->avg(function($s) {
+        // Pasangkan Huruf
+        $pasangkanProgress = PasangkanHurufProgress::where('user_id', $userId)
+            ->orderBy('level_number')
+            ->get();
+        $pasangkanSessions = PasangkanHurufSession::where('user_id', $userId)
+            ->orderBy('completed_at', 'desc')
+            ->limit(10)
+            ->get();
+        $pasangkanStats = [
+            'total_completed' => $pasangkanProgress->where('is_completed', true)->count(),
+            'total_stars' => $pasangkanProgress->sum('stars'),
+            'total_score' => $pasangkanProgress->sum('best_score'),
+            'avg_accuracy' => $pasangkanSessions->avg(function($s) {
                 $total = $s->correct_matches + $s->wrong_matches;
                 return $total > 0 ? ($s->correct_matches / $total) * 100 : 0;
             })
@@ -99,9 +124,16 @@ class AdminController extends Controller
         
         return response()->json([
             'user' => $user,
-            'progress' => $progress,
-            'recent_sessions' => $sessions,
-            'stats' => $stats
+            'carihijaiyah' => [
+                'progress' => $cariProgress,
+                'recent_sessions' => $cariSessions,
+                'stats' => $cariStats
+            ],
+            'pasangkanhuruf' => [
+                'progress' => $pasangkanProgress,
+                'recent_sessions' => $pasangkanSessions,
+                'stats' => $pasangkanStats
+            ]
         ]);
     }
 

@@ -203,7 +203,7 @@ ob_start();
                                     <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
                                     <select class="form-select" id="uploadCategory">
                                         <option value="">-- Choose Category --</option>
-                                        <option value="hijaiyyah">🕌 Hijaiyyah</option>
+                                        <option value="game">🎮 Game</option>
                                         <option value="ui">🎨 UI Elements</option>
                                         <option value="sound_effects">🔊 Sound Effects</option>
                                     </select>
@@ -345,6 +345,7 @@ ob_start();
                                     <tr>
                                         <th>Preview</th>
                                         <th>Name</th>
+                                        <th>Status</th>
                                         <th>Size</th>
                                         <th>Uploaded By</th>
                                         <th>Date</th>
@@ -352,7 +353,7 @@ ob_start();
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td colspan="6" class="text-center">Loading backgrounds...</td></tr>
+                                    <tr><td colspan="7" class="text-center">Loading backgrounds...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -485,57 +486,145 @@ ob_start();
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <!-- Stats Summary -->
-                <div class="card mb-4">
-                    <div class="card-body" id="gameProgressStats">
-                        Loading stats...
+                <!-- Game Tabs -->
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#cariHijaiyahTab">
+                            <i class="fas fa-search me-1"></i>Cari Hijaiyyah
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#pasangkanHurufTab">
+                            <i class="fas fa-puzzle-piece me-1"></i>Pasangkan Huruf
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content">
+                    <!-- Cari Hijaiyyah Tab -->
+                    <div class="tab-pane fade show active" id="cariHijaiyahTab">
+                        <div class="card mb-3">
+                            <div class="card-body" id="cariStats">Loading...</div>
+                        </div>
+                        <h6 class="mb-2"><i class="fas fa-list me-2"></i>Level Progress (15 Levels)</h6>
+                        <div class="table-responsive mb-3" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-sm table-hover">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Status</th>
+                                        <th>Completion</th>
+                                        <th>Best Score</th>
+                                        <th>Best Time</th>
+                                        <th>Stars</th>
+                                        <th>Attempts</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cariProgress">
+                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h6 class="mb-2"><i class="fas fa-history me-2"></i>Recent Sessions</h6>
+                        <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                            <table class="table table-sm table-hover">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Score</th>
+                                        <th>Time</th>
+                                        <th>Matches</th>
+                                        <th>Accuracy</th>
+                                        <th>Stars</th>
+                                        <th>Completed At</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cariSessions">
+                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Level Progress -->
-                <h6 class="mb-3"><i class="fas fa-list me-2"></i>Level Progress (17 Levels)</h6>
-                <div class="table-responsive mb-4">
-                    <table class="table table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th>Level</th>
-                                <th>Status</th>
-                                <th>Completion</th>
-                                <th>Best Score</th>
-                                <th>Best Time</th>
-                                <th>Stars</th>
-                                <th>Attempts</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gameProgressLevels">
-                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Recent Sessions -->
-                <h6 class="mb-3"><i class="fas fa-history me-2"></i>Recent Sessions (Last 10)</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th>Level</th>
-                                <th>Score</th>
-                                <th>Time</th>
-                                <th>Matches</th>
-                                <th>Accuracy</th>
-                                <th>Stars</th>
-                                <th>Completed At</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gameProgressSessions">
-                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
-                        </tbody>
-                    </table>
+                    
+                    <!-- Pasangkan Huruf Tab -->
+                    <div class="tab-pane fade" id="pasangkanHurufTab">
+                        <div class="card mb-3">
+                            <div class="card-body" id="pasangkanStats">Loading...</div>
+                        </div>
+                        <h6 class="mb-2"><i class="fas fa-list me-2"></i>Level Progress (15 Levels)</h6>
+                        <div class="table-responsive mb-3" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-sm table-hover">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Status</th>
+                                        <th>Completion</th>
+                                        <th>Best Score</th>
+                                        <th>Best Time</th>
+                                        <th>Stars</th>
+                                        <th>Attempts</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pasangkanProgress">
+                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h6 class="mb-2"><i class="fas fa-history me-2"></i>Recent Sessions</h6>
+                        <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                            <table class="table table-sm table-hover">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Score</th>
+                                        <th>Time</th>
+                                        <th>Matches</th>
+                                        <th>Accuracy</th>
+                                        <th>Stars</th>
+                                        <th>Completed At</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pasangkanSessions">
+                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Background Modal -->
+<div class="modal fade" id="editBackgroundModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Background</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBackgroundForm">
+                    <input type="hidden" id="editBackgroundId">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editBackgroundName" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editBackgroundActive" checked>
+                            <label class="form-check-label" for="editBackgroundActive">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateBackground()">Update Background</button>
             </div>
         </div>
     </div>
@@ -556,7 +645,7 @@ ob_start();
                         <label class="form-label">Category</label>
                         <select class="form-select" id="editAssetCategory">
                             <option value="">Select Category</option>
-                            <option value="hijaiyyah">Hijaiyyah</option>
+                            <option value="game">Game</option>
                             <option value="ui">UI</option>
                             <option value="sound_effects">Sound Effects</option>
                         </select>

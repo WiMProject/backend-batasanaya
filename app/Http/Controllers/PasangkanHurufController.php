@@ -2,30 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CariHijaiyyahProgress;
-use App\Models\CariHijaiyyahSession;
+use App\Models\PasangkanHurufProgress;
+use App\Models\PasangkanHurufSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
-class CariHijaiyyahController extends Controller
+class PasangkanHurufController extends Controller
 {
-    /**
-     * Get user progress untuk semua 15 level
-     */
     public function getProgress()
     {
         $userId = Auth::id();
         
-        // Ambil atau buat progress untuk 15 level
         $progress = [];
         for ($level = 1; $level <= 15; $level++) {
-            $levelProgress = CariHijaiyyahProgress::firstOrCreate(
+            $levelProgress = PasangkanHurufProgress::firstOrCreate(
                 ['user_id' => $userId, 'level_number' => $level],
                 [
                     'id' => Str::uuid(),
-                    'is_unlocked' => $level === 1, // Level 1 unlock otomatis
+                    'is_unlocked' => $level === 1,
                     'is_completed' => false,
                     'best_score' => 0,
                     'best_time' => 0,
@@ -48,9 +44,6 @@ class CariHijaiyyahController extends Controller
         return response()->json(['levels' => $progress]);
     }
     
-    /**
-     * Start game session
-     */
     public function startGame(Request $request)
     {
         $this->validate($request, [
@@ -60,8 +53,7 @@ class CariHijaiyyahController extends Controller
         $userId = Auth::id();
         $levelNumber = $request->level_number;
         
-        // Cek apakah level sudah unlock
-        $progress = CariHijaiyyahProgress::where('user_id', $userId)
+        $progress = PasangkanHurufProgress::where('user_id', $userId)
             ->where('level_number', $levelNumber)
             ->first();
             
@@ -69,7 +61,6 @@ class CariHijaiyyahController extends Controller
             return response()->json(['error' => 'Level belum unlock'], 403);
         }
         
-        // Increment attempts
         $progress->increment('attempts');
         
         $sessionId = Str::uuid();
@@ -81,9 +72,6 @@ class CariHijaiyyahController extends Controller
         ]);
     }
     
-    /**
-     * Finish game dan save score
-     */
     public function finishGame(Request $request)
     {
         $this->validate($request, [
@@ -98,8 +86,7 @@ class CariHijaiyyahController extends Controller
         
         $userId = Auth::id();
         
-        // Save session
-        CariHijaiyyahSession::create([
+        PasangkanHurufSession::create([
             'id' => $request->session_id,
             'user_id' => $userId,
             'level_number' => $request->level_number,
@@ -111,37 +98,31 @@ class CariHijaiyyahController extends Controller
             'completed_at' => Carbon::now()
         ]);
         
-        // Update progress
-        $progress = CariHijaiyyahProgress::where('user_id', $userId)
+        $progress = PasangkanHurufProgress::where('user_id', $userId)
             ->where('level_number', $request->level_number)
             ->first();
             
         $isNewBest = false;
         if ($progress) {
-            // Update best score jika lebih tinggi
             if ($request->score > $progress->best_score) {
                 $progress->best_score = $request->score;
                 $isNewBest = true;
             }
             
-            // Update best time jika lebih cepat (atau pertama kali)
             if ($progress->best_time == 0 || $request->time_taken < $progress->best_time) {
                 $progress->best_time = $request->time_taken;
             }
             
-            // Update stars jika lebih tinggi
             if ($request->stars > $progress->stars) {
                 $progress->stars = $request->stars;
             }
             
-            // Mark as completed
             $progress->is_completed = true;
             $progress->save();
             
-            // Unlock next level
             $nextLevel = $request->level_number + 1;
             if ($nextLevel <= 15) {
-                $nextProgress = CariHijaiyyahProgress::firstOrCreate(
+                $nextProgress = PasangkanHurufProgress::firstOrCreate(
                     ['user_id' => $userId, 'level_number' => $nextLevel],
                     [
                         'id' => Str::uuid(),
@@ -172,24 +153,21 @@ class CariHijaiyyahController extends Controller
         ]);
     }
     
-    /**
-     * Get user stats
-     */
     public function getStats()
     {
         $userId = Auth::id();
         
-        $totalCompleted = CariHijaiyyahProgress::where('user_id', $userId)
+        $totalCompleted = PasangkanHurufProgress::where('user_id', $userId)
             ->where('is_completed', true)
             ->count();
             
-        $totalStars = CariHijaiyyahProgress::where('user_id', $userId)
+        $totalStars = PasangkanHurufProgress::where('user_id', $userId)
             ->sum('stars');
             
-        $totalScore = CariHijaiyyahProgress::where('user_id', $userId)
+        $totalScore = PasangkanHurufProgress::where('user_id', $userId)
             ->sum('best_score');
             
-        $totalSessions = CariHijaiyyahSession::where('user_id', $userId)->count();
+        $totalSessions = PasangkanHurufSession::where('user_id', $userId)->count();
         
         return response()->json([
             'total_levels_completed' => $totalCompleted,

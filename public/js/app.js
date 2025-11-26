@@ -253,9 +253,8 @@ async function loadUsers() {
         if (data.data && data.data.length > 0) {
             tbody.innerHTML = data.data.map(user => {
                 const progress = user.game_progress || {};
-                const completedLevels = progress.completed_levels || 0;
-                const totalLevels = progress.total_levels || 0;
-                const totalStars = progress.total_stars || 0;
+                const cari = progress.carihijaiyah || {};
+                const pasangkan = progress.pasangkanhuruf || {};
                 
                 return `
                 <tr>
@@ -264,9 +263,13 @@ async function loadUsers() {
                     <td>${user.phone_number || '-'}</td>
                     <td><span class="badge bg-${user.role?.name === 'admin' ? 'danger' : 'primary'}">${user.role?.name || 'user'}</span></td>
                     <td>
-                        <div class="d-flex align-items-center">
-                            <span class="me-2">${completedLevels}/${totalLevels}</span>
-                            <span class="text-warning">⭐ ${totalStars}</span>
+                        <div class="small">
+                            <div class="mb-1">
+                                <span class="badge bg-info">Cari</span> ${cari.completed || 0}/15 <span class="text-warning">⭐${cari.stars || 0}</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-success">Pasangkan</span> ${pasangkan.completed || 0}/15 <span class="text-warning">⭐${pasangkan.stars || 0}</span>
+                            </div>
                         </div>
                     </td>
                     <td>${new Date(user.created_at).toLocaleDateString()}</td>
@@ -303,31 +306,21 @@ async function viewGameProgress(userId) {
         
         const data = await response.json();
         
-        // Populate modal
         document.getElementById('gameProgressUserName').textContent = data.user.full_name;
-        document.getElementById('gameProgressStats').innerHTML = `
+        
+        // Cari Hijaiyyah Stats
+        const cariStats = data.carihijaiyah.stats;
+        document.getElementById('cariStats').innerHTML = `
             <div class="row text-center">
-                <div class="col-3">
-                    <h4>${data.stats.total_completed}/17</h4>
-                    <small class="text-muted">Completed</small>
-                </div>
-                <div class="col-3">
-                    <h4 class="text-warning">⭐ ${data.stats.total_stars}</h4>
-                    <small class="text-muted">Stars</small>
-                </div>
-                <div class="col-3">
-                    <h4>${data.stats.total_score}</h4>
-                    <small class="text-muted">Total Score</small>
-                </div>
-                <div class="col-3">
-                    <h4>${Math.round(data.stats.avg_accuracy || 0)}%</h4>
-                    <small class="text-muted">Avg Accuracy</small>
-                </div>
+                <div class="col-3"><h5>${cariStats.total_completed}/15</h5><small>Completed</small></div>
+                <div class="col-3"><h5 class="text-warning">⭐ ${cariStats.total_stars}</h5><small>Stars</small></div>
+                <div class="col-3"><h5>${cariStats.total_score}</h5><small>Score</small></div>
+                <div class="col-3"><h5>${Math.round(cariStats.avg_accuracy || 0)}%</h5><small>Accuracy</small></div>
             </div>
         `;
         
-        // Progress table
-        const progressHtml = data.progress.map(p => `
+        // Cari Hijaiyyah Progress
+        document.getElementById('cariProgress').innerHTML = data.carihijaiyah.progress.map(p => `
             <tr>
                 <td>Level ${p.level_number}</td>
                 <td><span class="badge bg-${p.is_unlocked ? 'success' : 'secondary'}">${p.is_unlocked ? 'Unlocked' : 'Locked'}</span></td>
@@ -338,10 +331,9 @@ async function viewGameProgress(userId) {
                 <td>${p.attempts || 0}</td>
             </tr>
         `).join('');
-        document.getElementById('gameProgressLevels').innerHTML = progressHtml;
         
-        // Recent sessions
-        const sessionsHtml = data.recent_sessions.map(s => {
+        // Cari Hijaiyyah Sessions
+        document.getElementById('cariSessions').innerHTML = data.carihijaiyah.recent_sessions.map(s => {
             const accuracy = ((s.correct_matches / (s.correct_matches + s.wrong_matches)) * 100).toFixed(1);
             return `
             <tr>
@@ -355,9 +347,47 @@ async function viewGameProgress(userId) {
             </tr>
             `;
         }).join('') || '<tr><td colspan="7" class="text-center text-muted">No sessions yet</td></tr>';
-        document.getElementById('gameProgressSessions').innerHTML = sessionsHtml;
         
-        // Show modal
+        // Pasangkan Huruf Stats
+        const pasangkanStats = data.pasangkanhuruf.stats;
+        document.getElementById('pasangkanStats').innerHTML = `
+            <div class="row text-center">
+                <div class="col-3"><h5>${pasangkanStats.total_completed}/15</h5><small>Completed</small></div>
+                <div class="col-3"><h5 class="text-warning">⭐ ${pasangkanStats.total_stars}</h5><small>Stars</small></div>
+                <div class="col-3"><h5>${pasangkanStats.total_score}</h5><small>Score</small></div>
+                <div class="col-3"><h5>${Math.round(pasangkanStats.avg_accuracy || 0)}%</h5><small>Accuracy</small></div>
+            </div>
+        `;
+        
+        // Pasangkan Huruf Progress
+        document.getElementById('pasangkanProgress').innerHTML = data.pasangkanhuruf.progress.map(p => `
+            <tr>
+                <td>Level ${p.level_number}</td>
+                <td><span class="badge bg-${p.is_unlocked ? 'success' : 'secondary'}">${p.is_unlocked ? 'Unlocked' : 'Locked'}</span></td>
+                <td><span class="badge bg-${p.is_completed ? 'primary' : 'secondary'}">${p.is_completed ? 'Completed' : 'Not Completed'}</span></td>
+                <td>${p.best_score || 0}</td>
+                <td>${p.best_time || '-'}s</td>
+                <td class="text-warning">${'⭐'.repeat(p.stars || 0)}</td>
+                <td>${p.attempts || 0}</td>
+            </tr>
+        `).join('');
+        
+        // Pasangkan Huruf Sessions
+        document.getElementById('pasangkanSessions').innerHTML = data.pasangkanhuruf.recent_sessions.map(s => {
+            const accuracy = ((s.correct_matches / (s.correct_matches + s.wrong_matches)) * 100).toFixed(1);
+            return `
+            <tr>
+                <td>Level ${s.level_number}</td>
+                <td>${s.score}</td>
+                <td>${s.time_taken}s</td>
+                <td>${s.correct_matches}/${s.correct_matches + s.wrong_matches}</td>
+                <td>${accuracy}%</td>
+                <td class="text-warning">${'⭐'.repeat(s.stars || 0)}</td>
+                <td>${new Date(s.completed_at).toLocaleString()}</td>
+            </tr>
+            `;
+        }).join('') || '<tr><td colspan="7" class="text-center text-muted">No sessions yet</td></tr>';
+        
         const modal = new bootstrap.Modal(document.getElementById('gameProgressModal'));
         modal.show();
     } catch (error) {
@@ -487,7 +517,7 @@ function initUploadZone() {
     
     // Category options
     const subcategories = {
-        hijaiyyah: ['huruf', 'angka', 'harakat'],
+        game: ['carihijaiyah', 'berlatih', 'pasangkan'],
         ui: ['button', 'icon', 'frame'],
         sound_effects: ['feedback', 'ui', 'pronunciation']
     };
@@ -550,7 +580,14 @@ function initUploadZone() {
 }
 
 // Handle file uploads (batch)
+let isUploading = false;
+
 async function handleFiles(files) {
+    if (isUploading) {
+        showAlert('Upload sedang berlangsung, tunggu sebentar...', 'warning');
+        return;
+    }
+    
     const category = document.getElementById('uploadCategory')?.value;
     const subcategory = document.getElementById('uploadSubcategory')?.value;
     
@@ -558,6 +595,8 @@ async function handleFiles(files) {
         showAlert('Pilih kategori terlebih dahulu sebelum upload!', 'warning');
         return;
     }
+    
+    isUploading = true;
     
     // Convert FileList to Array and limit to 50 files
     const filesArray = Array.from(files).slice(0, 50);
@@ -596,6 +635,10 @@ async function handleFiles(files) {
         if (response.ok) {
             const result = await response.json();
             showAlert(result.message, 'success');
+            
+            // Reset file input
+            document.getElementById('fileInput').value = '';
+            
             loadAssets(); // Refresh assets list
         } else {
             const responseText = await response.text();
@@ -610,6 +653,8 @@ async function handleFiles(files) {
     } catch (error) {
         console.error('Upload exception:', error);
         showAlert('Failed to upload files: ' + error.message, 'danger');
+    } finally {
+        isUploading = false;
     }
 }
 
@@ -757,8 +802,8 @@ function uploadBackground() {
                 return;
             }
             
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                showAlert('File size must be less than 5MB', 'danger');
+            if (file.size > 20 * 1024 * 1024) { // 20MB
+                showAlert('File size must be less than 20MB', 'danger');
                 return;
             }
             
@@ -774,79 +819,127 @@ function uploadBackground() {
 
 // Upload file functions
 async function uploadSongFile(file, title) {
+    // Validate file
+    const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-m4a'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a)$/i)) {
+        showAlert('Please select a valid audio file (MP3, WAV, M4A)', 'danger');
+        return;
+    }
+    
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        showAlert('File size must be less than 10MB', 'danger');
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
     
+    console.log('Uploading song:', file.name, file.size, file.type);
+    
     try {
-        const response = await fetch('/api/songs', {
+        const response = await fetch(`${API_BASE}/songs`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             },
             body: formData
         });
+        
+        console.log('Song upload response status:', response.status);
         
         if (response.ok) {
             showAlert('Song uploaded successfully', 'success');
         } else {
             const error = await response.json();
+            console.error('Song upload error:', error);
             let errorMsg = 'Failed to upload song: ';
             if (error.message) {
                 errorMsg += error.message;
             } else if (error.file) {
-                errorMsg += error.file.join(', ');
+                errorMsg += Array.isArray(error.file) ? error.file.join(', ') : error.file;
             } else if (error.title) {
-                errorMsg += error.title.join(', ');
+                errorMsg += Array.isArray(error.title) ? error.title.join(', ') : error.title;
             } else {
-                errorMsg += 'Unknown error';
+                errorMsg += JSON.stringify(error);
             }
             showAlert(errorMsg, 'danger');
         }
     } catch (error) {
         console.error('Upload error:', error);
-        showAlert('Failed to upload song: Network error', 'danger');
+        showAlert('Failed to upload song: Network error - ' + error.message, 'danger');
     }
 }
 
 async function uploadVideoFile(file, title) {
+    // Validate file
+    const validTypes = ['video/mp4', 'video/avi', 'video/quicktime'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(mp4|avi|mov)$/i)) {
+        showAlert('Please select a valid video file (MP4, AVI, MOV)', 'danger');
+        return;
+    }
+    
+    if (file.size > 50 * 1024 * 1024) { // 50MB
+        showAlert('File size must be less than 50MB', 'danger');
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
     
+    console.log('Uploading video:', file.name, file.size, file.type);
+    
     try {
-        const response = await fetch('/api/videos', {
+        const response = await fetch(`${API_BASE}/videos`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             },
             body: formData
         });
+        
+        console.log('Video upload response status:', response.status);
         
         if (response.ok) {
             showAlert('Video uploaded successfully', 'success');
         } else {
             const error = await response.json();
+            console.error('Video upload error:', error);
             let errorMsg = 'Failed to upload video: ';
             if (error.message) {
                 errorMsg += error.message;
             } else if (error.file) {
-                errorMsg += error.file.join(', ');
+                errorMsg += Array.isArray(error.file) ? error.file.join(', ') : error.file;
             } else if (error.title) {
-                errorMsg += error.title.join(', ');
+                errorMsg += Array.isArray(error.title) ? error.title.join(', ') : error.title;
             } else {
-                errorMsg += 'Unknown error';
+                errorMsg += JSON.stringify(error);
             }
             showAlert(errorMsg, 'danger');
         }
     } catch (error) {
         console.error('Upload error:', error);
-        showAlert('Failed to upload video: Network error', 'danger');
+        showAlert('Failed to upload video: Network error - ' + error.message, 'danger');
     }
 }
 
 async function uploadBackgroundFile(file, name) {
     console.log('Starting background upload:', file.name, file.size, file.type);
+    
+    // Validate file
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
+        showAlert('Please select a valid image file (JPG, JPEG, PNG)', 'danger');
+        return;
+    }
+    
+    if (file.size > 20 * 1024 * 1024) { // 20MB
+        showAlert(`File too large: ${formatFileSize(file.size)}. Max 20MB`, 'danger');
+        return;
+    }
     
     await ensureValidToken();
     
@@ -854,13 +947,15 @@ async function uploadBackgroundFile(file, name) {
     formData.append('file', file);
     formData.append('name', name);
     
-    console.log('FormData created, sending request...');
+    console.log('FormData entries:', Array.from(formData.entries()).map(([k,v]) => `${k}: ${v instanceof File ? v.name : v}`));
+    console.log('Sending request to:', `${API_BASE}/backgrounds`);
     
     try {
-        const response = await fetch('/api/backgrounds', {
+        const response = await fetch(`${API_BASE}/backgrounds`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             },
             body: formData
         });
@@ -896,8 +991,11 @@ async function uploadBackgroundFile(file, name) {
 // Load songs
 async function loadSongs() {
     try {
-        const response = await fetch('/api/songs', {
-            headers: { 'Authorization': `Bearer ${adminToken}` }
+        const response = await fetch(`${API_BASE}/songs`, {
+            headers: { 
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
+            }
         });
         const data = await response.json();
         const tbody = document.querySelector('#songsTable tbody');
@@ -933,8 +1031,11 @@ async function loadSongs() {
 // Load videos
 async function loadVideos() {
     try {
-        const response = await fetch('/api/videos', {
-            headers: { 'Authorization': `Bearer ${adminToken}` }
+        const response = await fetch(`${API_BASE}/videos`, {
+            headers: { 
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
+            }
         });
         const data = await response.json();
         const tbody = document.querySelector('#videosTable tbody');
@@ -970,9 +1071,18 @@ async function loadVideos() {
 // Load backgrounds
 async function loadBackgrounds() {
     try {
-        const response = await fetch('/api/backgrounds', {
-            headers: { 'Authorization': `Bearer ${adminToken}` }
+        const response = await fetch(`${API_BASE}/backgrounds`, {
+            headers: { 
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
+            }
         });
+        
+        if (!response.ok) {
+            console.error('Load backgrounds failed:', response.status);
+            return;
+        }
+        
         const data = await response.json();
         const tbody = document.querySelector('#backgroundsTable tbody');
         
@@ -981,10 +1091,14 @@ async function loadBackgrounds() {
                 <tr>
                     <td><img src="/api/backgrounds/${bg.id}/file" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
                     <td>${bg.name}</td>
+                    <td><span class="badge bg-${bg.is_active ? 'success' : 'secondary'}">${bg.is_active ? 'Active' : 'Inactive'}</span></td>
                     <td>${formatFileSize(bg.size)}</td>
                     <td>${bg.created_by?.full_name || 'Unknown'}</td>
                     <td>${new Date(bg.created_at).toLocaleDateString()}</td>
                     <td class="table-actions">
+                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editBackground('${bg.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
                         <a href="/api/backgrounds/${bg.id}/file" class="btn btn-sm btn-outline-primary me-1" target="_blank">
                             <i class="fas fa-download"></i>
                         </a>
@@ -1007,10 +1121,11 @@ async function deleteSong(id) {
     if (!confirm('Delete this song?')) return;
     
     try {
-        const response = await fetch(`/api/songs/${id}`, {
+        const response = await fetch(`${API_BASE}/songs/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             }
         });
         
@@ -1029,10 +1144,11 @@ async function deleteVideo(id) {
     if (!confirm('Delete this video?')) return;
     
     try {
-        const response = await fetch(`/api/videos/${id}`, {
+        const response = await fetch(`${API_BASE}/videos/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             }
         });
         
@@ -1051,10 +1167,11 @@ async function deleteBackground(id) {
     if (!confirm('Delete this background?')) return;
     
     try {
-        const response = await fetch(`/api/backgrounds/${id}`, {
+        const response = await fetch(`${API_BASE}/backgrounds/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${adminToken}`,
+                ...NGROK_HEADERS
             }
         });
         
@@ -1167,33 +1284,93 @@ function initBackgroundUploadZone() {
 
 // Handle file uploads
 async function handleSongFiles(files) {
+    let uploadedCount = 0;
     for (let file of files) {
+        // Validate first
+        const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-m4a'];
+        if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a)$/i)) {
+            showAlert(`${file.name}: Invalid file type. Please select MP3, WAV, or M4A`, 'danger');
+            continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showAlert(`${file.name}: File too large (${formatFileSize(file.size)}). Max 10MB`, 'danger');
+            continue;
+        }
+        
         const title = prompt('Enter song title:', file.name.replace(/\.[^/.]+$/, ''));
         if (title) {
             await uploadSongFile(file, title);
+            uploadedCount++;
         }
     }
-    loadSongs();
+    
+    // Reset file input
+    const fileInput = document.getElementById('songFileInput');
+    if (fileInput) fileInput.value = '';
+    
+    if (uploadedCount > 0) {
+        loadSongs();
+    }
 }
 
 async function handleVideoFiles(files) {
+    let uploadedCount = 0;
     for (let file of files) {
+        // Validate first
+        const validTypes = ['video/mp4', 'video/avi', 'video/quicktime'];
+        if (!validTypes.includes(file.type) && !file.name.match(/\.(mp4|avi|mov)$/i)) {
+            showAlert(`${file.name}: Invalid file type. Please select MP4, AVI, or MOV`, 'danger');
+            continue;
+        }
+        if (file.size > 50 * 1024 * 1024) {
+            showAlert(`${file.name}: File too large (${formatFileSize(file.size)}). Max 50MB`, 'danger');
+            continue;
+        }
+        
         const title = prompt('Enter video title:', file.name.replace(/\.[^/.]+$/, ''));
         if (title) {
             await uploadVideoFile(file, title);
+            uploadedCount++;
         }
     }
-    loadVideos();
+    
+    // Reset file input
+    const fileInput = document.getElementById('videoFileInput');
+    if (fileInput) fileInput.value = '';
+    
+    if (uploadedCount > 0) {
+        loadVideos();
+    }
 }
 
 async function handleBackgroundFiles(files) {
+    let uploadedCount = 0;
     for (let file of files) {
+        // Validate first
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            showAlert(`${file.name}: Invalid file type. Please select JPG or PNG`, 'danger');
+            continue;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+            showAlert(`${file.name}: File too large (${formatFileSize(file.size)}). Max 20MB`, 'danger');
+            continue;
+        }
+        
         const name = prompt('Enter background name:', file.name.replace(/\.[^/.]+$/, ''));
         if (name) {
             await uploadBackgroundFile(file, name);
+            uploadedCount++;
         }
     }
-    loadBackgrounds();
+    
+    // Reset file input
+    const fileInput = document.getElementById('backgroundFileInput');
+    if (fileInput) fileInput.value = '';
+    
+    if (uploadedCount > 0) {
+        loadBackgrounds();
+    }
 }
 
 // Edit user functions
@@ -1257,8 +1434,11 @@ function refreshStats() {
 
 // Edit asset function
 function editAsset(assetId) {
-    fetch(`/api/admin/assets`, {
-        headers: { 'Authorization': `Bearer ${adminToken}` }
+    fetch(`${API_BASE}/admin/assets`, {
+        headers: { 
+            'Authorization': `Bearer ${adminToken}`,
+            ...NGROK_HEADERS
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -1275,6 +1455,7 @@ function editAsset(assetId) {
         }
     })
     .catch(error => {
+        console.error('Edit asset error:', error);
         showAlert('Failed to load asset data', 'danger');
     });
 }
@@ -1283,7 +1464,7 @@ function editAsset(assetId) {
 function updateEditSubcategories(category, selectedSubcategory = '') {
     const subcategorySelect = document.getElementById('editAssetSubcategory');
     const subcategories = {
-        hijaiyyah: ['huruf', 'angka', 'harakat'],
+        game: ['carihijaiyah', 'berlatih', 'pasangkan'],
         ui: ['button', 'icon', 'frame'],
         sound_effects: ['feedback', 'ui', 'pronunciation']
     };
@@ -1310,11 +1491,12 @@ async function updateAsset() {
     };
     
     try {
-        const response = await fetch(`/api/assets/${assetId}`, {
+        const response = await fetch(`${API_BASE}/assets/${assetId}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${adminToken}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...NGROK_HEADERS
             },
             body: JSON.stringify(assetData)
         });
@@ -1328,6 +1510,7 @@ async function updateAsset() {
             showAlert('Failed to update asset: ' + (error.message || 'Unknown error'), 'danger');
         }
     } catch (error) {
+        console.error('Update asset error:', error);
         showAlert('Failed to update asset', 'danger');
     }
 }
@@ -1378,11 +1561,66 @@ async function deleteUser(userId) {
     }
 }
 
+// Edit background
+function editBackground(bgId) {
+    fetch(`${API_BASE}/backgrounds/${bgId}`, {
+        headers: { 
+            'Authorization': `Bearer ${adminToken}`,
+            ...NGROK_HEADERS
+        }
+    })
+    .then(response => response.json())
+    .then(bg => {
+        document.getElementById('editBackgroundId').value = bg.id;
+        document.getElementById('editBackgroundName').value = bg.name;
+        document.getElementById('editBackgroundActive').checked = bg.is_active;
+        
+        const modal = new bootstrap.Modal(document.getElementById('editBackgroundModal'));
+        modal.show();
+    })
+    .catch(error => {
+        showAlert('Failed to load background data', 'danger');
+    });
+}
+
+async function updateBackground() {
+    const bgId = document.getElementById('editBackgroundId').value;
+    const bgData = {
+        name: document.getElementById('editBackgroundName').value,
+        is_active: document.getElementById('editBackgroundActive').checked
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/backgrounds/${bgId}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${adminToken}`,
+                'Content-Type': 'application/json',
+                ...NGROK_HEADERS
+            },
+            body: JSON.stringify(bgData)
+        });
+        
+        if (response.ok) {
+            showAlert('Background updated successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editBackgroundModal')).hide();
+            loadBackgrounds();
+        } else {
+            const error = await response.json();
+            showAlert('Failed to update background: ' + (error.message || 'Unknown error'), 'danger');
+        }
+    } catch (error) {
+        showAlert('Failed to update background', 'danger');
+    }
+}
+
 // Assign all functions to window for global access
 window.editAsset = editAsset;
 window.updateAsset = updateAsset;
 window.deleteAsset = deleteAsset;
 window.deleteUser = deleteUser;
 window.viewGameProgress = viewGameProgress;
+window.editBackground = editBackground;
+window.updateBackground = updateBackground;
 
 console.log('✅ All functions assigned to window object');

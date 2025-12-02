@@ -14,13 +14,9 @@ class VideoController extends Controller
     {
         $this->validate($request, [
             'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:mp4,avi,mov|max:51200', // Max 50MB
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'url' => 'required|url|max:500',
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
-
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $file->move(base_path('public/uploads/videos'), $fileName);
 
         $thumbnailPath = null;
         if ($request->hasFile('thumbnail')) {
@@ -33,12 +29,12 @@ class VideoController extends Controller
         $video = Video::create([
             'id' => Str::uuid(),
             'title' => $request->title,
-            'file' => 'uploads/videos/' . $fileName,
+            'url' => $request->url,
             'thumbnail' => $thumbnailPath,
             'created_by_id' => Auth::id(),
         ]);
 
-        return response()->json(['message' => 'Video uploaded successfully', 'video' => $video], 201);
+        return response()->json(['message' => 'Video URL saved successfully', 'video' => $video], 201);
     }
 
     public function index()
@@ -56,6 +52,47 @@ class VideoController extends Controller
         return response()->json($video);
     }
 
+    public function update(Request $request, $id)
+    {
+        $video = Video::find($id);
+        if (!$video) {
+            return response()->json(['error' => 'Video not found'], 404);
+        }
+
+        $this->validate($request, [
+            'title' => 'nullable|string|max:255',
+            'url' => 'nullable|url|max:500',
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        if ($request->has('title')) {
+            $video->title = $request->title;
+        }
+
+        if ($request->has('url')) {
+            $video->url = $request->url;
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            // Delete old thumbnail
+            if ($video->thumbnail) {
+                $oldThumbPath = base_path('public/' . $video->thumbnail);
+                if (File::exists($oldThumbPath)) {
+                    File::delete($oldThumbPath);
+                }
+            }
+
+            // Upload new thumbnail
+            $thumbnail = $request->file('thumbnail');
+            $thumbnailName = time() . '_thumb_' . $thumbnail->getClientOriginalName();
+            $thumbnail->move(base_path('public/uploads/thumbnails'), $thumbnailName);
+            $video->thumbnail = 'uploads/thumbnails/' . $thumbnailName;
+        }
+
+        $video->save();
+        return response()->json(['message' => 'Video updated successfully', 'video' => $video]);
+    }
+
     public function stream($id)
     {
         $video = Video::find($id);
@@ -63,12 +100,8 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video not found'], 404);
         }
 
-        $filePath = base_path('public/' . $video->file);
-        if (!File::exists($filePath)) {
-            return response()->json(['error' => 'Video file not found'], 404);
-        }
-
-        return response()->file($filePath);
+        // Return video URL for redirect
+        return response()->json(['url' => $video->url]);
     }
 
     public function destroy($id)
@@ -78,12 +111,7 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video not found'], 404);
         }
 
-        // Delete files
-        $filePath = base_path('public/' . $video->file);
-        if (File::exists($filePath)) {
-            File::delete($filePath);
-        }
-
+        // Delete thumbnail only (URL doesn't need file deletion)
         if ($video->thumbnail) {
             $thumbnailPath = base_path('public/' . $video->thumbnail);
             if (File::exists($thumbnailPath)) {

@@ -18,18 +18,12 @@ class CariHijaiyyahProgress extends Model
         'level_number',
         'is_unlocked',
         'is_completed',
-        'best_score',
-        'best_time',
-        'stars',
         'attempts'
     ];
     
     protected $casts = [
         'is_unlocked' => 'boolean',
         'is_completed' => 'boolean',
-        'best_score' => 'integer',
-        'best_time' => 'integer',
-        'stars' => 'integer',
         'attempts' => 'integer'
     ];
     

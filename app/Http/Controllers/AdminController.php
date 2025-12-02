@@ -47,29 +47,21 @@ class AdminController extends Controller
         // Tambahkan game progress summary untuk setiap user
         $users->getCollection()->transform(function ($user) {
             // Cari Hijaiyyah Progress
-            $cariProgress = CariHijaiyyahProgress::where('user_id', $user->id)
-                ->select(
-                    DB::raw('SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END) as completed_levels'),
-                    DB::raw('SUM(stars) as total_stars')
-                )
-                ->first();
+            $cariCompleted = CariHijaiyyahProgress::where('user_id', $user->id)
+                ->where('is_completed', true)
+                ->count();
             
             // Pasangkan Huruf Progress
-            $pasangkanProgress = PasangkanHurufProgress::where('user_id', $user->id)
-                ->select(
-                    DB::raw('SUM(CASE WHEN is_completed = 1 THEN 1 ELSE 0 END) as completed_levels'),
-                    DB::raw('SUM(stars) as total_stars')
-                )
-                ->first();
+            $pasangkanCompleted = PasangkanHurufProgress::where('user_id', $user->id)
+                ->where('is_completed', true)
+                ->count();
             
             $user->game_progress = [
                 'carihijaiyah' => [
-                    'completed' => $cariProgress->completed_levels ?? 0,
-                    'stars' => $cariProgress->total_stars ?? 0
+                    'completed' => $cariCompleted
                 ],
                 'pasangkanhuruf' => [
-                    'completed' => $pasangkanProgress->completed_levels ?? 0,
-                    'stars' => $pasangkanProgress->total_stars ?? 0
+                    'completed' => $pasangkanCompleted
                 ]
             ];
             
@@ -96,12 +88,7 @@ class AdminController extends Controller
             ->get();
         $cariStats = [
             'total_completed' => $cariProgress->where('is_completed', true)->count(),
-            'total_stars' => $cariProgress->sum('stars'),
-            'total_score' => $cariProgress->sum('best_score'),
-            'avg_accuracy' => $cariSessions->avg(function($s) {
-                $total = $s->correct_matches + $s->wrong_matches;
-                return $total > 0 ? ($s->correct_matches / $total) * 100 : 0;
-            })
+            'total_sessions' => $cariSessions->count()
         ];
         
         // Pasangkan Huruf
@@ -114,12 +101,7 @@ class AdminController extends Controller
             ->get();
         $pasangkanStats = [
             'total_completed' => $pasangkanProgress->where('is_completed', true)->count(),
-            'total_stars' => $pasangkanProgress->sum('stars'),
-            'total_score' => $pasangkanProgress->sum('best_score'),
-            'avg_accuracy' => $pasangkanSessions->avg(function($s) {
-                $total = $s->correct_matches + $s->wrong_matches;
-                return $total > 0 ? ($s->correct_matches / $total) * 100 : 0;
-            })
+            'total_sessions' => $pasangkanSessions->count()
         ];
         
         return response()->json([
@@ -140,9 +122,31 @@ class AdminController extends Controller
     /**
      * Daftar semua asset dengan detail uploader
      */
-    public function getAllAssets()
+    public function getAllAssets(Request $request)
     {
-        $assets = Asset::with('createdBy')->latest()->paginate(20);
+        $query = Asset::with('createdBy');
+        
+        // Search by filename
+        if ($request->has('search') && $request->search) {
+            $query->where('file_name', 'like', '%' . $request->search . '%');
+        }
+        
+        // Filter by category
+        if ($request->has('category') && $request->category) {
+            $query->where('category', $request->category);
+        }
+        
+        // Filter by subcategory
+        if ($request->has('subcategory') && $request->subcategory) {
+            $query->where('subcategory', $request->subcategory);
+        }
+        
+        // Filter by type
+        if ($request->has('type') && $request->type) {
+            $query->where('type', $request->type);
+        }
+        
+        $assets = $query->latest()->paginate(20);
         return response()->json($assets);
     }
 

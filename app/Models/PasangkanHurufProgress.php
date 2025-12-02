@@ -11,8 +11,12 @@ class PasangkanHurufProgress extends Model
     protected $table = 'pasangkanhuruf_progress';
 
     protected $fillable = [
-        'id', 'user_id', 'level_number', 'is_unlocked', 'is_completed',
-        'best_score', 'best_time', 'stars', 'attempts'
+        'id', 
+        'user_id', 
+        'level_number',
+        'is_unlocked',
+        'is_completed',
+        'attempts'
     ];
 
     protected $casts = [

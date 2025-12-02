@@ -10,7 +10,11 @@ class Song extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'title', 'file', 'thumbnail', 'created_by_id',
+        'id', 
+        'title', 
+        'file', 
+        'thumbnail', 
+        'created_by_id',
     ];
 
     public function createdBy()

@@ -11,8 +11,10 @@ class PasangkanHurufSession extends Model
     protected $table = 'pasangkanhuruf_sessions';
 
     protected $fillable = [
-        'id', 'user_id', 'level_number', 'score', 'time_taken',
-        'correct_matches', 'wrong_matches', 'stars', 'completed_at'
+        'id', 
+        'user_id', 
+        'level_number', 
+        'completed_at'
     ];
 
     protected $casts = [

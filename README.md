@@ -17,19 +17,19 @@ API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentik
 - **UUID Primary Keys** - Better security & scalability
 
 ### 📁 Content Management
-- **Asset Management** - Upload, download, batch download assets
-- **Song Management** - Upload audio files dengan thumbnail
-- **Video Management** - Upload dan streaming video files
-- **Background Management** - Upload background images
+- **Asset Management** - Upload, edit, search, filter by category/subcategory, batch download
+- **Song Management** - Upload audio files dengan thumbnail, edit title/file/thumbnail
+- **Video Management** - Store video URLs (YouTube/Vimeo) dengan optional thumbnail
+- **Background Management** - Upload background images dengan active/inactive status
 - **Letter Pairs Management** - Upload huruf Hijaiyyah untuk game
 - **Asset Manifest** - Untuk sync game/app data dengan checksum
 
 ### 🎮 Game Features
 - **Game Cari Hijaiyyah** - Game mencari huruf Hijaiyyah dengan 15 level
 - **Game Pasangkan Huruf** - Game pasangkan huruf Hijaiyyah dengan 15 level
-- **Progress Tracking** - Tracking progress per level dengan unlock system
-- **Session History** - Menyimpan history setiap gameplay
-- **Stars & Scoring** - Sistem bintang (1-3) dan scoring berdasarkan performa
+- **Progress Tracking** - Tracking completion status dan attempts per level dengan unlock system
+- **Session History** - Menyimpan history setiap gameplay (level & timestamp)
+- **Simplified Tracking** - Backend hanya track completion, game logic di mobile app
 - **Admin Monitoring** - Admin dapat melihat progress kedua game untuk semua user
 
 ### 🎛️ Admin Dashboard
@@ -37,7 +37,8 @@ API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentik
 - **Statistics Dashboard** - Real-time stats dan analytics
 - **User Management** - CRUD operations untuk users dengan game progress
 - **Game Progress Monitoring** - Lihat detail progress kedua game (Cari Hijaiyyah & Pasangkan Huruf) dengan tabs
-- **Content Management** - Upload dan kelola semua konten
+- **Content Management** - Upload dan kelola semua konten dengan edit/search/filter
+- **Asset Search & Filter** - Search by filename, filter by type/category/subcategory
 - **Batch Upload** - Upload sampai 50 files sekaligus (max 100MB per file)
 - **Background Status** - Active/Inactive status untuk backgrounds
 - **Drag & Drop Upload** - Modern file upload interface
@@ -314,17 +315,16 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 **Response:**
 ```json
-[
+{
+  "levels": [
     {
         "level_number": 1,
         "is_unlocked": true,
         "is_completed": true,
-        "best_score": 850,
-        "best_time": 45,
-        "stars": 3,
         "attempts": 2
     }
-]
+  ]
+}
 ```
 
 #### Start Game
@@ -354,20 +354,16 @@ Authorization: Bearer YOUR_JWT_TOKEN
 Content-Type: application/json
 
 {
-    "level_number": 1,
-    "score": 850,
-    "time_taken": 45,
-    "correct_matches": 6,
-    "wrong_matches": 0,
-    "stars": 3
+    "session_id": "uuid",
+    "level_number": 1
 }
 ```
 
 **Response:**
 ```json
 {
-    "message": "Game completed",
-    "is_new_best_score": true,
+    "message": "Level completed!",
+    "level_number": 1,
     "next_level_unlocked": true
 }
 ```
@@ -381,9 +377,8 @@ Authorization: Bearer YOUR_JWT_TOKEN
 **Response:**
 ```json
 {
-    "total_completed": 5,
-    "total_stars": 12,
-    "total_score": 4500
+    "total_levels_completed": 5,
+    "total_sessions": 8
 }
 ```
 
@@ -392,25 +387,25 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ### Game Cari Hijaiyyah Flow
 1. **User requests progress** - GET /api/carihijaiyah/progress
 2. **Check unlocked levels** - Level 1 auto-unlocked, others unlock after completing previous
-3. **Start game** - POST /api/carihijaiyah/start dengan level_number
-4. **Play game** - Game logic handled by mobile app (matching, validation)
-5. **Finish game** - POST /api/carihijaiyah/finish dengan score, time, matches, stars
-6. **Backend updates** - Save session, update best score/time, unlock next level
+3. **Start game** - POST /api/carihijaiyah/start dengan level_number (get session_id)
+4. **Play game** - Game logic handled by mobile app (matching, scoring, validation)
+5. **Finish game** - POST /api/carihijaiyah/finish dengan session_id & level_number
+6. **Backend updates** - Save session timestamp, mark completed, unlock next level
 7. **Admin monitors** - Admin dapat lihat progress semua user via dashboard
 
 ### Game Features
 - **15 Levels** - Progressive difficulty (both games)
 - **Unlock System** - Complete level to unlock next
-- **Stars** - 0-3 stars based on performance
-- **Best Score Tracking** - Automatically saves best score & time
-- **Session History** - All gameplay sessions saved
+- **Simplified Tracking** - Backend only tracks completion status & attempts
+- **Session History** - All gameplay sessions saved with timestamp
 - **Attempts Counter** - Track how many times user tried each level
+- **Game Logic in App** - Scoring, stars, time tracking handled by mobile app
 
 ### Admin Monitoring
-- View all users with both games progress summary
+- View all users with both games progress summary (completion count)
 - Click user to see detailed progress with tabs (Cari Hijaiyyah & Pasangkan Huruf)
 - Each tab shows 15 levels progress + recent 10 sessions
-- See stats: completion rate, stars, score, accuracy per game
+- See stats: completion rate, total sessions per game
 - Identify stuck users and difficult levels
 
 ## 🗄️ Database Schema
@@ -473,14 +468,15 @@ pasangkanhuruf_sessions.user_id -> users.id
    - Password: `admin123`
 
 ### Dashboard Features
-- **Statistics Overview** - Real-time stats cards
+- **Statistics Overview** - Real-time stats cards (users, assets, songs, videos, backgrounds, storage)
 - **User Management** - Create, edit, delete users dengan game progress monitoring
-- **Game Progress Modal** - View detailed 17 level progress + session history per user
-- **Asset Management** - Upload dan kelola files dengan category/subcategory
+- **Game Progress Modal** - View detailed 15 level progress + session history per user (dual tabs)
+- **Asset Management** - Upload, edit, search, filter files dengan category/subcategory
+- **Asset Search & Filter** - Real-time search by filename, filter by type/category/subcategory
 - **Batch Upload** - Upload sampai 50 files sekaligus
-- **Song Management** - Upload audio dengan thumbnail
-- **Video Management** - Upload dan streaming videos
-- **Background Management** - Upload background images
+- **Song Management** - Upload audio dengan thumbnail, edit title/file/thumbnail
+- **Video Management** - Store video URLs (YouTube/Vimeo) dengan optional thumbnail
+- **Background Management** - Upload background images dengan active/inactive toggle
 - **Drag & Drop Upload** - Modern file upload interface
 
 ### Admin API Endpoints
@@ -500,8 +496,8 @@ Authorization: Bearer ADMIN_TOKEN
 GET /api/admin/users/{userId}/game-progress
 Authorization: Bearer ADMIN_TOKEN
 
-# Get All Assets
-GET /api/admin/assets
+# Get All Assets (with search & filter)
+GET /api/admin/assets?search=filename&type=image&category=game&subcategory=carihijaiyah
 Authorization: Bearer ADMIN_TOKEN
 
 # Bulk Delete Assets
@@ -768,22 +764,24 @@ POST   /api/user/profile-picture    - Upload profile picture
 POST   /api/assets                  - Upload asset
 POST   /api/assets/batch            - Upload multiple assets
 GET    /api/assets                  - Get assets list
+PATCH  /api/assets/{id}             - Update asset category/subcategory
 DELETE /api/assets/{id}             - Delete asset
 DELETE /api/assets/batch            - Delete multiple assets
 
 # Song Management
-POST   /api/songs                   - Upload song
+POST   /api/songs                   - Upload song with thumbnail
 GET    /api/songs                   - Get songs list
 GET    /api/songs/{id}              - Get song details
-POST   /api/songs/{id}              - Update song
+PATCH  /api/songs/{id}              - Update song (title/file/thumbnail)
 GET    /api/songs/{id}/file         - Stream song
 DELETE /api/songs/{id}              - Delete song
 
 # Video Management
-POST   /api/videos                  - Upload video
+POST   /api/videos                  - Store video URL with optional thumbnail
 GET    /api/videos                  - Get videos list
 GET    /api/videos/{id}             - Get video details
-GET    /api/videos/{id}/file        - Stream video
+PATCH  /api/videos/{id}             - Update video (title/url/thumbnail)
+GET    /api/videos/{id}/file        - Get video URL
 DELETE /api/videos/{id}             - Delete video
 
 # Background Management

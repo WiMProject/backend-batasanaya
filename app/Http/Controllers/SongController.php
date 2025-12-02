@@ -14,8 +14,8 @@ class SongController extends Controller
     {
         $this->validate($request, [
             'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:mp3,wav,m4a|max:10240', // Max 10MB
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'file' => 'required|file|mimes:mp3,wav,m4a|max:102400', // 100MB
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5MB
         ]);
 
         $file = $request->file('file');
@@ -64,9 +64,9 @@ class SongController extends Controller
         }
 
         $this->validate($request, [
-            'title' => 'sometimes|required|string|max:255',
-            'file' => 'sometimes|file|mimes:mp3,wav,m4a|max:10240',
-            'thumbnail' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'title' => 'nullable|string|max:255',
+            'file' => 'nullable|file|mimes:mp3,wav,m4a|max:102400',
+            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         if ($request->has('title')) {
@@ -90,9 +90,9 @@ class SongController extends Controller
         if ($request->hasFile('thumbnail')) {
             // Delete old thumbnail
             if ($song->thumbnail) {
-                $oldThumbnailPath = base_path('public/' . $song->thumbnail);
-                if (File::exists($oldThumbnailPath)) {
-                    File::delete($oldThumbnailPath);
+                $oldThumbPath = base_path('public/' . $song->thumbnail);
+                if (File::exists($oldThumbPath)) {
+                    File::delete($oldThumbPath);
                 }
             }
 

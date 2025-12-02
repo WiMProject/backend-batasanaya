@@ -98,31 +98,6 @@ ob_start();
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="stats-card info p-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-0">Total Songs</h6>
-                                        <h3 class="mb-0" id="totalSongs">-</h3>
-                                    </div>
-                                    <i class="fas fa-music fa-2x opacity-75"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-lg-4 col-md-6 mb-3">
-                            <div class="stats-card p-3" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
-                                <div class="d-flex align-items-center">
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-0">Total Videos</h6>
-                                        <h3 class="mb-0" id="totalVideos">-</h3>
-                                    </div>
-                                    <i class="fas fa-video fa-2x opacity-75"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="stats-card p-3" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1">
@@ -130,6 +105,28 @@ ob_start();
                                         <h3 class="mb-0" id="totalBackgrounds">-</h3>
                                     </div>
                                     <i class="fas fa-image fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stats-card info p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Songs</h6>
+                                        <h3 class="mb-0" id="totalSongs">-</h3>
+                                    </div>
+                                    <i class="fas fa-music fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 mb-3">
+                            <div class="stats-card p-3" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Videos</h6>
+                                        <h3 class="mb-0" id="totalVideos">-</h3>
+                                    </div>
+                                    <i class="fas fa-video fa-2x opacity-75"></i>
                                 </div>
                             </div>
                         </div>
@@ -193,6 +190,33 @@ ob_start();
                             <button class="btn btn-danger" onclick="bulkDelete()" id="bulkDeleteBtn" disabled>
                                 <i class="fas fa-trash me-1"></i>Delete Selected
                             </button>
+                        </div>
+
+                        <!-- Search & Filter -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="assetSearch" placeholder="🔍 Search by filename...">
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="filterType">
+                                    <option value="">All Types</option>
+                                    <option value="image">Image</option>
+                                    <option value="audio">Audio</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="game">Game</option>
+                                    <option value="ui">UI</option>
+                                    <option value="sound_effects">Sound Effects</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterSubcategory" disabled>
+                                    <option value="">All Subcategories</option>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Category Selection - Outside Upload Zone -->
@@ -263,14 +287,14 @@ ob_start();
                 <!-- Songs Tab -->
                 <div class="tab-pane fade" id="songs">
                     <div class="admin-content p-4">
-                        <h3 class="mb-4">Song Management</h3>
-                        
-                        <!-- Upload Zone -->
-                        <div class="upload-zone mb-4" id="songUploadZone">
-                            <i class="fas fa-music fa-3x text-muted mb-3"></i>
-                            <h5>Drag & Drop Songs Here</h5>
-                            <p class="text-muted">or click to browse (MP3, WAV, M4A - Max 10MB)</p>
-                            <input type="file" id="songFileInput" multiple accept=".mp3,.wav,.m4a" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h3 class="mb-1">Song Management</h3>
+                                <p class="text-muted mb-0">Upload songs with thumbnail. Thumbnail will be requested after selecting song file.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="uploadSong()">
+                                <i class="fas fa-upload me-1"></i>Upload Song
+                            </button>
                         </div>
                         
                         <div class="table-responsive">
@@ -296,14 +320,14 @@ ob_start();
                 <!-- Videos Tab -->
                 <div class="tab-pane fade" id="videos">
                     <div class="admin-content p-4">
-                        <h3 class="mb-4">Video Management</h3>
-                        
-                        <!-- Upload Zone -->
-                        <div class="upload-zone mb-4" id="videoUploadZone">
-                            <i class="fas fa-video fa-3x text-muted mb-3"></i>
-                            <h5>Drag & Drop Videos Here</h5>
-                            <p class="text-muted">or click to browse (MP4, AVI, MOV - Max 50MB)</p>
-                            <input type="file" id="videoFileInput" multiple accept=".mp4,.avi,.mov" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h3 class="mb-1">Video Management</h3>
+                                <p class="text-muted mb-0">Upload videos with thumbnail. Thumbnail will be requested after selecting video file.</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="uploadVideo()">
+                                <i class="fas fa-upload me-1"></i>Upload Video
+                            </button>
                         </div>
                         
                         <div class="table-responsive">
@@ -514,14 +538,11 @@ ob_start();
                                         <th>Level</th>
                                         <th>Status</th>
                                         <th>Completion</th>
-                                        <th>Best Score</th>
-                                        <th>Best Time</th>
-                                        <th>Stars</th>
                                         <th>Attempts</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cariProgress">
-                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                    <tr><td colspan="4" class="text-center">Loading...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -531,16 +552,11 @@ ob_start();
                                 <thead class="sticky-top bg-white">
                                     <tr>
                                         <th>Level</th>
-                                        <th>Score</th>
-                                        <th>Time</th>
-                                        <th>Matches</th>
-                                        <th>Accuracy</th>
-                                        <th>Stars</th>
                                         <th>Completed At</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cariSessions">
-                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                    <tr><td colspan="2" class="text-center">Loading...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -559,14 +575,11 @@ ob_start();
                                         <th>Level</th>
                                         <th>Status</th>
                                         <th>Completion</th>
-                                        <th>Best Score</th>
-                                        <th>Best Time</th>
-                                        <th>Stars</th>
                                         <th>Attempts</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pasangkanProgress">
-                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                    <tr><td colspan="4" class="text-center">Loading...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -576,16 +589,11 @@ ob_start();
                                 <thead class="sticky-top bg-white">
                                     <tr>
                                         <th>Level</th>
-                                        <th>Score</th>
-                                        <th>Time</th>
-                                        <th>Matches</th>
-                                        <th>Accuracy</th>
-                                        <th>Stars</th>
                                         <th>Completed At</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pasangkanSessions">
-                                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                    <tr><td colspan="2" class="text-center">Loading...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -661,6 +669,76 @@ ob_start();
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="updateAsset()">Update Asset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Song Modal -->
+<div class="modal fade" id="editSongModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Song</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editSongForm">
+                    <input type="hidden" id="editSongId">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editSongTitle">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Replace Audio File (optional)</label>
+                        <input type="file" class="form-control" id="editSongFile" accept=".mp3,.wav,.m4a">
+                        <small class="text-muted">Max 100MB</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Replace Thumbnail (optional)</label>
+                        <input type="file" class="form-control" id="editSongThumbnail" accept="image/jpeg,image/jpg,image/png">
+                        <small class="text-muted">Max 5MB</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateSong()">Update Song</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Video Modal -->
+<div class="modal fade" id="editVideoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editVideoForm">
+                    <input type="hidden" id="editVideoId">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editVideoTitle">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Video URL</label>
+                        <input type="url" class="form-control" id="editVideoUrl" placeholder="https://youtube.com/watch?v=...">
+                        <small class="text-muted">YouTube, Vimeo, or direct video URL</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Replace Thumbnail (optional)</label>
+                        <input type="file" class="form-control" id="editVideoThumbnail" accept="image/jpeg,image/jpg,image/png">
+                        <small class="text-muted">Max 5MB</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateVideo()">Update Video</button>
             </div>
         </div>
     </div>

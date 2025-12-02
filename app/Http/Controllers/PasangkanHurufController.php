@@ -23,9 +23,6 @@ class PasangkanHurufController extends Controller
                     'id' => Str::uuid(),
                     'is_unlocked' => $level === 1,
                     'is_completed' => false,
-                    'best_score' => 0,
-                    'best_time' => 0,
-                    'stars' => 0,
                     'attempts' => 0
                 ]
             );
@@ -34,9 +31,6 @@ class PasangkanHurufController extends Controller
                 'level_number' => $levelProgress->level_number,
                 'is_unlocked' => $levelProgress->is_unlocked,
                 'is_completed' => $levelProgress->is_completed,
-                'best_score' => $levelProgress->best_score,
-                'best_time' => $levelProgress->best_time,
-                'stars' => $levelProgress->stars,
                 'attempts' => $levelProgress->attempts
             ];
         }
@@ -76,12 +70,7 @@ class PasangkanHurufController extends Controller
     {
         $this->validate($request, [
             'session_id' => 'required|string',
-            'level_number' => 'required|integer|min:1|max:15',
-            'score' => 'required|integer|min:0',
-            'time_taken' => 'required|integer|min:0',
-            'correct_matches' => 'required|integer|min:0',
-            'wrong_matches' => 'required|integer|min:0',
-            'stars' => 'required|integer|min:1|max:3'
+            'level_number' => 'required|integer|min:1|max:15'
         ]);
         
         $userId = Auth::id();
@@ -90,11 +79,6 @@ class PasangkanHurufController extends Controller
             'id' => $request->session_id,
             'user_id' => $userId,
             'level_number' => $request->level_number,
-            'score' => $request->score,
-            'time_taken' => $request->time_taken,
-            'correct_matches' => $request->correct_matches,
-            'wrong_matches' => $request->wrong_matches,
-            'stars' => $request->stars,
             'completed_at' => Carbon::now()
         ]);
         
@@ -102,21 +86,7 @@ class PasangkanHurufController extends Controller
             ->where('level_number', $request->level_number)
             ->first();
             
-        $isNewBest = false;
         if ($progress) {
-            if ($request->score > $progress->best_score) {
-                $progress->best_score = $request->score;
-                $isNewBest = true;
-            }
-            
-            if ($progress->best_time == 0 || $request->time_taken < $progress->best_time) {
-                $progress->best_time = $request->time_taken;
-            }
-            
-            if ($request->stars > $progress->stars) {
-                $progress->stars = $request->stars;
-            }
-            
             $progress->is_completed = true;
             $progress->save();
             
@@ -128,9 +98,6 @@ class PasangkanHurufController extends Controller
                         'id' => Str::uuid(),
                         'is_unlocked' => false,
                         'is_completed' => false,
-                        'best_score' => 0,
-                        'best_time' => 0,
-                        'stars' => 0,
                         'attempts' => 0
                     ]
                 );
@@ -145,10 +112,6 @@ class PasangkanHurufController extends Controller
         return response()->json([
             'message' => 'Level completed!',
             'level_number' => $request->level_number,
-            'score' => $request->score,
-            'time_taken' => $request->time_taken,
-            'stars' => $request->stars,
-            'is_new_best' => $isNewBest,
             'next_level_unlocked' => $request->level_number < 15
         ]);
     }
@@ -161,18 +124,10 @@ class PasangkanHurufController extends Controller
             ->where('is_completed', true)
             ->count();
             
-        $totalStars = PasangkanHurufProgress::where('user_id', $userId)
-            ->sum('stars');
-            
-        $totalScore = PasangkanHurufProgress::where('user_id', $userId)
-            ->sum('best_score');
-            
         $totalSessions = PasangkanHurufSession::where('user_id', $userId)->count();
         
         return response()->json([
             'total_levels_completed' => $totalCompleted,
-            'total_stars' => $totalStars,
-            'total_score' => $totalScore,
             'total_sessions' => $totalSessions
         ]);
     }

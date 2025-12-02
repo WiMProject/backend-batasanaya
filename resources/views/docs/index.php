@@ -151,7 +151,7 @@ pre code {
                                     <li>Game Cari Hijaiyyah (15 Levels)</li>
                                     <li>Game Pasangkan Huruf (15 Levels)</li>
                                     <li>Progress Tracking & Unlock System</li>
-                                    <li>Stars (1-3) & Best Score Tracking</li>
+                                    <li>Session History & Attempts Counter</li>
                                 </ul>
                             </div>
                         </div>
@@ -618,7 +618,7 @@ file: [image file]</code></pre>
                             <li>Finish Game → Save score, unlock next level</li>
                         </ol>
                     </div>
-                    <p class="text-muted mb-4">15 levels game dengan unlock system (level 1 auto-unlock), stars (1-3), dan best score tracking. Backend hanya menyimpan progress, game logic ada di mobile app.</p>
+                    <p class="text-muted mb-4">15 levels game dengan unlock system (level 1 auto-unlock). Backend hanya menyimpan completion status dan attempts, game logic ada di mobile app.</p>
                     
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
@@ -635,9 +635,6 @@ file: [image file]</code></pre>
       "level_number": 1,
       "is_unlocked": true,
       "is_completed": true,
-      "best_score": 850,
-      "best_time": 45,
-      "stars": 3,
       "attempts": 2
     }
   ]
@@ -677,17 +674,12 @@ file: [image file]</code></pre>
                             <h6>Request Body:</h6>
                             <pre><code>{
   "session_id": "uuid",
-  "level_number": 1,
-  "score": 850,
-  "time_taken": 45,
-  "correct_matches": 6,
-  "wrong_matches": 0,
-  "stars": 3
+  "level_number": 1
 }</code></pre>
                             <h6>Response:</h6>
                             <pre><code>{
   "message": "Level completed!",
-  "is_new_best": true,
+  "level_number": 1,
   "next_level_unlocked": true
 }</code></pre>
                         </div>
@@ -704,8 +696,6 @@ file: [image file]</code></pre>
                             <h6>Response:</h6>
                             <pre><code>{
   "total_levels_completed": 5,
-  "total_stars": 12,
-  "total_score": 4500,
   "total_sessions": 8
 }</code></pre>
                         </div>
@@ -811,12 +801,10 @@ file: [image file]</code></pre>
       "email": "john@example.com",
       "game_progress": {
         "carihijaiyah": {
-          "completed": 5,
-          "stars": 12
+          "completed": 5
         },
         "pasangkanhuruf": {
-          "completed": 3,
-          "stars": 8
+          "completed": 3
         }
       }
     }

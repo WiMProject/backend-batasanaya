@@ -16,21 +16,11 @@ class CariHijaiyyahSession extends Model
         'id',
         'user_id',
         'level_number',
-        'score',
-        'time_taken',
-        'correct_matches',
-        'wrong_matches',
-        'stars',
         'completed_at'
     ];
     
     protected $casts = [
         'level_number' => 'integer',
-        'score' => 'integer',
-        'time_taken' => 'integer',
-        'correct_matches' => 'integer',
-        'wrong_matches' => 'integer',
-        'stars' => 'integer',
         'completed_at' => 'datetime'
     ];
     

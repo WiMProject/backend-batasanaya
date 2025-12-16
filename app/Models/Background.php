@@ -10,7 +10,7 @@ class Background extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'name', 'file', 'size', 'is_active', 'created_by_id',
+        'id', 'title', 'file_name', 'file_path', 'size', 'is_active', 'type', 'created_by_id',
     ];
 
     protected $casts = [

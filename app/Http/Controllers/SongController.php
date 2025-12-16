@@ -14,27 +14,18 @@ class SongController extends Controller
     {
         $this->validate($request, [
             'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:mp3,wav,m4a|max:102400', // 100MB
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5MB
+            'file' => 'required|file|mimes:mp3,wav,ogg|max:102400',
         ]);
 
-        $file = $request->file('file');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $file->move(base_path('public/uploads/songs'), $fileName);
-
-        $thumbnailPath = null;
-        if ($request->hasFile('thumbnail')) {
-            $thumbnail = $request->file('thumbnail');
-            $thumbnailName = time() . '_thumb_' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(base_path('public/uploads/thumbnails'), $thumbnailName);
-            $thumbnailPath = 'uploads/thumbnails/' . $thumbnailName;
-        }
+        $audioFile = $request->file('file');
+        $audioFileName = time() . '_' . $audioFile->getClientOriginalName();
+        $audioFile->move(base_path('public/uploads/songs'), $audioFileName);
+        $audioPath = 'uploads/songs/' . $audioFileName;
 
         $song = Song::create([
             'id' => Str::uuid(),
             'title' => $request->title,
-            'file' => 'uploads/songs/' . $fileName,
-            'thumbnail' => $thumbnailPath,
+            'file' => $audioPath,
             'created_by_id' => Auth::id(),
         ]);
 
@@ -65,8 +56,7 @@ class SongController extends Controller
 
         $this->validate($request, [
             'title' => 'nullable|string|max:255',
-            'file' => 'nullable|file|mimes:mp3,wav,m4a|max:102400',
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'file' => 'nullable|file|mimes:mp3,wav,ogg|max:102400',
         ]);
 
         if ($request->has('title')) {
@@ -74,33 +64,14 @@ class SongController extends Controller
         }
 
         if ($request->hasFile('file')) {
-            // Delete old file
-            $oldFilePath = base_path('public/' . $song->file);
-            if (File::exists($oldFilePath)) {
-                File::delete($oldFilePath);
+            if ($song->file && File::exists(base_path('public/' . $song->file))) {
+                File::delete(base_path('public/' . $song->file));
             }
-
-            // Upload new file
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(base_path('public/uploads/songs'), $fileName);
-            $song->file = 'uploads/songs/' . $fileName;
-        }
-
-        if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail
-            if ($song->thumbnail) {
-                $oldThumbPath = base_path('public/' . $song->thumbnail);
-                if (File::exists($oldThumbPath)) {
-                    File::delete($oldThumbPath);
-                }
-            }
-
-            // Upload new thumbnail
-            $thumbnail = $request->file('thumbnail');
-            $thumbnailName = time() . '_thumb_' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(base_path('public/uploads/thumbnails'), $thumbnailName);
-            $song->thumbnail = 'uploads/thumbnails/' . $thumbnailName;
+            
+            $audioFile = $request->file('file');
+            $audioFileName = time() . '_' . $audioFile->getClientOriginalName();
+            $audioFile->move(base_path('public/uploads/songs'), $audioFileName);
+            $song->file = 'uploads/songs/' . $audioFileName;
         }
 
         $song->save();
@@ -129,17 +100,8 @@ class SongController extends Controller
             return response()->json(['error' => 'Song not found'], 404);
         }
 
-        // Delete files
-        $filePath = base_path('public/' . $song->file);
-        if (File::exists($filePath)) {
-            File::delete($filePath);
-        }
-
-        if ($song->thumbnail) {
-            $thumbnailPath = base_path('public/' . $song->thumbnail);
-            if (File::exists($thumbnailPath)) {
-                File::delete($thumbnailPath);
-            }
+        if ($song->file && File::exists(base_path('public/' . $song->file))) {
+            File::delete(base_path('public/' . $song->file));
         }
 
         $song->delete();

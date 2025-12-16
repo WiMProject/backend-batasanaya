@@ -882,6 +882,15 @@ async function uploadBackgroundFile(file, name) {
         });
         
         console.log('Response status:', response.status);
+        console.log('Response content-type:', response.headers.get('content-type'));
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Non-JSON response:', text.substring(0, 500));
+            showAlert('Server error: Invalid response format', 'danger');
+            return;
+        }
         
         if (response.ok) {
             const result = await response.json();
@@ -940,7 +949,7 @@ async function loadBackgrounds() {
             tbody.innerHTML = data.data.map(bg => `
                 <tr>
                     <td><img src="/api/backgrounds/${bg.id}/file" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                    <td>${bg.name}</td>
+                    <td>${bg.title || bg.name || 'N/A'}</td>
                     <td><span class="badge bg-${bg.is_active ? 'success' : 'secondary'}">${bg.is_active ? 'Active' : 'Inactive'}</span></td>
                     <td>${formatFileSize(bg.size)}</td>
                     <td>${bg.created_by?.full_name || 'Unknown'}</td>
@@ -1476,30 +1485,27 @@ async function loadSongs() {
         const tbody = document.querySelector('#songsTable tbody');
         
         if (data.data && data.data.length > 0) {
-            tbody.innerHTML = data.data.map(song => `
+            tbody.innerHTML = data.data.map(song => {
+                const fileUrl = song.file ? `http://lumen-backend-batasanaya.test/${song.file}` : '#';
+                
+                return `
                 <tr>
-                    <td>
-                        ${song.thumbnail 
-                            ? `<img src="/${song.thumbnail}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">` 
-                            : `<i class="fas fa-music fa-2x text-muted"></i>`
-                        }
-                    </td>
                     <td>${song.title}</td>
-                    <td><a href="/api/songs/${song.id}/file" target="_blank">${song.file.split('/').pop()}</a></td>
+                    <td><a href="${fileUrl}" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">${song.file || 'N/A'}</a></td>
                     <td>${song.created_by?.full_name || 'Unknown'}</td>
                     <td>${new Date(song.created_at).toLocaleDateString()}</td>
                     <td class="table-actions">
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editSong('${song.id}')">
-                            <i class="fas fa-edit"></i>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="playSong('${song.id}')" title="Play">
+                            <i class="fas fa-play"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteSong('${song.id}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No songs found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No songs found</td></tr>';
         }
     } catch (error) {
         console.error('Failed to load songs:', error);
@@ -1519,100 +1525,83 @@ async function loadVideos() {
         const tbody = document.querySelector('#videosTable tbody');
         
         if (data.data && data.data.length > 0) {
-            tbody.innerHTML = data.data.map(video => `
+            tbody.innerHTML = data.data.map(video => {
+                const fileUrl = video.file ? `http://lumen-backend-batasanaya.test/${video.file}` : '#';
+                const qualities = video.qualities ? JSON.parse(video.qualities) : [];
+                const qualityBadges = qualities.map(q => `<span class="badge bg-info me-1">${q.quality}</span>`).join('');
+                
+                return `
                 <tr>
-                    <td>
-                        ${video.thumbnail 
-                            ? `<img src="/${video.thumbnail}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">` 
-                            : `<i class="fas fa-video fa-2x text-muted"></i>`
-                        }
-                    </td>
                     <td>${video.title}</td>
-                    <td><a href="${video.url}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">${video.url}</a></td>
+                    <td>
+                        <a href="${fileUrl}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">${video.file || 'N/A'}</a>
+                        <div class="mt-1">${qualityBadges}</div>
+                    </td>
                     <td>${video.created_by?.full_name || 'Unknown'}</td>
                     <td>${new Date(video.created_at).toLocaleDateString()}</td>
                     <td class="table-actions">
-                        <button class="btn btn-sm btn-outline-warning me-1" onclick="editVideo('${video.id}')">
-                            <i class="fas fa-edit"></i>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="playVideo('${video.id}')" title="Play">
+                            <i class="fas fa-play"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteVideo('${video.id}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         } else {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No videos found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No videos found</td></tr>';
         }
     } catch (error) {
         console.error('Failed to load videos:', error);
     }
 }
 
-// Upload song with thumbnail
+// Upload song URL
 function uploadSong() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.mp3,.wav,.m4a';
+    input.accept = 'audio/mp3,audio/wav,audio/ogg';
     input.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
         
-        // Validate
-        if (file.size > 100 * 1024 * 1024) {
-            showAlert('File too large. Max 100MB', 'danger');
-            return;
-        }
-        
-        const title = prompt('Enter song title:', file.name.replace(/\.[^/.]+$/, ''));
+        const title = prompt('Enter song title:');
         if (!title) return;
         
-        // Ask for thumbnail
-        if (confirm('Upload thumbnail for this song?')) {
-            const thumbInput = document.createElement('input');
-            thumbInput.type = 'file';
-            thumbInput.accept = 'image/jpeg,image/jpg,image/png';
-            thumbInput.onchange = async (e) => {
-                const thumbnail = e.target.files[0];
-                if (thumbnail && thumbnail.size > 5 * 1024 * 1024) {
-                    showAlert('Thumbnail too large. Max 5MB', 'danger');
-                    return;
-                }
-                await uploadSongFile(file, title, thumbnail);
-                loadSongs();
-            };
-            thumbInput.click();
-        } else {
-            await uploadSongFile(file, title, null);
-            loadSongs();
-        }
+        await uploadSongFile(file, title);
+        loadSongs();
     };
     input.click();
 }
 
-// Upload video URL (thumbnail can be added via edit)
+// Upload video URL
 function uploadVideo() {
-    const url = prompt('Enter video URL (YouTube, Vimeo, etc):');
-    if (!url) return;
-    
-    const title = prompt('Enter video title:');
-    if (!title) return;
-    
-    // Save without thumbnail (user can edit later to add thumbnail)
-    uploadVideoUrl(url, title, null).then(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/mp4,video/avi,video/mov,video/mkv';
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const title = prompt('Enter video title:');
+        if (!title) return;
+        
+        await uploadVideoFile(file, title);
         loadVideos();
-        showAlert('Video saved! You can edit it to add a thumbnail.', 'info');
-    });
+    };
+    input.click();
 }
 
 // Upload song file
-async function uploadSongFile(file, title, thumbnail) {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('title', title);
-    if (thumbnail) formData.append('thumbnail', thumbnail);
-    
+async function uploadSongFile(file, title) {
     try {
+        showAlert('Uploading song...', 'info');
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', title);
+        
         const response = await fetch(`${API_BASE}/songs`, {
             method: 'POST',
             headers: {
@@ -1623,24 +1612,25 @@ async function uploadSongFile(file, title, thumbnail) {
         });
         
         if (response.ok) {
-            showAlert('Song uploaded successfully', 'success');
+            showAlert('Song uploaded successfully!', 'success');
         } else {
             const error = await response.json();
             showAlert('Failed to upload song: ' + (error.message || 'Unknown error'), 'danger');
         }
     } catch (error) {
-        showAlert('Failed to upload song: ' + error.message, 'danger');
+        showAlert('Failed to save song: ' + error.message, 'danger');
     }
 }
 
-// Upload video URL
-async function uploadVideoUrl(url, title, thumbnail) {
-    const formData = new FormData();
-    formData.append('url', url);
-    formData.append('title', title);
-    if (thumbnail) formData.append('thumbnail', thumbnail);
-    
+// Upload video file
+async function uploadVideoFile(file, title) {
     try {
+        showAlert('Uploading video... This may take several minutes.', 'info');
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', title);
+        
         const response = await fetch(`${API_BASE}/videos`, {
             method: 'POST',
             headers: {
@@ -1651,13 +1641,13 @@ async function uploadVideoUrl(url, title, thumbnail) {
         });
         
         if (response.ok) {
-            showAlert('Video URL saved successfully', 'success');
+            showAlert('Video uploaded and processed successfully!', 'success');
         } else {
             const error = await response.json();
-            showAlert('Failed to save video: ' + (error.message || 'Unknown error'), 'danger');
+            showAlert('Failed to upload video: ' + (error.message || 'Unknown error'), 'danger');
         }
     } catch (error) {
-        showAlert('Failed to save video: ' + error.message, 'danger');
+        showAlert('Failed to upload video: ' + error.message, 'danger');
     }
 }
 
@@ -1709,29 +1699,13 @@ async function deleteVideo(id) {
     }
 }
 
-// Edit song
-function editSong(id) {
-    fetch(`${API_BASE}/songs/${id}`, {
-        headers: { 
-            'Authorization': `Bearer ${adminToken}`,
-            ...NGROK_HEADERS
-        }
-    })
-    .then(response => response.json())
-    .then(song => {
-        document.getElementById('editSongId').value = song.id;
-        document.getElementById('editSongTitle').value = song.title;
-        
-        const modal = new bootstrap.Modal(document.getElementById('editSongModal'));
-        modal.show();
-    })
-    .catch(error => {
-        showAlert('Failed to load song data', 'danger');
-    });
+// Play song
+function playSong(id) {
+    window.open(`${API_BASE}/songs/${id}/file`, '_blank');
 }
 
-// Edit video
-function editVideo(id) {
+// Play video
+function playVideo(id) {
     fetch(`${API_BASE}/videos/${id}`, {
         headers: { 
             'Authorization': `Bearer ${adminToken}`,
@@ -1740,40 +1714,68 @@ function editVideo(id) {
     })
     .then(response => response.json())
     .then(video => {
-        document.getElementById('editVideoId').value = video.id;
-        document.getElementById('editVideoTitle').value = video.title;
-        document.getElementById('editVideoUrl').value = video.url;
+        const videoUrl = `http://lumen-backend-batasanaya.test/${video.file}`;
         
-        const modal = new bootstrap.Modal(document.getElementById('editVideoModal'));
-        modal.show();
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${video.title}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <video id="videoPlayer" controls style="width: 100%; height: auto;"></video>
+                        <div class="mt-2">
+                            <small class="text-muted">HLS URL: ${videoUrl}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        
+        // Load HLS
+        const videoElement = document.getElementById('videoPlayer');
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(videoUrl);
+            hls.attachMedia(videoElement);
+        } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+            videoElement.src = videoUrl;
+        }
+        
+        // Cleanup on close
+        modal.addEventListener('hidden.bs.modal', () => {
+            videoElement.pause();
+            modal.remove();
+        });
     })
     .catch(error => {
-        showAlert('Failed to load video data', 'danger');
+        showAlert('Failed to load video', 'danger');
     });
 }
 
 // Update song
 async function updateSong() {
     const id = document.getElementById('editSongId').value;
-    const formData = new FormData();
-    
     const title = document.getElementById('editSongTitle').value;
-    if (title) formData.append('title', title);
-    
-    const fileInput = document.getElementById('editSongFile');
-    if (fileInput.files[0]) formData.append('file', fileInput.files[0]);
-    
-    const thumbInput = document.getElementById('editSongThumbnail');
-    if (thumbInput.files[0]) formData.append('thumbnail', thumbInput.files[0]);
+    const url = document.getElementById('editSongUrl').value;
     
     try {
         const response = await fetch(`${API_BASE}/songs/${id}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${adminToken}`,
+                'Content-Type': 'application/json',
                 ...NGROK_HEADERS
             },
-            body: formData
+            body: JSON.stringify({ title, url })
         });
         
         if (response.ok) {
@@ -1792,27 +1794,18 @@ async function updateSong() {
 // Update video
 async function updateVideo() {
     const id = document.getElementById('editVideoId').value;
-    const formData = new FormData();
-    
     const title = document.getElementById('editVideoTitle').value;
-    if (title) formData.append('title', title);
-    
     const url = document.getElementById('editVideoUrl').value;
-    if (url) formData.append('url', url);
-    
-    const thumbInput = document.getElementById('editVideoThumbnail');
-    if (thumbInput.files[0]) {
-        formData.append('thumbnail', thumbInput.files[0]);
-    }
     
     try {
         const response = await fetch(`${API_BASE}/videos/${id}`, {
             method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${adminToken}`,
+                'Content-Type': 'application/json',
                 ...NGROK_HEADERS
             },
-            body: formData
+            body: JSON.stringify({ title, url })
         });
         
         if (response.ok) {
@@ -1831,8 +1824,7 @@ async function updateVideo() {
 // Export to window
 window.uploadSong = uploadSong;
 window.uploadVideo = uploadVideo;
-window.editSong = editSong;
-window.editVideo = editVideo;
+
 window.updateSong = updateSong;
 window.updateVideo = updateVideo;
 window.deleteSong = deleteSong;

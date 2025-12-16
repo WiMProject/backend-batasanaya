@@ -26,8 +26,9 @@ class BackgroundController extends Controller
 
         $background = Background::create([
             'id' => Str::uuid(),
-            'name' => $request->name,
-            'file' => $filePath,
+            'title' => $request->name,
+            'file_name' => $fileName,
+            'file_path' => $filePath,
             'size' => $fileSize,
             'created_by_id' => Auth::id(),
         ]);
@@ -57,7 +58,7 @@ class BackgroundController extends Controller
             return response()->json(['error' => 'Background not found'], 404);
         }
 
-        $filePath = base_path('public/' . $background->file);
+        $filePath = base_path('public/' . $background->file_path);
         if (!File::exists($filePath)) {
             return response()->json(['error' => 'Background file not found'], 404);
         }
@@ -77,7 +78,15 @@ class BackgroundController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
-        $background->update($request->only(['name', 'is_active']));
+        $updateData = [];
+        if ($request->has('name')) {
+            $updateData['title'] = $request->name;
+        }
+        if ($request->has('is_active')) {
+            $updateData['is_active'] = $request->is_active;
+        }
+        
+        $background->update($updateData);
         return response()->json(['message' => 'Background updated successfully', 'background' => $background]);
     }
 
@@ -88,7 +97,7 @@ class BackgroundController extends Controller
             return response()->json(['error' => 'Background not found'], 404);
         }
 
-        $filePath = base_path('public/' . $background->file);
+        $filePath = base_path('public/' . $background->file_path);
         if (File::exists($filePath)) {
             File::delete($filePath);
         }

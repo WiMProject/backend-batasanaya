@@ -16,7 +16,6 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->string('file');
-            $table->string('thumbnail')->nullable();
             $table->uuid('created_by_id');
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
@@ -27,7 +26,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->string('file');
-            $table->string('thumbnail')->nullable();
+            $table->json('qualities')->nullable();
             $table->uuid('created_by_id');
             $table->foreign('created_by_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

@@ -1,0 +1,240 @@
+{
+	"info": {
+		"_postman_id": "game-cari-hijaiyyah-v2",
+		"name": "Game Cari Hijaiyyah API (15 Levels)",
+		"description": "API Collection untuk Game Cari Hijaiyyah - 15 Levels dengan Simplified Tracking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"token\", jsonData.access_token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth/login",
+					"host": ["{{base_url}}"],
+					"path": ["api", "auth", "login"]
+				},
+				"description": "Login untuk mendapatkan JWT token"
+			}
+		},
+		{
+			"name": "2. Get Progress (15 Levels)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/progress",
+					"host": ["{{base_url}}"],
+					"path": ["api", "carihijaiyah", "progress"]
+				},
+				"description": "Ambil progress semua 15 level user"
+			}
+		},
+		{
+			"name": "3. Start Level 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    var jsonData = pm.response.json();",
+							"    pm.environment.set(\"session_id\", jsonData.session_id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"level_number\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/start",
+					"host": ["{{base_url}}"],
+					"path": ["api", "carihijaiyah", "start"]
+				}
+			}
+		},
+		{
+			"name": "4. Finish Level 1",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/finish",
+					"host": ["{{base_url}}"],
+					"path": ["api", "carihijaiyah", "finish"]
+				}
+			}
+		},
+		{
+			"name": "5. Complete All Levels (1-15)",
+			"item": [
+				{
+					"name": "Level 2 - Start",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.environment.set(\"session_id\", pm.response.json().session_id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"level_number\": 2}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/carihijaiyah/start",
+							"host": ["{{base_url}}"],
+							"path": ["api", "carihijaiyah", "start"]
+						}
+					}
+				},
+				{
+					"name": "Level 2 - Finish",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"session_id\": \"{{session_id}}\", \"level_number\": 2}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/carihijaiyah/finish",
+							"host": ["{{base_url}}"],
+							"path": ["api", "carihijaiyah", "finish"]
+						}
+					}
+				},
+				{
+					"name": "Level 3 - Start & Finish",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Authorization", "value": "Bearer {{token}}"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"level_number\": 3}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/carihijaiyah/start",
+							"host": ["{{base_url}}"],
+							"path": ["api", "carihijaiyah", "start"]
+						}
+					}
+				},
+				{
+					"name": "Level 4-15 (Copy Pattern Above)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/carihijaiyah/progress",
+							"host": ["{{base_url}}"],
+							"path": ["api", "carihijaiyah", "progress"]
+						},
+						"description": "Duplicate Level 2-3 pattern untuk level 4-15"
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Get Stats",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/carihijaiyah/stats",
+					"host": ["{{base_url}}"],
+					"path": ["api", "carihijaiyah", "stats"]
+				},
+				"description": "Ambil statistik: total_levels_completed, total_sessions"
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://lumen-backend-batasanaya.test",
+			"type": "string"
+		}
+	]
+}

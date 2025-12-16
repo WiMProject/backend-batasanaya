@@ -290,10 +290,10 @@ ob_start();
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
                                 <h3 class="mb-1">Song Management</h3>
-                                <p class="text-muted mb-0">Upload songs with thumbnail. Thumbnail will be requested after selecting song file.</p>
+                                <p class="text-muted mb-0">Store song URLs (Spotify, SoundCloud, etc.)</p>
                             </div>
                             <button class="btn btn-primary" onclick="uploadSong()">
-                                <i class="fas fa-upload me-1"></i>Upload Song
+                                <i class="fas fa-plus me-1"></i>Add Song
                             </button>
                         </div>
                         
@@ -301,16 +301,15 @@ ob_start();
                             <table class="table table-hover" id="songsTable">
                                 <thead>
                                     <tr>
-                                        <th>Thumbnail</th>
                                         <th>Title</th>
-                                        <th>File</th>
+                                        <th>URL</th>
                                         <th>Uploaded By</th>
                                         <th>Date</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td colspan="6" class="text-center">Loading songs...</td></tr>
+                                    <tr><td colspan="5" class="text-center">Loading songs...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -323,10 +322,10 @@ ob_start();
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
                                 <h3 class="mb-1">Video Management</h3>
-                                <p class="text-muted mb-0">Upload videos with thumbnail. Thumbnail will be requested after selecting video file.</p>
+                                <p class="text-muted mb-0">Store video URLs (YouTube, Vimeo, etc.)</p>
                             </div>
                             <button class="btn btn-primary" onclick="uploadVideo()">
-                                <i class="fas fa-upload me-1"></i>Upload Video
+                                <i class="fas fa-plus me-1"></i>Add Video
                             </button>
                         </div>
                         
@@ -334,16 +333,15 @@ ob_start();
                             <table class="table table-hover" id="videosTable">
                                 <thead>
                                     <tr>
-                                        <th>Thumbnail</th>
                                         <th>Title</th>
-                                        <th>File</th>
+                                        <th>URL</th>
                                         <th>Uploaded By</th>
                                         <th>Date</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td colspan="6" class="text-center">Loading videos...</td></tr>
+                                    <tr><td colspan="5" class="text-center">Loading videos...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -690,14 +688,9 @@ ob_start();
                         <input type="text" class="form-control" id="editSongTitle">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Replace Audio File (optional)</label>
-                        <input type="file" class="form-control" id="editSongFile" accept=".mp3,.wav,.m4a">
-                        <small class="text-muted">Max 100MB</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Replace Thumbnail (optional)</label>
-                        <input type="file" class="form-control" id="editSongThumbnail" accept="image/jpeg,image/jpg,image/png">
-                        <small class="text-muted">Max 5MB</small>
+                        <label class="form-label">Song URL</label>
+                        <input type="url" class="form-control" id="editSongUrl" placeholder="https://spotify.com/...">
+                        <small class="text-muted">Spotify, SoundCloud, or direct audio URL</small>
                     </div>
                 </form>
             </div>
@@ -728,11 +721,6 @@ ob_start();
                         <label class="form-label">Video URL</label>
                         <input type="url" class="form-control" id="editVideoUrl" placeholder="https://youtube.com/watch?v=...">
                         <small class="text-muted">YouTube, Vimeo, or direct video URL</small>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Replace Thumbnail (optional)</label>
-                        <input type="file" class="form-control" id="editVideoThumbnail" accept="image/jpeg,image/jpg,image/png">
-                        <small class="text-muted">Max 5MB</small>
                     </div>
                 </form>
             </div>

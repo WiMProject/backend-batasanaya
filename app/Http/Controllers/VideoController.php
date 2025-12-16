@@ -12,29 +12,96 @@ class VideoController extends Controller
 {
     public function store(Request $request)
     {
+        // Allow 10 minutes for video processing
+        set_time_limit(600);
+        
         $this->validate($request, [
             'title' => 'required|string|max:255',
-            'url' => 'required|url|max:500',
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'file' => 'required|file|mimes:mp4,avi,mov,mkv,ts|max:1024000',
         ]);
 
-        $thumbnailPath = null;
-        if ($request->hasFile('thumbnail')) {
-            $thumbnail = $request->file('thumbnail');
-            $thumbnailName = time() . '_thumb_' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(base_path('public/uploads/thumbnails'), $thumbnailName);
-            $thumbnailPath = 'uploads/thumbnails/' . $thumbnailName;
-        }
+        $videoId = Str::uuid();
+        $videoFile = $request->file('file');
+        
+        // Create video folder
+        $videoDir = base_path('public/uploads/videos/' . $videoId);
+        File::makeDirectory($videoDir, 0755, true);
+        
+        // Save original
+        $originalPath = $videoDir . '/original.mp4';
+        $videoFile->move($videoDir, 'original.mp4');
+        
+        // Generate qualities (360p, 720p, 1080p)
+        $qualities = $this->generateQualities($videoId, $originalPath);
 
         $video = Video::create([
-            'id' => Str::uuid(),
+            'id' => $videoId,
             'title' => $request->title,
-            'url' => $request->url,
-            'thumbnail' => $thumbnailPath,
+            'file' => 'uploads/videos/' . $videoId . '/master.m3u8',
+            'qualities' => json_encode($qualities),
             'created_by_id' => Auth::id(),
         ]);
 
-        return response()->json(['message' => 'Video URL saved successfully', 'video' => $video], 201);
+        return response()->json(['message' => 'Video uploaded successfully', 'video' => $video], 201);
+    }
+    
+    private function generateQualities($videoId, $originalPath)
+    {
+        // Requires FFmpeg installed
+        $videoDir = base_path('public/uploads/videos/' . $videoId);
+        $qualities = [];
+        
+        $resolutions = [
+            '380p' => ['width' => 640, 'height' => 380, 'bitrate' => '800k'],
+            '480p' => ['width' => 854, 'height' => 480, 'bitrate' => '1200k'],
+            '780p' => ['width' => 1280, 'height' => 780, 'bitrate' => '2500k'],
+            '1080p' => ['width' => 1920, 'height' => 1080, 'bitrate' => '5000k'],
+        ];
+        
+        foreach ($resolutions as $quality => $config) {
+            $qualityDir = $videoDir . '/' . $quality;
+            File::makeDirectory($qualityDir, 0755, true);
+            
+            // FFmpeg command to generate HLS
+            $cmd = sprintf(
+                'ffmpeg -i %s -vf scale=%d:%d -c:v libx264 -b:v %s -c:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename %s/segment_%%03d.ts %s/playlist.m3u8',
+                escapeshellarg($originalPath),
+                $config['width'],
+                $config['height'],
+                $config['bitrate'],
+                escapeshellarg($qualityDir),
+                escapeshellarg($qualityDir)
+            );
+            
+            exec($cmd);
+            
+            $qualities[] = [
+                'quality' => $quality,
+                'url' => url('uploads/videos/' . $videoId . '/' . $quality . '/playlist.m3u8')
+            ];
+        }
+        
+        // Create master playlist
+        $this->createMasterPlaylist($videoDir, $resolutions);
+        
+        return $qualities;
+    }
+    
+    private function createMasterPlaylist($videoDir, $resolutions)
+    {
+        $content = "#EXTM3U\n#EXT-X-VERSION:3\n";
+        
+        foreach ($resolutions as $quality => $config) {
+            $content .= sprintf(
+                "#EXT-X-STREAM-INF:BANDWIDTH=%d,RESOLUTION=%dx%d\n%s/playlist.m3u8\n",
+                (int)str_replace('k', '000', $config['bitrate']),
+                $config['width'],
+                $config['height'],
+                $quality
+            );
+        }
+        
+        file_put_contents($videoDir . '/master.m3u8', $content);
     }
 
     public function index()
@@ -61,32 +128,22 @@ class VideoController extends Controller
 
         $this->validate($request, [
             'title' => 'nullable|string|max:255',
-            'url' => 'nullable|url|max:500',
-            'thumbnail' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+            'file' => 'nullable|file|mimes:mp4,avi,mov,mkv,ts|max:1024000',
         ]);
 
         if ($request->has('title')) {
             $video->title = $request->title;
         }
 
-        if ($request->has('url')) {
-            $video->url = $request->url;
-        }
-
-        if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail
-            if ($video->thumbnail) {
-                $oldThumbPath = base_path('public/' . $video->thumbnail);
-                if (File::exists($oldThumbPath)) {
-                    File::delete($oldThumbPath);
-                }
+        if ($request->hasFile('file')) {
+            if ($video->file && File::exists(base_path('public/' . $video->file))) {
+                File::delete(base_path('public/' . $video->file));
             }
-
-            // Upload new thumbnail
-            $thumbnail = $request->file('thumbnail');
-            $thumbnailName = time() . '_thumb_' . $thumbnail->getClientOriginalName();
-            $thumbnail->move(base_path('public/uploads/thumbnails'), $thumbnailName);
-            $video->thumbnail = 'uploads/thumbnails/' . $thumbnailName;
+            
+            $videoFile = $request->file('file');
+            $videoFileName = time() . '_' . $videoFile->getClientOriginalName();
+            $videoFile->move(base_path('public/uploads/videos'), $videoFileName);
+            $video->file = 'uploads/videos/' . $videoFileName;
         }
 
         $video->save();
@@ -100,8 +157,12 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video not found'], 404);
         }
 
-        // Return video URL for redirect
-        return response()->json(['url' => $video->url]);
+        $filePath = base_path('public/' . $video->file);
+        if (!File::exists($filePath)) {
+            return response()->json(['error' => 'Video file not found'], 404);
+        }
+
+        return response()->file($filePath);
     }
 
     public function destroy($id)
@@ -111,12 +172,8 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video not found'], 404);
         }
 
-        // Delete thumbnail only (URL doesn't need file deletion)
-        if ($video->thumbnail) {
-            $thumbnailPath = base_path('public/' . $video->thumbnail);
-            if (File::exists($thumbnailPath)) {
-                File::delete($thumbnailPath);
-            }
+        if ($video->file && File::exists(base_path('public/' . $video->file))) {
+            File::delete(base_path('public/' . $video->file));
         }
 
         $video->delete();

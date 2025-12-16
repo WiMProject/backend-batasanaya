@@ -12,9 +12,13 @@ class Video extends Model
     protected $fillable = [
         'id', 
         'title', 
-        'url', 
-        'thumbnail', 
+        'file',
+        'qualities',
         'created_by_id',
+    ];
+
+    protected $casts = [
+        'qualities' => 'array',
     ];
 
     public function createdBy()

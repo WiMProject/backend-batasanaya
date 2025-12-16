@@ -67,6 +67,9 @@ if (localStorage.getItem('adminToken')) {
 document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Logging in...';
@@ -76,7 +79,8 @@ document.getElementById('adminLoginForm').addEventListener('submit', async funct
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ email, password })
         });
         
         const data = await response.json();

@@ -623,7 +623,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-get me-2">GET</span>
-                            <code>/carihijaiyah/progress</code>
+                            <code>api/carihijaiyah/progress</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">
@@ -645,7 +645,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-post me-2">POST</span>
-                            <code>/carihijaiyah/start</code>
+                            <code>api/carihijaiyah/start</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">
@@ -666,7 +666,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-post me-2">POST</span>
-                            <code>/carihijaiyah/finish</code>
+                            <code>api/carihijaiyah/finish</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">
@@ -688,7 +688,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-get me-2">GET</span>
-                            <code>/carihijaiyah/stats</code>
+                            <code>api/carihijaiyah/stats</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">
@@ -725,7 +725,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-post me-2">POST</span>
-                            <code>/pasangkanhuruf/start</code>
+                            <code>api/pasangkanhuruf/start</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">
@@ -736,7 +736,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-post me-2">POST</span>
-                            <code>/pasangkanhuruf/finish</code>
+                            <code>api/pasangkanhuruf/finish</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">
@@ -747,7 +747,7 @@ file: [image file]</code></pre>
                     <div class="endpoint-card card">
                         <div class="card-header d-flex align-items-center">
                             <span class="method-badge method-get me-2">GET</span>
-                            <code>/pasangkanhuruf/stats</code>
+                            <code>api/pasangkanhuruf/stats</code>
                             <span class="badge bg-warning ms-2">Auth Required</span>
                         </div>
                         <div class="card-body">

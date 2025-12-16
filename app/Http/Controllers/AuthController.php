@@ -212,16 +212,23 @@ public function resetPassword(Request $request)
      */
     public function adminLogin(Request $request)
     {
-        $credentials = [
-            'email' => 'admin@test.com',
-            'password' => 'admin123'
-        ];
+        $this->validate($request, [
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only('email', 'password');
 
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Admin credentials invalid.'], 401);
         }
 
-        $user = User::with('role')->where('email', 'admin@test.com')->first();
+        $user = User::with('role')->where('email', $request->email)->first();
+        
+        if (!$user || $user->role->name !== 'admin') {
+            Auth::logout();
+            return response()->json(['error' => 'Not authorized as admin.'], 403);
+        }
         
         return response()->json([
             'message' => 'Admin login successful',

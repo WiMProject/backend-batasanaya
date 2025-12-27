@@ -1,0 +1,1228 @@
+{
+  "info": {
+    "_postman_id": "game-cari-complete",
+    "name": "Game Cari Hijaiyyah - Complete 15 Levels",
+    "description": "Complete API untuk test semua 15 level Game Cari Hijaiyyah",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('token', pm.response.json().access_token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Get Progress",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/progress",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "progress"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Start Level 1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Finish Level 1",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Start Level 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 2\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Finish Level 2",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 2\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "7. Start Level 3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 3\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8. Finish Level 3",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 3\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "9. Start Level 4",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 4\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10. Finish Level 4",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 4\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "11. Start Level 5",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 5\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "12. Finish Level 5",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 5\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "13. Start Level 6",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 6\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "14. Finish Level 6",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 6\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "15. Start Level 7",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 7\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "16. Finish Level 7",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 7\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "17. Start Level 8",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 8\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "18. Finish Level 8",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 8\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "19. Start Level 9",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 9\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "20. Finish Level 9",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 9\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "21. Start Level 10",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 10\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "22. Finish Level 10",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 10\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "23. Start Level 11",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 11\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "24. Finish Level 11",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 11\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "25. Start Level 12",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 12\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "26. Finish Level 12",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 12\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "27. Start Level 13",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 13\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "28. Finish Level 13",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 13\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "29. Start Level 14",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 14\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "30. Finish Level 14",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 14\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "31. Start Level 15",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    pm.environment.set('session_id', pm.response.json().session_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"level_number\": 15\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/start",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "start"
+          ]
+        }
+      }
+    },
+    {
+      "name": "32. Finish Level 15",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"level_number\": 15\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/finish",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "finish"
+          ]
+        }
+      }
+    },
+    {
+      "name": "33. Get Stats",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/carihijaiyah/stats",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "carihijaiyah",
+            "stats"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://lumen-backend-batasanaya.test",
+      "type": "string"
+    }
+  ]
+}

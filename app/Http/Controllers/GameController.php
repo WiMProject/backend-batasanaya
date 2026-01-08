@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
 
 class GameController extends Controller
 {
@@ -71,10 +72,19 @@ class GameController extends Controller
         
         $progress->increment('attempts');
         
-        $sessionId = Str::uuid();
+        $realSessionId = Str::uuid()->toString();
+        
+        // Encrypt the session data to prevent tampering
+        // Users cannot use a session generated for Level 1 to finish Level 2
+        $sessionToken = Crypt::encryptString(json_encode([
+            'id' => $realSessionId,
+            'level' => (int) $levelNumber,
+            'user_id' => $userId,
+            'timestamp' => time()
+        ]));
         
         return response()->json([
-            'session_id' => $sessionId,
+            'session_id' => $sessionToken,
             'level_number' => $levelNumber,
             'started_at' => Carbon::now()->toDateTimeString()
         ]);
@@ -91,8 +101,26 @@ class GameController extends Controller
         $ProgressModel = $this->getProgressModel($gameType);
         $SessionModel = $this->getSessionModel($gameType);
         
+        $gameSession = null;
+        try {
+            $decrypted = json_decode(Crypt::decryptString($request->session_id), true);
+            $gameSession = $decrypted;
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid session token.'], 400);
+        }
+
+        // Validate that this session belongs to the requested level
+        if ($gameSession['level'] !== (int) $request->level_number) {
+            return response()->json(['error' => 'Session ID does not match the level.'], 400);
+        }
+
+        // Validate user
+        if ($gameSession['user_id'] !== $userId) {
+            return response()->json(['error' => 'Session ID does not belong to this user.'], 403);
+        }
+        
         $SessionModel::create([
-            'id' => $request->session_id,
+            'id' => $gameSession['id'], // Use the original UUID
             'user_id' => $userId,
             'level_number' => $request->level_number,
             'completed_at' => Carbon::now()

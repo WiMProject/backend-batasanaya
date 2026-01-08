@@ -109,6 +109,22 @@ class AuthController extends Controller
     }
 
     /**
+     * [TB-New] Set password baru tanpa old password (untuk Forgot Password flow).
+     */
+    public function setNewPassword(Request $request)
+    {
+        $this->validate($request, [
+            'new_password' => 'required|string|min:6'
+        ]);
+        
+        $user = User::find(Auth::id());
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password berhasil direset. Silakan login kembali dengan password baru.']);
+    }
+
+    /**
      * [TB-20] Refresh a token.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -123,9 +139,20 @@ class AuthController extends Controller
     /**
      * [TB-21a] Membuat dan mengirim OTP baru.
      */
-    public function requestOtp()
+    public function requestOtp(Request $request)
     {
         $user = Auth::user();
+
+        // Jika user belum login (Lupa Password flow), cari berdasarkan email
+        if (!$user) {
+            $this->validate($request, [
+                'email' => 'required|email'
+            ]);
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['error' => 'Email tidak terdaftar.'], 404);
+            }
+        }
 
         // Memastikan user punya nomor telepon terdaftar
         if (!$user->phone_number) {
@@ -145,7 +172,8 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'OTP berhasil dikirim.',
-            // Hanya untuk testing.
+            'phone_number' => $user->phone_number, // Info ke user dikirim kemana
+            // Hanya untuk testing development
             'testing_otp_code' => $otpCode,
         ]);
     }
@@ -157,20 +185,29 @@ class AuthController extends Controller
     {
         $this->validate($request, [
             'otp' => 'required|string|digits:6',
+            'email' => 'nullable|email' // Optional jika sudah login
         ]);
 
         $user = Auth::user();
+
+        // Jika belum login, cari user berdasarkan email
+        if (!$user) {
+            if (!$request->email) {
+                return response()->json(['error' => 'Email wajib diisi untuk verifikasi tanpa login.'], 400);
+            }
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json(['error' => 'User tidak ditemukan.'], 404);
+            }
+        }
+
         $submittedOtp = $request->otp;
 
-        // Cari OTP yang valid di database:
-        // - Punya user ini
-        // - Belum dipakai
-        // - Belum dibatalkan
-        // - Ambil yang paling baru
+        // Cari OTP yang valid di database
         $otp = \App\Models\Otp::where('phone_number', $user->phone_number)
             ->where('is_used', false)
             ->where('is_revoked', false)
-            ->latest() // Mengambil yang terbaru
+            ->latest()
             ->first();
 
         // Cek jika tidak ada OTP yang valid atau kodenya salah
@@ -180,7 +217,6 @@ class AuthController extends Controller
 
         // Cek jika OTP sudah kedaluwarsa
         if (Carbon::now()->gt($otp->expired_at)) {
-            // Batalkan OTP-nya juga
             $otp->is_revoked = true;
             $otp->save();
             return response()->json(['error' => 'Kode OTP sudah kedaluwarsa.'], 400);
@@ -189,6 +225,17 @@ class AuthController extends Controller
         // Jika semua berhasil, tandai OTP sudah dipakai
         $otp->is_used = true;
         $otp->save();
+
+        // Jika user belum login, berikan token login agar bisa reset password
+        if (!Auth::check()) {
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'message' => 'OTP berhasil diverifikasi. Anda sekarang login.',
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => JWTAuth::factory()->getTTL() * 60
+            ]);
+        }
 
         return response()->json(['message' => 'OTP berhasil diverifikasi.']);
     }

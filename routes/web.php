@@ -42,6 +42,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('admin-login', 'AuthController@adminLogin');
         $router->post('google', 'AuthController@loginWithGoogle');
         $router->post('refresh', 'AuthController@refresh');
+        
+        // OTP & Password Reset
+        $router->post('request-otp', 'AuthController@requestOtp');
+        $router->post('verify-otp', 'AuthController@verifyOtp');
     });
     
     // Asset Downloads (Public)
@@ -85,10 +89,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->get('me', 'AuthController@getMe');
             $router->post('logout', 'AuthController@logout');
             $router->post('reset-password', 'AuthController@resetPassword');
-            $router->post('set-pin', 'AuthController@setPin');
-            $router->post('verify-pin', 'AuthController@verifyPin');
-            $router->post('request-otp', 'AuthController@requestOtp');
-            $router->post('verify-otp', 'AuthController@verifyOtp');
+            $router->post('set-new-password', 'AuthController@setNewPassword');
         });
 
         // User Profile Management

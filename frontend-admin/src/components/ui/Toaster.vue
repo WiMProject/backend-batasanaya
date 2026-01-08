@@ -18,7 +18,12 @@ const { toasts, remove } = useToast()
             <div 
                 v-for="toast in toasts" 
                 :key="toast.id" 
-                class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-background border shadow-lg ring-1 ring-black ring-opacity-5"
+                class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-xl bg-background/80 backdrop-blur-xl border border-border/50 shadow-2xl ring-1 ring-black/5"
+                :class="{
+                    'border-l-4 border-l-green-500': toast.type === 'success',
+                    'border-l-4 border-l-red-500': toast.type === 'error',
+                    'border-l-4 border-l-blue-500': toast.type === 'info'
+                }"
             >
                 <div class="p-4">
                     <div class="flex items-start">
@@ -32,9 +37,9 @@ const { toasts, remove } = useToast()
                             <p class="text-sm text-muted-foreground">{{ toast.message }}</p>
                         </div>
                         <div class="ml-4 flex flex-shrink-0">
-                            <button type="button" @click="remove(toast.id)" class="inline-flex rounded-md bg-background text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2">
+                            <button type="button" @click="remove(toast.id)" class="inline-flex rounded-md bg-transparent text-muted-foreground hover:text-foreground hover:bg-black/5 focus:outline-none transition-colors p-1">
                                 <span class="sr-only">Close</span>
-                                <X class="h-5 w-5" aria-hidden="true" />
+                                <X class="h-4 w-4" aria-hidden="true" />
                             </button>
                         </div>
                     </div>

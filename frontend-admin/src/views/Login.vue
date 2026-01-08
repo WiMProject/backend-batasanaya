@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { LayoutDashboard, Loader2 } from 'lucide-vue-next'
+import { Loader2, ArrowRight } from 'lucide-vue-next'
 
 const router = useRouter()
 const email = ref('')
@@ -22,7 +22,7 @@ const handleLogin = async () => {
         
         if (res.ok && data.access_token) {
             localStorage.setItem('adminToken', data.access_token)
-            router.push('/')
+            router.push('/dashboard')
         } else {
             error.value = data.message || 'Login failed'
         }
@@ -35,50 +35,81 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-background px-4">
-    <div class="w-full max-w-sm space-y-6">
-      <div class="text-center space-y-2">
-        <div class="h-12 w-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mx-auto">
-            <LayoutDashboard class="w-6 h-6" />
-        </div>
-        <h1 class="text-2xl font-bold tracking-tight">Admin Portal</h1>
-        <p class="text-sm text-muted-foreground">Sign in to manage Batasanaya backend</p>
-      </div>
+  <div class="min-h-screen flex items-center justify-center bg-zinc-950 font-sans relative overflow-hidden">
+    
+    <!-- Animated Background FX -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/20 blur-[120px] animate-pulse-slow"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-rose-500/20 blur-[100px] animate-pulse-slow delay-1000"></div>
+    </div>
 
-      <form @submit.prevent="handleLogin" class="space-y-4">
-        <div v-if="error" class="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-            {{ error }}
+    <!-- Login Card -->
+    <div class="w-full max-w-md relative z-10 p-6">
+        <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 md:p-10 animate-in fade-in zoom-in-95 duration-700">
+            
+            <div class="text-center space-y-3 mb-8">
+                <div class="h-14 w-14 bg-gradient-to-br from-indigo-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-rose-500/30 mb-4 transform hover:rotate-12 transition-transform duration-500">
+                    <span class="text-white font-bold text-2xl">B</span>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
+                <p class="text-zinc-400">Enter your credentials to access the Batasanaya Core.</p>
+            </div>
+
+            <form @submit.prevent="handleLogin" class="space-y-6">
+                <div v-if="error" class="p-4 text-sm text-red-200 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center gap-2 animate-in slide-in-from-top-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    {{ error }}
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold uppercase tracking-wider text-zinc-500 ml-1">Email</label>
+                        <input 
+                            v-model="email" 
+                            type="email" 
+                            class="w-full h-12 rounded-xl border border-white/10 bg-black/20 px-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/40 transition-all font-medium" 
+                            placeholder="admin@batasanaya.com"
+                            required
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold uppercase tracking-wider text-zinc-500 ml-1">Password</label>
+                            <a href="#" class="text-xs text-primary hover:text-primary/80 transition-colors">Forgot?</a>
+                        </div>
+                        <input 
+                            v-model="password" 
+                            type="password" 
+                            class="w-full h-12 rounded-xl border border-white/10 bg-black/20 px-4 text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-black/40 transition-all font-medium"
+                            placeholder="••••••••"
+                            required 
+                        />
+                    </div>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    :disabled="loading"
+                    class="group w-full h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-rose-600 hover:to-rose-500 text-white font-bold rounded-xl shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
+                    <span v-else>Sign In to Dashboard</span>
+                    <ArrowRight v-if="!loading" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-white/5 text-center">
+                 <p class="text-xs text-zinc-500">
+                    &copy; 2025 Batasanaya Project. Secure Access Only.
+                </p>
+            </div>
         </div>
-        
-        <div class="space-y-2">
-            <label class="text-sm font-medium leading-none">Email</label>
-            <input 
-                v-model="email" 
-                type="email" 
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                placeholder="admin@example.com"
-                required
-            />
-        </div>
-        <div class="space-y-2">
-            <label class="text-sm font-medium leading-none">Password</label>
-            <input 
-                v-model="password" 
-                type="password" 
-                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                required 
-            />
-        </div>
-        
-        <button 
-            type="submit" 
-            :disabled="loading"
-            class="inline-flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-colors"
-        >
-            <Loader2 v-if="loading" class="w-4 h-4 mr-2 animate-spin" />
-            Sign In
-        </button>
-      </form>
     </div>
   </div>
 </template>
+
+<style scoped>
+.animate-pulse-slow {
+    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+</style>

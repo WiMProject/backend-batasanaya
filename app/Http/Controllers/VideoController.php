@@ -52,8 +52,9 @@ class VideoController extends Controller
         $qualities = [];
         
         $resolutions = [
-            '380p' => ['width' => 640, 'height' => 380, 'bitrate' => '800k'],
-            '480p' => ['width' => 854, 'height' => 480, 'bitrate' => '1200k'],
+            '360p' => ['width' => 640, 'height' => 360, 'bitrate' => '800k'],
+            '480p' => ['width' => 854, 'height' => 480, 'bitrate' => '1500k'],
+            '720p' => ['width' => 1280, 'height' => 720, 'bitrate' => '3000k'],
             '1080p' => ['width' => 1920, 'height' => 1080, 'bitrate' => '5000k'],
         ];
         
@@ -82,6 +83,11 @@ class VideoController extends Controller
         
         // Create master playlist
         $this->createMasterPlaylist($videoDir, $resolutions);
+
+        // Delete original file to save space
+        if (File::exists($originalPath)) {
+            File::delete($originalPath);
+        }
         
         return $qualities;
     }
@@ -171,8 +177,20 @@ class VideoController extends Controller
             return response()->json(['error' => 'Video not found'], 404);
         }
 
-        if ($video->file && File::exists(base_path('public/' . $video->file))) {
-            File::delete(base_path('public/' . $video->file));
+        if ($video->file) {
+            $videoPath = base_path('public/' . $video->file);
+            // If it's an HLS stream (m3u8), we need to delete the parent folder
+            if (Str::endsWith($videoPath, '.m3u8')) {
+                $videoDir = dirname($videoPath);
+                if (File::isDirectory($videoDir)) {
+                    File::deleteDirectory($videoDir);
+                }
+            } else {
+                // Determine if it's a single file or directory logic
+                if (File::exists($videoPath)) {
+                    File::delete($videoPath);
+                }
+            }
         }
 
         $video->delete();

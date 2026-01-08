@@ -74,8 +74,9 @@ Base URL: `http://localhost:8000/api`
 | `POST` | `/auth/register` | Mendaftarkan user baru | - |
 | `POST` | `/auth/login` | Login user untuk mendapatkan Token | - |
 | `POST` | `/auth/admin-login` | Login khusus dashboard admin | - |
-| `POST` | `/auth/request-otp` | Request kode OTP ke email | 🔐 |
-| `POST` | `/auth/verify-otp` | Verifikasi validitas kode OTP | 🔐 |
+| `POST` | `/auth/request-otp` | Request kode OTP ke email (Forgot Password) | - |
+| `POST` | `/auth/verify-otp` | Verifikasi OTP & Auto Login | - |
+| `POST` | `/auth/set-new-password` | Set password baru (setelah verify OTP) | 🔐 |
 
 ### 👤 User Module
 
@@ -101,6 +102,8 @@ Base URL: `http://localhost:8000/api`
 | `GET` | `/games/{type}/progress` | Cek level mana saja yang sudah unlock | 🔐 |
 | `POST` | `/games/{type}/start` | Mulai sesi game baru (Generate Session ID) | 🔐 |
 | `POST` | `/games/{type}/finish` | Selesaikan level & simpan skor | 🔐 |
+
+> **Anti-Cheat System**: `start` endpoint mengembalikan **Encrypted Session ID**. Token ini wajib dikirim kembali saat `finish` untuk memvalidasi bahwa level yang diselesaikan sesuai dengan sesi yang dimulai. Attempt untuk menggunakan sesi Level 1 untuk menyelesaikan Level 2 akan ditolak.
 
 > **Note**: `{type}` bisa bernilai `carihijaiyah` atau `pasangkanhuruf`.
 
@@ -141,7 +144,9 @@ composer install
 
 # 3. Setup Environment
 cp .env.example .env
-php artisan key:generate
+# Generate Key Manual (Lumen):
+php -r "echo 'base64:'.base64_encode(random_bytes(32));" 
+# Copy output diatas ke APP_KEY di .env
 php artisan jwt:secret
 
 # 4. Migrate Database
@@ -173,6 +178,6 @@ npm run dev
 ---
 
 <div align="center">
-  <p>Maintained by <b>Tim Batasanaya</b></p>
-  <p>© 2024 All Rights Reserved</p>
+  <p>Maintained by <b>Wildan Miladji - Tim Batasanaya</b></p>
+  <p>© 2025 All Rights Reserved</p>
 </div>

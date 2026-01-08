@@ -2,14 +2,13 @@
 import { ref, onMounted } from 'vue'
 import { api } from '@/lib/api'
 import { useToast } from '@/lib/toast'
-import { Loader2, Search, Upload, Trash2, X, CheckCircle, Edit } from 'lucide-vue-next'
+import { Loader2, Search, Upload, Trash2, X, CheckCircle, Edit, Play, Film } from 'lucide-vue-next'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
 
 const videos = ref<any[]>([])
 const loading = ref(true)
 const search = ref('')
 const toast = useToast()
-
 
 // Confirmation State
 const confirmState = ref({
@@ -132,11 +131,8 @@ const onSearch = () => {
 }
 
 // Delete Logic
-const isDeleting = ref(false)
-
 const openDeleteModal = (id: number) => {
     openConfirm('Delete Video', 'Are you sure you want to delete this video? This action cannot be undone.', async () => {
-        isDeleting.value = true
         try {
             await api.delete(`/videos/${id}`)
             fetchVideos()
@@ -144,8 +140,6 @@ const openDeleteModal = (id: number) => {
         } catch(e) {
             console.error(e)
             toast.error('Failed to delete video')
-        } finally {
-            isDeleting.value = false
         }
     }, 'destructive')
 }
@@ -195,51 +189,89 @@ onMounted(fetchVideos)
 </script>
 
 <template>
-    <div class="space-y-6 relative">
-         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="space-y-8 animate-in fade-in duration-500">
+         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-border/40">
             <div>
-                <h2 class="text-3xl font-bold tracking-tight">Video Library</h2>
-                <p class="text-muted-foreground">Manage story and tutorial videos.</p>
+                 <h2 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Video Library</h2>
+                <p class="text-muted-foreground mt-2 text-lg">Manage story content and tutorial clips.</p>
             </div>
-            <button @click="isUploadOpen = true" class="inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors w-full md:w-auto">
-                <Upload class="w-4 h-4 mr-2" />
+            <button @click="isUploadOpen = true" class="group relative inline-flex items-center justify-center h-11 px-8 py-2 text-sm font-medium text-white transition-all bg-primary rounded-full hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 active:scale-95 w-full md:w-auto overflow-hidden">
+                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+                <Upload class="w-5 h-5 mr-2" />
                 Upload Video
             </button>
         </div>
 
-        <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
-            <div class="p-6 border-b flex items-center justify-between">
-                 <div class="relative w-full max-w-sm">
-                     <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                     <input 
-                        v-model="search"
-                        @input="onSearch"
-                        type="search" 
-                        placeholder="Search videos..." 
-                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring pl-9"
-                     />
-                 </div>
+        <div class="relative w-full max-w-md">
+             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search class="h-5 w-5 text-muted-foreground" />
             </div>
+            <input 
+                v-model="search"
+                @input="onSearch"
+                type="text"
+                class="block w-full pl-10 pr-3 py-3 border border-input rounded-xl leading-5 bg-card/50 backdrop-blur-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm transition-all shadow-sm"
+                placeholder="Find videos..."
+            />
+        </div>
 
-            <!-- Grid for Videos -->
-            <div class="p-6">
-                <div v-if="loading" class="flex justify-center py-12"><Loader2 class="w-8 h-8 animate-spin text-muted-foreground"/></div>
-                <div v-else-if="videos.length === 0" class="text-center py-12 text-muted-foreground">No videos found.</div>
-                <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div v-for="video in videos" :key="video.id" class="rounded-lg border bg-card overflow-hidden shadow-sm flex flex-col">
-                        <div class="aspect-video bg-black relative group">
-                            <video controls class="w-full h-full">
-                                <source :src="`/${video.file}`" type="application/x-mpegURL">
-                                Your browser does not support the video tag.
-                            </video>
+        <!-- Grid for Videos -->
+        <div class="min-h-[200px]">
+            <div v-if="loading" class="flex justify-center py-20">
+                <div class="flex flex-col items-center gap-4">
+                    <Loader2 class="w-10 h-10 animate-spin text-primary"/>
+                    <p class="text-muted-foreground">Loading library...</p>
+                </div>
+            </div>
+            <div v-else-if="videos.length === 0" class="flex flex-col items-center justify-center py-20 text-muted-foreground border-2 border-dashed border-border/50 rounded-3xl bg-card/20">
+                <Film class="w-16 h-16 opacity-20 mb-4" />
+                <p class="text-lg font-medium">No videos found.</p>
+                <p class="text-sm">Upload a new video to get started.</p>
+            </div>
+            
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div 
+                    v-for="video in videos" 
+                    :key="video.id" 
+                    class="group relative bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-1 border border-border/50"
+                >
+                    <!-- Thumbnail / Video Wrapper -->
+                    <div class="aspect-video bg-black relative overflow-hidden">
+                        <video 
+                            class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" 
+                            preload="metadata"
+                        >
+                            <source :src="`/${video.file}#t=0.5`" type="video/mp4">
+                        </video>
+                        
+                        <!-- Overlay controls (Play icon only visual here, real controls inside modal or simple generic controls enabled) -->
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                            <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                                <Play class="w-6 h-6 text-white ml-1" />
+                            </div>
                         </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold truncate">{{ video.title }}</h3>
-                             <div class="flex items-center justify-end mt-2 gap-2">
-                                <button @click="openEdit(video)" class="text-foreground hover:bg-muted p-2 rounded-md" title="Edit">
+
+                         <!-- Actual Video Element for playback (simple default controls for admin) -->
+                         <div class="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                             <!-- We use standard controls for simplicity but hide them initially to show clean thumbnail -->
+                              <video controls class="w-full h-full absolute inset-0 opacity-0 hover:opacity-100 transition-opacity">
+                                <source :src="`/${video.file}`" type="application/x-mpegURL">
+                            </video>
+                         </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="p-5">
+                        <h3 class="font-bold text-foreground truncate text-lg group-hover:text-primary transition-colors">{{ video.title }}</h3>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-xs text-muted-foreground font-medium uppercase tracking-wider bg-secondary/50 px-2 py-1 rounded-md">
+                                MP4
+                            </span>
+                             <div class="flex gap-1">
+                                <button @click="openEdit(video)" class="p-2 hover:bg-blue-50 text-muted-foreground hover:text-blue-600 rounded-lg transition-colors relative z-20" title="Edit">
                                     <Edit class="w-4 h-4"/>
                                 </button>
-                                <button @click="openDeleteModal(video.id)" class="text-destructive hover:bg-destructive/10 p-2 rounded-md" title="Delete">
+                                <button @click="openDeleteModal(video.id)" class="p-2 hover:bg-red-50 text-muted-foreground hover:text-red-600 rounded-lg transition-colors relative z-20" title="Delete">
                                     <Trash2 class="w-4 h-4"/>
                                 </button>
                              </div>
@@ -250,50 +282,53 @@ onMounted(fetchVideos)
         </div>
 
         <!-- Upload Modal -->
-        <div v-if="isUploadOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-            <div class="w-full max-w-lg rounded-lg border bg-card p-6 shadow-lg animate-in fade-in zoom-in-95 duration-200">
+        <div v-if="isUploadOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold">Upload Video</h3>
-                    <button @click="isUploadOpen = false" class="p-1 hover:bg-muted rounded text-muted-foreground">
+                    <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Upload Video</h3>
+                    <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
                         <X class="w-5 h-5" />
                     </button>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div class="space-y-2">
-                         <label class="text-sm font-medium">Title</label>
-                         <input v-model="uploadForm.title" type="text" placeholder="Video Title" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                         <label class="text-sm font-semibold">Video Title</label>
+                         <input v-model="uploadForm.title" type="text" placeholder="e.g. Tutorial Level 1" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
                     </div>
 
-
-
                     <div class="space-y-2">
-                         <label class="text-sm font-medium">Video File</label>
-                         <div class="border-2 border-dashed border-input rounded-lg p-8 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
-                             <input type="file" accept="video/*" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                             <div v-if="uploadForm.file" class="flex flex-col items-center gap-2">
-                                 <CheckCircle class="w-8 h-8 text-green-500" />
-                                 <p class="text-sm font-medium">{{ uploadForm.file.name }}</p>
+                         <label class="text-sm font-semibold">Video File</label>
+                         <div class="border-2 border-dashed border-input rounded-xl p-10 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative group">
+                             <input type="file" accept="video/*" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                             <div v-if="uploadForm.file" class="flex flex-col items-center gap-3">
+                                 <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    <CheckCircle class="w-6 h-6" />
+                                 </div>
+                                 <p class="text-sm font-bold text-foreground">{{ uploadForm.file.name }}</p>
                                  <p class="text-xs text-muted-foreground">Click to replace</p>
                              </div>
-                             <div v-else class="flex flex-col items-center gap-2 text-muted-foreground">
-                                 <Upload class="w-8 h-8" />
+                             <div v-else class="flex flex-col items-center gap-3 text-muted-foreground">
+                                 <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                    <Upload class="w-6 h-6" />
+                                 </div>
                                  <p class="text-sm font-medium">Drag & drop or click to upload</p>
+                                 <p class="text-xs opacity-60 max-w-[200px]">Supports MP4, WebM. Max 50MB recommended.</p>
                              </div>
                          </div>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-4">
-                        <button @click="isUploadOpen = false" class="px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors">
+                        <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
                             Cancel
                         </button>
                         <button 
                             @click="handleUpload" 
                             :disabled="isUploading || !uploadForm.file || !uploadForm.title"
-                            class="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
-                            {{ isUploading ? 'Uploading...' : 'Upload' }}
+                            {{ isUploading ? 'Uploading...' : 'Upload Video' }}
                         </button>
                     </div>
                 </div>
@@ -301,47 +336,45 @@ onMounted(fetchVideos)
         </div>
 
         <!-- Edit Modal -->
-        <div v-if="isEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-            <div class="w-full max-w-lg rounded-lg border bg-card p-6 shadow-lg animate-in fade-in zoom-in-95 duration-200">
+         <div v-if="isEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold">Edit Video</h3>
-                    <button @click="isEditOpen = false" class="p-1 hover:bg-muted rounded text-muted-foreground">
+                    <h3 class="text-xl font-bold">Edit Video</h3>
+                    <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
                         <X class="w-5 h-5" />
                     </button>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div class="space-y-2">
-                         <label class="text-sm font-medium">Title</label>
-                         <input v-model="editForm.title" type="text" placeholder="Video Title" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+                         <label class="text-sm font-semibold">Video Title</label>
+                         <input v-model="editForm.title" type="text" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
                     </div>
 
-
-
                     <div class="space-y-2">
-                         <label class="text-sm font-medium">Replace Video (Optional)</label>
-                         <div class="border-2 border-dashed border-input rounded-lg p-8 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
-                             <input type="file" accept="video/*" @change="handleEditFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                         <label class="text-sm font-semibold">Replace File (Optional)</label>
+                         <div class="border-2 border-dashed border-input rounded-xl p-8 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
+                             <input type="file" accept="video/*" @change="handleEditFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                              <div v-if="editForm.file" class="flex flex-col items-center gap-2">
-                                 <CheckCircle class="w-8 h-8 text-green-500" />
+                                 <CheckCircle class="w-6 h-6 text-green-500" />
                                  <p class="text-sm font-medium">{{ editForm.file.name }}</p>
                                  <p class="text-xs text-muted-foreground">Click to change</p>
                              </div>
                              <div v-else class="flex flex-col items-center gap-2 text-muted-foreground">
-                                 <Upload class="w-8 h-8" />
+                                 <Upload class="w-6 h-6" />
                                  <p class="text-sm font-medium">Drag & drop to replace</p>
                              </div>
                          </div>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-4">
-                        <button @click="isEditOpen = false" class="px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors">
+                        <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
                             Cancel
                         </button>
                         <button 
                             @click="updateVideo" 
                             :disabled="isUpdating || !editForm.title"
-                            class="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
                         >
                             <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
                             {{ isUpdating ? 'Saving...' : 'Save Changes' }}
@@ -351,7 +384,6 @@ onMounted(fetchVideos)
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
         <ConfirmModal 
             :is-open="confirmState.isOpen"
             :title="confirmState.title"
@@ -363,4 +395,3 @@ onMounted(fetchVideos)
         />
     </div>
 </template>
-

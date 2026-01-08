@@ -292,13 +292,12 @@ onMounted(() => fetchAssets(1))
 <template>
     <div class="space-y-8 animate-in fade-in duration-500">
         <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-border/40">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border/40">
             <div>
-                 <h2 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Assets Library</h2>
+                 <h2 class="text-3xl font-bold tracking-tight text-foreground">Assets Library</h2>
                 <p class="text-muted-foreground mt-2 text-lg">Centralized resource management for game interactions.</p>
             </div>
-            <button @click="isUploadOpen = true" class="group relative inline-flex items-center justify-center h-11 px-8 py-2 text-sm font-medium text-white transition-all bg-primary rounded-full hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 active:scale-95 w-full md:w-auto overflow-hidden">
-                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+            <button @click="isUploadOpen = true" class="inline-flex items-center justify-center h-10 px-6 py-2 text-sm font-medium text-white transition-colors bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-200">
                 <Upload class="w-5 h-5 mr-2" />
                 Upload New
             </button>
@@ -391,8 +390,9 @@ onMounted(() => fetchAssets(1))
                              </div>
                              
                              <!-- Category Badge -->
-                             <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-md backdrop-blur-md border border-white/10">
-                                 {{ asset.category }}
+                             <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-md backdrop-blur-md border border-white/10 flex items-center gap-1">
+                                 <span>{{ asset.category }}</span>
+                                 <span v-if="asset.subcategory" class="opacity-70 font-normal border-l border-white/20 pl-1 uppercase tracking-wider">{{ asset.subcategory }}</span>
                              </div>
                         </div>
                         

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { api } from '@/lib/api'
 import { useToast } from '@/lib/toast'
 import ConfirmModal from '@/components/ui/ConfirmModal.vue'
-import { Loader2, Search, Trash2, Edit, Gamepad2, X, Trophy, Plus, CheckCircle, Lock, Unlock, Clock, User as UserIcon } from 'lucide-vue-next'
+import { Loader2, Search, Trash2, Edit, Gamepad2, X, Trophy, CheckCircle, Lock, Unlock, Clock, User as UserIcon, UserPlus } from 'lucide-vue-next'
 
 const users = ref<any[]>([])
 const loading = ref(true)
@@ -75,6 +75,7 @@ const fetchUsers = async () => {
     loading.value = true
     try {
         const query = search.value ? `?search=${search.value}` : ''
+        // Use the admin endpoint for users
         const res = await api.get(`/admin/users${query}`)
         if (res.ok) {
             const data = await res.json()
@@ -224,14 +225,13 @@ onMounted(fetchUsers)
 <template>
     <div class="space-y-8 animate-in fade-in duration-500">
         <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-border/40">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border/40">
             <div>
-                 <h2 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">User Management</h2>
+                 <h2 class="text-3xl font-bold tracking-tight text-foreground">User Management</h2>
                 <p class="text-muted-foreground mt-2 text-lg">Oversee all registered players and administrators.</p>
             </div>
-            <button @click="isAddUserOpen = true" class="group relative inline-flex items-center justify-center h-11 px-8 py-2 text-sm font-medium text-white transition-all bg-primary rounded-full hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 active:scale-95 w-full md:w-auto overflow-hidden">
-                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
-                <Plus class="w-5 h-5 mr-2" />
+            <button @click="isAddUserOpen = true" class="inline-flex items-center justify-center h-10 px-6 py-2 text-sm font-medium text-white transition-colors bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-200">
+                <UserPlus class="w-4 h-4 mr-2" />
                 Add New User
             </button>
         </div>
@@ -290,8 +290,8 @@ onMounted(fetchUsers)
                             </td>
                             <td class="p-4 px-6 align-middle">
                                 <span 
-                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset"
-                                    :class="user.role?.name === 'admin' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' : 'bg-blue-50 text-blue-700 ring-blue-600/20'"
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset transition-colors"
+                                    :class="user.role?.name === 'admin' ? 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-900/30 dark:text-purple-300 dark:ring-purple-400/30' : 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-blue-400/30'"
                                 >
                                     {{ user.role?.name || 'User' }}
                                 </span>
@@ -328,7 +328,7 @@ onMounted(fetchUsers)
         <div v-if="isAddUserOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
             <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Add New User</h3>
+                    <h3 class="text-xl font-bold text-foreground">Add New User</h3>
                     <button @click="isAddUserOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
                         <X class="w-5 h-5" />
                     </button>

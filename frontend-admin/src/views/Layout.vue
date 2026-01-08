@@ -1,10 +1,33 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { LayoutDashboard, Users, FileImage, User, LogOut, Menu, Music, Video, Image as ImageIcon, X, ChevronRight } from 'lucide-vue-next'
+import { LayoutDashboard, Users, FileImage, User, LogOut, Menu, Music, Video, Image as ImageIcon, X, ChevronRight, Sun, Moon } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
+
+// Theme Logic
+const isDark = ref(false)
+
+const toggleTheme = () => {
+    isDark.value = !isDark.value
+    if (isDark.value) {
+        document.documentElement.classList.add('dark')
+        localStorage.setItem('theme', 'dark')
+    } else {
+        document.documentElement.classList.remove('dark')
+        localStorage.setItem('theme', 'light')
+    }
+}
+
+onMounted(() => {
+    const saved = localStorage.getItem('theme')
+    const system = window.matchMedia('(prefers-color-scheme: dark)').matches
+    if (saved === 'dark' || (!saved && system)) {
+        isDark.value = true
+        document.documentElement.classList.add('dark')
+    }
+})
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -45,7 +68,7 @@ watch(route, () => {
 </script>
 
 <template>
-  <div class="flex h-screen bg-background text-foreground overflow-hidden font-sans select-none">
+  <div class="flex h-screen bg-background text-foreground overflow-hidden font-sans select-none transition-colors duration-300">
     
     <!-- Mobile Backdrop -->
     <div 
@@ -108,7 +131,7 @@ watch(route, () => {
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         
         <!-- Glass Header -->
-        <header class="h-16 flex items-center justify-between px-4 md:px-8 border-b bg-white/80 backdrop-blur-xl sticky top-0 z-30 transition-all duration-200">
+        <header class="h-16 flex items-center justify-between px-4 md:px-8 border-b bg-background/80 backdrop-blur-xl sticky top-0 z-30 transition-all duration-200">
             <div class="flex items-center gap-4">
                 <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="md:hidden p-2 -ml-2 text-muted-foreground hover:text-primary transition-colors">
                     <Menu class="w-6 h-6" />
@@ -125,27 +148,29 @@ watch(route, () => {
             </div>
 
             <div class="flex items-center gap-4">
+                <!-- Theme Toggle -->
+                <button @click="toggleTheme" class="p-2 rounded-full text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all">
+                    <Sun v-if="!isDark" class="w-5 h-5" />
+                    <Moon v-else class="w-5 h-5" />
+                </button>
+
                 <!-- User Profile -->
                 <div class="flex items-center gap-3 pl-1">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-semibold text-foreground leading-tight">Administrator</p>
                         <p class="text-[10px] text-muted-foreground">Super Admin</p>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-slate-100 border-2 border-white shadow-sm overflow-hidden transition-transform hover:scale-105 active:scale-95 duration-200">
-                        <User class="w-full h-full p-2 text-slate-400 bg-slate-200" />
+                    <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-white dark:border-slate-700 shadow-sm overflow-hidden transition-transform hover:scale-105 active:scale-95 duration-200">
+                        <User class="w-full h-full p-2 text-slate-400 bg-slate-200 dark:bg-slate-700" />
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50/50 scroll-smooth relative">
-            <!-- Background Decoration (Cozy Vibe) -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-                <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-200/20 blur-3xl animate-pulse-slow"></div>
-                <div class="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-rose-200/20 blur-3xl animate-pulse-slow font-sans delay-1000"></div>
-                <div class="absolute bottom-[10%] left-[20%] w-[30%] h-[30%] rounded-full bg-orange-100/30 blur-3xl animate-float delay-500"></div>
-            </div>
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-background relative transition-colors duration-300">
+            <!-- Background Decoration (Tech/Pro Vibe) -->
+            <div class="absolute inset-0 pointer-events-none -z-10 bg-dot-pattern opacity-60 dark:opacity-20"></div>
 
             <div class="max-w-7xl mx-auto w-full pb-10">
                 <router-view v-slot="{ Component }">

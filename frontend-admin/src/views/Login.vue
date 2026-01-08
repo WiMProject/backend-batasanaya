@@ -37,18 +37,16 @@ const handleLogin = async () => {
 <template>
   <div class="min-h-screen flex items-center justify-center bg-zinc-950 font-sans relative overflow-hidden">
     
-    <!-- Animated Background FX -->
-    <div class="absolute inset-0 z-0">
-        <div class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/20 blur-[120px] animate-pulse-slow"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-rose-500/20 blur-[100px] animate-pulse-slow delay-1000"></div>
-    </div>
+    <!-- Background FX -->
+    <div class="absolute inset-0 z-0 bg-dot-pattern opacity-20 pointer-events-none"></div>
+    <div class="absolute inset-0 z-0 bg-gradient-to-b from-transparent to-black/80 pointer-events-none"></div>
 
     <!-- Login Card -->
     <div class="w-full max-w-md relative z-10 p-6">
         <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 md:p-10 animate-in fade-in zoom-in-95 duration-700">
             
             <div class="text-center space-y-3 mb-8">
-                <div class="h-14 w-14 bg-gradient-to-br from-indigo-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-rose-500/30 mb-4 transform hover:rotate-12 transition-transform duration-500">
+                <div class="h-14 w-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg border border-white/10 mb-4">
                     <span class="text-white font-bold text-2xl">B</span>
                 </div>
                 <h1 class="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
@@ -90,7 +88,7 @@ const handleLogin = async () => {
                 <button 
                     type="submit" 
                     :disabled="loading"
-                    class="group w-full h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-rose-600 hover:to-rose-500 text-white font-bold rounded-xl shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="group w-full h-12 flex items-center justify-center gap-2 bg-white text-black hover:bg-zinc-200 font-bold rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
                     <span v-else>Sign In to Dashboard</span>

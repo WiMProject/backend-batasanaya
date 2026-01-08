@@ -235,13 +235,12 @@ onMounted(fetchSongs)
 <template>
     <div class="space-y-8 animate-in fade-in duration-500">
         <!-- Header Section -->
-         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-border/40">
+         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border/40">
             <div>
-                 <h2 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Audio Library</h2>
+                 <h2 class="text-3xl font-bold tracking-tight text-foreground">Audio Library</h2>
                 <p class="text-muted-foreground mt-2 text-lg">Manage bgm and sfx for the game experience.</p>
             </div>
-            <button @click="isUploadOpen = true" class="group relative inline-flex items-center justify-center h-11 px-8 py-2 text-sm font-medium text-white transition-all bg-primary rounded-full hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 active:scale-95 w-full md:w-auto overflow-hidden">
-                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+            <button @click="isUploadOpen = true" class="inline-flex items-center justify-center h-10 px-6 py-2 text-sm font-medium text-white transition-colors bg-slate-900 rounded-lg hover:bg-slate-800 shadow-sm dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-200">
                 <Upload class="w-4 h-4 mr-2" />
                 Upload Audio
             </button>
@@ -347,7 +346,7 @@ onMounted(fetchSongs)
         <div v-if="isUploadOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
             <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Upload Audio</h3>
+                    <h3 class="text-xl font-bold text-foreground">Upload Audio</h3>
                     <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
                         <X class="w-5 h-5" />
                     </button>

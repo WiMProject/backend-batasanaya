@@ -21,7 +21,7 @@ const fetchDashboard = async () => {
         const res = await api.get('/admin/stats')
         if (res.ok) stats.value = await res.json()
         
-        const uRes = await api.get('/users?page=1') // Using standard pagination endpoint
+        const uRes = await api.get('/admin/users?page=1') // Using standard pagination endpoint
         if (uRes.ok) {
              const d = await uRes.json()
              recentUsers.value = d.data ? d.data.slice(0, 5) : []
@@ -47,7 +47,7 @@ onMounted(fetchDashboard)
     <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         
         <!-- Welcome Banner -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-500 to-rose-500 p-8 md:p-10 text-white shadow-2xl shadow-rose-500/20">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 to-violet-950 p-8 md:p-10 text-white shadow-2xl shadow-slate-900/20">
             <div class="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute bottom-0 left-0 -mb-10 -ml-10 h-40 w-40 rounded-full bg-black/10 blur-2xl"></div>
             

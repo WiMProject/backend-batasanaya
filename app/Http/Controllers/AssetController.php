@@ -11,6 +11,68 @@ use Illuminate\Support\Str;
 class AssetController extends Controller
 {
     /**
+     * Helper to build asset folder path
+     */
+    private function getAssetPath($category, $subcategory, $type)
+    {
+        $path = 'assets/' . $category;
+        if ($subcategory) {
+            $path .= '/' . $subcategory;
+        }
+        $path .= '/' . $type;
+        return $path;
+    }
+
+    /**
+     * Upload single asset
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|file|mimes:jpg,jpeg,png,mp3,wav,ogg|max:104857600',
+            'category' => 'required|string',
+            'subcategory' => 'nullable|string'
+        ]);
+
+        $file = $request->file('file');
+        $fileName = $file->getClientOriginalName();
+        $extension = strtolower($file->getClientOriginalExtension());
+        
+        // Auto-detect type
+        if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+            $type = 'image';
+        } elseif (in_array($extension, ['mp3', 'wav', 'ogg'])) {
+            $type = 'audio';
+        } else {
+            return response()->json(['error' => 'Unsupported file type'], 400);
+        }
+
+        $folderPath = $this->getAssetPath($request->category, $request->subcategory, $type);
+        $uploadPath = base_path('public/uploads/' . $folderPath);
+        
+        if (!File::exists($uploadPath)) {
+            File::makeDirectory($uploadPath, 0755, true);
+        }
+
+        $filePath = $uploadPath . '/' . $fileName;
+        $file->move($uploadPath, $fileName);
+        
+        $asset = Asset::create([
+            'id' => Str::uuid(),
+            'file_name' => $fileName,
+            'type' => $type,
+            'file' => 'uploads/' . $folderPath . '/' . $fileName,
+            'size' => filesize($filePath),
+            'checksum' => md5_file($filePath),
+            'category' => $request->category,
+            'subcategory' => $request->subcategory,
+            'created_by_id' => Auth::id(),
+        ]);
+
+        return response()->json($asset, 201);
+    }
+
+    /**
      * Upload batch assets dengan category/subcategory structure
      */
     public function storeBatch(Request $request)
@@ -23,7 +85,6 @@ class AssetController extends Controller
         ]);
         
         $uploaded = [];
-        $updated = [];
         
         foreach ($request->file('files') as $file) {
             $fileName = $file->getClientOriginalName();
@@ -38,21 +99,15 @@ class AssetController extends Controller
                 continue; // Skip unsupported files
             }
             
-            // Build path: assets/{category}/{subcategory}/{type}/
-            $folderPath = 'assets/' . $request->category;
-            if ($request->subcategory) {
-                $folderPath .= '/' . $request->subcategory;
-            }
-            $folderPath .= '/' . $type;
-            
+            $folderPath = $this->getAssetPath($request->category, $request->subcategory, $type);
             $uploadPath = base_path('public/uploads/' . $folderPath);
+            
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true);
             }
             
             $filePath = $uploadPath . '/' . $fileName;
             $file->move($uploadPath, $fileName);
-            $checksum = md5_file($filePath);
             
             $asset = Asset::create([
                 'id' => Str::uuid(),
@@ -60,24 +115,45 @@ class AssetController extends Controller
                 'type' => $type,
                 'file' => 'uploads/' . $folderPath . '/' . $fileName,
                 'size' => filesize($filePath),
+                'checksum' => md5_file($filePath),
                 'category' => $request->category,
                 'subcategory' => $request->subcategory,
                 'created_by_id' => Auth::id(),
             ]);
-            $asset->checksum = $checksum;
+            
             $uploaded[] = $asset;
         }
         
         return response()->json([
-            'message' => count($uploaded) . ' new files uploaded, ' . count($updated) . ' files updated',
-            'uploaded' => $uploaded,
-            'updated' => $updated
+            'message' => count($uploaded) . ' files uploaded successfully',
+            'uploaded' => $uploaded
         ], 201);
     }
     
-    public function index()
+    public function index(Request $request)
     {
-        $assets = Asset::with('createdBy')->latest()->paginate(20);
+        $query = Asset::with('createdBy');
+        
+        // Search by filename
+        if ($request->has('search')) {
+            $query->where('file_name', 'like', '%' . $request->search . '%');
+        }
+        
+        // Filter by type
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+        
+        // Filter by category
+        if ($request->has('category')) {
+            $query->where('category', $request->category);
+        }
+        // Filter by subcategory
+        if ($request->has('subcategory')) {
+            $query->where('subcategory', $request->subcategory);
+        }
+        
+        $assets = $query->latest()->paginate(20);
         return response()->json($assets);
     }
 
@@ -96,78 +172,51 @@ class AssetController extends Controller
 
         $oldCategory = $asset->category;
         $oldSubcategory = $asset->subcategory;
-        $categoryChanged = false;
+        
+        // Update Metadata
+        if ($request->has('category')) $asset->category = $request->category;
+        if ($request->has('subcategory')) $asset->subcategory = $request->subcategory;
 
-        // Update category/subcategory
-        if ($request->has('category')) {
-            $asset->category = $request->category;
-            $categoryChanged = ($oldCategory !== $request->category || $oldSubcategory !== $request->subcategory);
-        }
-        if ($request->has('subcategory')) {
-            $asset->subcategory = $request->subcategory;
-            $categoryChanged = ($oldCategory !== $asset->category || $oldSubcategory !== $request->subcategory);
-        }
+        $pathChanged = ($oldCategory !== $asset->category || $oldSubcategory !== $asset->subcategory);
 
-        // Replace file if uploaded
+        // Handle File Replacement
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $extension = strtolower($file->getClientOriginalExtension());
             
-            // Auto-detect type
-            if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
-                $type = 'image';
-            } elseif (in_array($extension, ['mp3', 'wav', 'ogg'])) {
-                $type = 'audio';
-            } else {
-                return response()->json(['error' => 'Unsupported file type'], 400);
-            }
+            if (in_array($extension, ['jpg', 'jpeg', 'png'])) $type = 'image';
+            elseif (in_array($extension, ['mp3', 'wav', 'ogg'])) $type = 'audio';
+            else return response()->json(['error' => 'Unsupported file type'], 400);
 
             // Delete old file
             $oldFilePath = base_path('public/' . $asset->file);
-            if (File::exists($oldFilePath)) {
-                File::delete($oldFilePath);
-            }
+            if (File::exists($oldFilePath)) File::delete($oldFilePath);
 
-            // Build new path
-            $folderPath = 'assets/' . $asset->category;
-            if ($asset->subcategory) {
-                $folderPath .= '/' . $asset->subcategory;
-            }
-            $folderPath .= '/' . $type;
-
+            // New Path
+            $folderPath = $this->getAssetPath($asset->category, $asset->subcategory, $type);
             $uploadPath = base_path('public/uploads/' . $folderPath);
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
+            if (!File::exists($uploadPath)) File::makeDirectory($uploadPath, 0755, true);
 
             $fileName = $file->getClientOriginalName();
             $file->move($uploadPath, $fileName);
+            $finalPath = $uploadPath . '/' . $fileName;
 
             $asset->file_name = $fileName;
             $asset->type = $type;
             $asset->file = 'uploads/' . $folderPath . '/' . $fileName;
-            $asset->size = filesize($uploadPath . '/' . $fileName);
-        }
-        // Move file if category/subcategory changed (without new file upload)
-        elseif ($categoryChanged) {
+            $asset->size = filesize($finalPath);
+            $asset->checksum = md5_file($finalPath);
+
+        } elseif ($pathChanged) {
+            // Move existing file
             $oldFilePath = base_path('public/' . $asset->file);
             
             if (File::exists($oldFilePath)) {
-                // Build new path
-                $folderPath = 'assets/' . $asset->category;
-                if ($asset->subcategory) {
-                    $folderPath .= '/' . $asset->subcategory;
-                }
-                $folderPath .= '/' . $asset->type;
-
+                $folderPath = $this->getAssetPath($asset->category, $asset->subcategory, $asset->type);
                 $uploadPath = base_path('public/uploads/' . $folderPath);
-                if (!File::exists($uploadPath)) {
-                    File::makeDirectory($uploadPath, 0755, true);
-                }
+                if (!File::exists($uploadPath)) File::makeDirectory($uploadPath, 0755, true);
 
                 $newFilePath = $uploadPath . '/' . $asset->file_name;
-                
-                // Move file
                 File::move($oldFilePath, $newFilePath);
                 
                 $asset->file = 'uploads/' . $folderPath . '/' . $asset->file_name;
@@ -185,14 +234,10 @@ class AssetController extends Controller
     public function download($id)
     {
         $asset = Asset::find($id);
-        if (!$asset) {
-            return response()->json(['error' => 'Asset not found'], 404);
-        }
+        if (!$asset) return response()->json(['error' => 'Asset not found'], 404);
 
         $filePath = base_path('public/' . $asset->file);
-        if (!File::exists($filePath)) {
-            return response()->json(['error' => 'Asset file not found'], 404);
-        }
+        if (!File::exists($filePath)) return response()->json(['error' => 'Asset file not found'], 404);
 
         return response()->file($filePath);
     }
@@ -207,9 +252,7 @@ class AssetController extends Controller
         }
         
         $assets = $query->get();
-        if ($assets->isEmpty()) {
-            return response()->json(['error' => 'No assets found'], 404);
-        }
+        if ($assets->isEmpty()) return response()->json(['error' => 'No assets found'], 404);
 
         $zipFileName = 'all_assets_' . time() . '.zip';
         $zipPath = storage_path('app/' . $zipFileName);
@@ -222,7 +265,12 @@ class AssetController extends Controller
         foreach ($assets as $asset) {
             $filePath = base_path('public/' . $asset->file);
             if (File::exists($filePath)) {
-                $zip->addFile($filePath, $asset->file_name);
+                // Determine internal ZIP structure based on category
+                $zipInternalPath = $asset->category;
+                if ($asset->subcategory) $zipInternalPath .= '/' . $asset->subcategory;
+                $zipInternalPath .= '/' . $asset->type . '/' . $asset->file_name;
+
+                $zip->addFile($filePath, $zipInternalPath);
             }
         }
         
@@ -238,9 +286,7 @@ class AssetController extends Controller
         ]);
 
         $assets = Asset::whereIn('id', $request->asset_ids)->get();
-        if ($assets->isEmpty()) {
-            return response()->json(['error' => 'No assets found'], 404);
-        }
+        if ($assets->isEmpty()) return response()->json(['error' => 'No assets found'], 404);
 
         $zipFileName = 'assets_' . time() . '.zip';
         $zipPath = storage_path('app/' . $zipFileName);
@@ -253,7 +299,11 @@ class AssetController extends Controller
         foreach ($assets as $asset) {
             $filePath = base_path('public/' . $asset->file);
             if (File::exists($filePath)) {
-                $zip->addFile($filePath, $asset->file_name);
+                 $zipInternalPath = $asset->category;
+                if ($asset->subcategory) $zipInternalPath .= '/' . $asset->subcategory;
+                $zipInternalPath .= '/' . $asset->type . '/' . $asset->file_name;
+
+                $zip->addFile($filePath, $zipInternalPath);
             }
         }
         
@@ -264,21 +314,21 @@ class AssetController extends Controller
     public function manifest(Request $request)
     {
         $type = $request->get('type');
-        $query = Asset::select('id', 'file_name', 'type', 'size', 'updated_at');
+        $query = Asset::select('id', 'file_name', 'type', 'size', 'updated_at', 'checksum');
         
         if ($type && $type !== 'all') {
             $query->where('type', $type);
         }
         
+        // Optimization: Use DB checksum instead of reading file every time
         $assets = $query->get()->map(function($asset) {
-            $filePath = base_path('public/uploads/assets/' . $asset->file_name);
             return [
                 'id' => $asset->id,
                 'filename' => $asset->file_name,
                 'type' => $asset->type,
                 'size' => $asset->size,
-                'checksum' => File::exists($filePath) ? md5_file($filePath) : null,
-                'download_url' => url('/api/assets/download-all'),
+                'checksum' => $asset->checksum, // Used stored checksum
+                'download_url' => url('/api/assets/' . $asset->id . '/file'),
                 'last_modified' => $asset->updated_at->timestamp
             ];
         });
@@ -294,14 +344,10 @@ class AssetController extends Controller
     public function destroy($id)
     {
         $asset = Asset::find($id);
-        if (!$asset) {
-            return response()->json(['error' => 'Asset not found'], 404);
-        }
+        if (!$asset) return response()->json(['error' => 'Asset not found'], 404);
 
         $filePath = base_path('public/' . $asset->file);
-        if (File::exists($filePath)) {
-            File::delete($filePath);
-        }
+        if (File::exists($filePath)) File::delete($filePath);
 
         $asset->delete();
         return response()->json(['message' => 'Asset deleted']);
@@ -319,9 +365,8 @@ class AssetController extends Controller
 
         foreach ($assets as $asset) {
             $filePath = base_path('public/' . $asset->file);
-            if (File::exists($filePath)) {
-                File::delete($filePath);
-            }
+            if (File::exists($filePath)) File::delete($filePath);
+            
             $asset->delete();
             $deletedCount++;
         }

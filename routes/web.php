@@ -55,6 +55,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     
     // Song Downloads (Public)
     $router->get('songs/{id}/file', 'SongController@stream');
+    $router->get('videos/{id}/file', 'VideoController@stream');
 
     /*
     |--------------------------------------------------------------------------
@@ -138,7 +139,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('songs', ['middleware' => 'role:admin', 'uses' => 'SongController@index']);
         $router->get('songs/{id}', ['middleware' => 'role:admin', 'uses' => 'SongController@show']);
         $router->patch('songs/{id}', ['middleware' => 'role:admin', 'uses' => 'SongController@update']);
-        $router->get('songs/{id}/file', ['middleware' => 'role:admin', 'uses' => 'SongController@stream']);
+        // $router->get('songs/{id}/file', ['middleware' => 'role:admin', 'uses' => 'SongController@stream']);
         $router->delete('songs/{id}', ['middleware' => 'role:admin', 'uses' => 'SongController@destroy']);
         
         // Admin - Video Management
@@ -146,7 +147,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('videos', ['middleware' => 'role:admin', 'uses' => 'VideoController@index']);
         $router->get('videos/{id}', ['middleware' => 'role:admin', 'uses' => 'VideoController@show']);
         $router->patch('videos/{id}', ['middleware' => 'role:admin', 'uses' => 'VideoController@update']);
-        $router->get('videos/{id}/file', ['middleware' => 'role:admin', 'uses' => 'VideoController@stream']);
+        // $router->get('videos/{id}/file', ['middleware' => 'role:admin', 'uses' => 'VideoController@stream']);
         $router->delete('videos/{id}', ['middleware' => 'role:admin', 'uses' => 'VideoController@destroy']);
         
         // Admin - Game Progress Monitoring

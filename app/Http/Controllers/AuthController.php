@@ -19,13 +19,19 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'fullName' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone_number' => ['required','string','unique:users,phone_number','regex:/^(\+62|62|0)8[1-9][0-9]{7,10}$/'],
             'password' => 'required|string|min:6',
-            
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'Validation failed',
+                'messages' => $validator->errors()
+            ], 422);
+        }
 
         $userRole = Role::where('name', 'user')->first();
         if (!$userRole) {
@@ -69,7 +75,7 @@ class AuthController extends Controller
     /**
      * [TB-19] Mengganti password user yang sedang login.
      */
-public function resetPassword(Request $request)
+    public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'old_password' => 'required|string',

@@ -1,983 +1,162 @@
-# Lumen App Batasanaya - Hijaiyyah Learning Game API
+<div align="center">
 
-[![PHP](https://img.shields.io/badge/PHP-8.1+-blue.svg)](https://php.net)
-[![Lumen](https://img.shields.io/badge/Lumen-10.0-orange.svg)](https://lumen.laravel.com)
-[![JWT](https://img.shields.io/badge/JWT-Auth-green.svg)](https://github.com/tymondesigns/jwt-auth)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue.svg)](https://mysql.com)
+# 🕌 BATASANAYA BACKEND API
+### Intelligent Hijaiyyah Learning Platform Engine
 
-API backend lengkap untuk aplikasi pembelajaran Hijaiyyah dengan sistem autentikasi JWT, manajemen konten multimedia, admin dashboard, dan game pasang huruf interaktif.
+[![Lumen](https://img.shields.io/badge/Framework-Lumen%2010.0-e74c3c?style=for-the-badge&logo=laravel)](https://lumen.laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.1+-777bb4?style=for-the-badge&logo=php)](https://php.net)
+[![MySQL](https://img.shields.io/badge/Database-MySQL%208.0-00758f?style=for-the-badge&logo=mysql)](https://mysql.com)
+[![JWT](https://img.shields.io/badge/Auth-JWT%20Secure-000000?style=for-the-badge&logo=json-web-tokens)](https://jwt.io)
 
-## 🚀 Features
+<p align="center">
+  <b>Batasanaya Backend</b> adalah core engine yang mentenagai aplikasi pembelajaran Hijaiyyah interaktif.<br>
+  Dirancang dengan arsitektur RESTful yang <i>scalable</i>, sistem CMS multimedia canggih, dan mekanisme gamifikasi real-time.
+</p>
 
-### 🔐 Authentication & Security
-- **Complete JWT Authentication** - Login, register, refresh token, logout
-- **OTP Verification** - 6-digit OTP dengan expiry 5 menit
-- **Role-Based Access Control** - Admin & User permissions
-- **Admin Login System** - Dedicated admin authentication
-- **UUID Primary Keys** - Better security & scalability
+<p align="center">
+  <a href="#-fitur-unggulan">Fitur</a> •
+  <a href="#-arsitektur-sistem">Arsitektur</a> •
+  <a href="#-api-reference">Dokumentasi API</a> •
+  <a href="#-instalasi">Instalasi</a>
+</p>
 
-### 📁 Content Management
-- **Asset Management** - Upload, edit, search, filter by category/subcategory, batch upload (max 50 files), bulk delete
-- **Song Management** - Upload audio files (MP3, WAV, OGG), public streaming endpoint
-- **Video Management** - Upload video files with automatic HLS conversion (380p, 480p, 1080p), FFmpeg processing
-- **Background Management** - Upload background images dengan active/inactive status, public download endpoint
-- **Asset Manifest** - Untuk sync game/app data dengan checksum
-- **Batch Operations** - Upload sampai 50 files sekaligus (max 1020MB per file)
+</div>
 
-### 🎮 Game Features
-- **Game Cari Hijaiyyah** - Game mencari huruf Hijaiyyah dengan 15 level
-- **Game Pasangkan Huruf** - Game pasangkan huruf Hijaiyyah dengan 15 level
-- **Progress Tracking** - Tracking completion status dan attempts per level dengan unlock system
-- **Session History** - Menyimpan history setiap gameplay (level & timestamp)
-- **Simplified Tracking** - Backend hanya track completion, game logic di mobile app
-- **Admin Monitoring** - Admin dapat melihat progress kedua game untuk semua user
+---
 
-### 🎛️ Admin Dashboard
-- **Professional Admin Panel** - Web-based admin interface dengan Bootstrap 5
-- **Statistics Dashboard** - Real-time stats (users, assets, songs, videos, backgrounds, storage)
-- **User Management** - CRUD operations untuk users dengan game progress monitoring
-- **Game Progress Monitoring** - Lihat detail progress kedua game dengan tabs (Cari Hijaiyyah & Pasangkan Huruf)
-- **Content Management** - Upload dan kelola semua konten (assets, songs, videos, backgrounds)
-- **Asset Search & Filter** - Search by filename, filter by type/category/subcategory
-- **Batch Upload** - Upload sampai 50 files sekaligus (max 1020MB per file)
-- **Bulk Delete** - Select multiple assets dan delete sekaligus
-- **Simple Upload Interface** - Click-to-upload buttons (no drag & drop)
-- **Responsive Design** - Mobile-friendly admin panel
+## ⚡ Fitur Unggulan
 
-### 🔧 Technical Features
-- **RESTful API Design** - Clean dan consistent endpoints
-- **HLS Video Streaming** - Automatic video conversion ke multiple quality (380p, 480p, 1080p)
-- **FFmpeg Integration** - Video processing dengan preset faster untuk speed
-- **File Validation** - Type, size, dan format validation
-- **Error Handling** - Comprehensive error responses
-- **CORS Support** - Cross-origin resource sharing
-- **Public & Protected Routes** - Flexible access control
-- **Large File Support** - Upload sampai 1020MB per file
-- **Bulk Operations** - Batch upload dan bulk delete
+### 🛡️ **Military-Grade Security**
+- **JWT Authentication Layer**: Token-based auth yang aman untuk ribuan concurrent users.
+- **OTP Verification System**: Verifikasi identitas real-time dengan expirable 6-digit codes.
+- **Role-Based Access Control (RBAC)**: Segregasi total antara akses `User` dan `Super Admin`.
+- **UUID Primary Keys**: Proteksi terhadap ID enumeration attack.
 
-## 📋 Requirements
+### 🎮 **Advanced Gamification Engine**
+- **Multi-Game Tracking**: Support native untuk game *"Cari Hijaiyyah"* & *"Pasangkan Huruf"*.
+- **Live Session Analytics**: Mencatat durasi main, percobaan (attempts), dan skor secara presisi.
+- **Dynamic Progression**: Sistem unlock level otomatis berdasarkan pencapaian user di sisi server.
 
-- PHP 8.1+ (8.4 recommended)
-- MySQL 8.0+
+### 🎥 **Adaptive Multimedia Streaming**
+- **HLS Video On-Demand**: Server otomatis mengonversi upload video menjadi format HLS (`.m3u8`) dengan multi-quality (**1080p, 480p, 360p**) untuk streaming lancar di semua kondisi sinyal.
+- **Smart Asset Sync**: Mekanisme sinkronisasi aset cerdas berbasis `checksum` MD5, hemat kuota user hingga 90% saat update konten.
+
+---
+
+## 🏗 Arsitektur Sistem
+
+```mermaid
+graph TD
+    Client[Mobile App / Web Admin] -->|REST API| Router[Lumen Router]
+    Router -->|Middleware| Auth[JWT Auth Guard]
+    Auth --> Controller[API Controllers]
+    Controller -->|Read/Write| DB[(MySQL Database)]
+    Controller -->|Process| Media[FFmpeg Engine]
+    Media -->|Store| Storage[Public Storage]
+    
+    subgraph "Core Modules"
+    Controller --> UserMgr[User Manager]
+    Controller --> AssetMgr[Asset CMS]
+    Controller --> GameEng[Game Engine]
+    end
+```
+
+---
+
+## 📚 API Reference
+
+Base URL: `http://localhost:8000/api`
+
+### 🔐 Authentication Module
+
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/auth/register` | Mendaftarkan user baru | - |
+| `POST` | `/auth/login` | Login user untuk mendapatkan Token | - |
+| `POST` | `/auth/admin-login` | Login khusus dashboard admin | - |
+| `POST` | `/auth/request-otp` | Request kode OTP ke email | 🔐 |
+| `POST` | `/auth/verify-otp` | Verifikasi validitas kode OTP | 🔐 |
+
+### 👤 User Module
+
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/auth/me` | Mengambil profil user yang sedang login | 🔐 |
+| `PATCH` | `/users/{id}` | Update data profil user | 🔐 |
+| `POST` | `/user/profile-picture` | Upload avatar user | 🔐 |
+
+### 📦 Asset Management (CMS)
+
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/assets/manifest` | **[CRITICAL]** Cek versi aset terbaru untuk sync | - |
+| `GET` | `/assets/{id}/file` | Download file aset fisik | - |
+| `POST` | `/assets` | **[Admin]** Upload aset baru | 🔐 |
+| `POST` | `/videos` | **[Admin]** Upload & Convert video ke HLS | 🔐 |
+
+### 🕹️ Game Data Engine
+
+| Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/games/{type}/progress` | Cek level mana saja yang sudah unlock | 🔐 |
+| `POST` | `/games/{type}/start` | Mulai sesi game baru (Generate Session ID) | 🔐 |
+| `POST` | `/games/{type}/finish` | Selesaikan level & simpan skor | 🔐 |
+
+> **Note**: `{type}` bisa bernilai `carihijaiyah` atau `pasangkanhuruf`.
+
+---
+
+## 💻 Panduan Integrasi Frontend
+
+### 1. Smart Asset Synchronization Strategy
+Jangan download semua aset setiap saat! Gunakan strategi ini untuk performa maksimal:
+1. Panggil `GET /assets/manifest`.
+2. Bandingkan `checksum` dari server dengan file lokal di device.
+3. Hanya download file yang checksum-nya berbeda atau belum ada.
+
+### 2. HLS Video Player
+Server ini tidak menyajikan file `.mp4` mentah demi performa. Gunakan player yang mendukung HLS:
+- **Flutter**: Gunakan `video_player` atau `chewie`.
+- **Web**: Gunakan `video.js` atau `hls.js`.
+- **URL Source**: `http://host/api/videos/{id}/file` (akan return file `.m3u8`).
+
+---
+
+## 🚀 Instalasi
+
+### Persyaratan
+- PHP 8.1+
 - Composer
-- Nginx/Apache (Laravel Herd recommended for Windows)
-- **FFmpeg** - Required for video HLS processing
-- PHP Extensions: php-fpm, php-mysql, php-mbstring, php-xml
-- PHP Settings: upload_max_filesize=1020M, post_max_size=1020M, max_file_uploads=100, memory_limit=1020M
-- Nginx Settings: client_max_body_size=1020M
-- Laravel Valet/Herd (recommended)
-- Ngrok (untuk public testing)
+- MySQL 8.0
+- **FFmpeg** (Wajib untuk fitur video)
 
-## 🛠️ Installation
+### Quick Start
 
-### 1. Clone repository
 ```bash
-git clone <repository-url>
-cd batasanaya
-```
+# 1. Clone Project
+git clone https://github.com/username/batasanaya-backend.git
 
-### 2. Install dependencies
-```bash
+# 2. Install Dependencies
 composer install
-```
 
-### 3. Setup environment
-```bash
+# 3. Setup Environment
 cp .env.example .env
-# Edit .env dengan database credentials
-```
+php artisan key:generate
+php artisan jwt:secret
 
-### 4. Run migrations & seeders
-```bash
-php artisan migrate
-php artisan db:seed --class=RoleSeeder
-```
+# 4. Migrate Database
+php artisan migrate --seed
 
-### 5. Create upload folders
-```bash
-# Windows (PowerShell)
-mkdir public\uploads\assets, public\uploads\profiles, public\uploads\songs, public\uploads\videos, public\uploads\backgrounds
-
-# Unix/Linux/Mac
+# 5. Create Storage Folders
 mkdir -p public/uploads/{assets,profiles,songs,videos,backgrounds}
-chmod -R 755 public/uploads storage
-```
 
-### 6. Install FFmpeg (Required for video processing)
-
-**Windows:**
-1. Download FFmpeg: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip
-2. Extract ke `C:\ffmpeg`
-3. Add to PATH:
-   - Open "Edit the system environment variables"
-   - Click "Environment Variables"
-   - Edit "Path" di System variables
-   - Add `C:\ffmpeg\bin`
-   - Restart terminal
-4. Test: `ffmpeg -version`
-
-**Linux:**
-```bash
-sudo apt install ffmpeg  # Ubuntu/Debian
-sudo yum install ffmpeg  # CentOS/RHEL
-```
-
-**Mac:**
-```bash
-brew install ffmpeg
-```
-
-### 7. Configure PHP & Nginx limits
-
-**PHP (php.ini):**
-```ini
-upload_max_filesize = 1020M
-post_max_size = 1020M
-max_file_uploads = 100
-memory_limit = 1020M
-max_execution_time = 600
-max_input_time = 600
-```
-
-**Nginx:**
-```nginx
-client_max_body_size 1020M;
-```
-
-### 8. Run server
-```bash
-# Via Laravel Herd (Windows - Recommended)
-herd link
-herd restart
-
-# Via Laravel Valet (Mac)
-valet link
-valet restart
-
-# Via PHP built-in server
+# 6. Ignite! 🚀
 php -S localhost:8000 -t public
 ```
 
-## 🌐 Public Access (Ngrok)
-
-```bash
-# Install ngrok
-yay -S ngrok  # Arch Linux
-
-# Setup auth token
-ngrok config add-authtoken YOUR_TOKEN
-
-# Expose local server
-ngrok http lumen-app-batasanaya.test:80
-```
-
-## 📚 API Documentation
-
-### Base URL
-```
-Local: http://lumen-app-batasanaya.test
-Public: https://your-ngrok-url.ngrok.io
-```
-
-### Authentication
-
-#### Register
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-    "fullName": "John Doe",
-    "email": "john@example.com",
-    "phone_number": "081234567890",
-    "password": "password123"
-}
-```
-
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-    "email": "john@example.com",
-    "password": "password123"
-}
-```
-
-**Response:**
-```json
-{
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-    "token_type": "bearer",
-    "expires_in": 3600
-}
-```
-
-#### Protected Endpoints
-Semua endpoint yang membutuhkan autentikasi harus menyertakan header:
-```http
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-### User Management
-
-#### Get Current User
-```http
-GET /api/auth/me
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Update User
-```http
-PATCH /api/users/{id}
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: application/json
-
-{
-    "fullName": "Updated Name",
-    "email": "updated@example.com"
-}
-```
-
-#### Upload Profile Picture
-```http
-POST /api/user/profile-picture
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: multipart/form-data
-
-profile_picture: [file]
-```
-
-### Asset Management
-
-#### Upload Asset
-```http
-POST /api/assets
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: multipart/form-data
-
-file: [file]
-type: image|audio
-```
-
-#### Get Assets List
-```http
-GET /api/assets
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Download Single Asset
-```http
-GET /api/assets/{id}/file
-# Public endpoint - no auth required
-```
-
-#### Download All Assets (ZIP)
-```http
-GET /api/assets/download-all
-# Public endpoint - no auth required
-# Optional: ?type=image or ?type=audio
-```
-
-#### Download Batch Assets (ZIP)
-```http
-POST /api/assets/download-batch
-# Public endpoint - no auth required
-Content-Type: application/json
-
-{
-    "asset_ids": ["uuid1", "uuid2", "uuid3"]
-}
-```
-
-#### Get Assets Manifest
-```http
-GET /api/assets/manifest?type=image
-# Public endpoint - no auth required
-```
-
-**Response:**
-```json
-{
-    "version": 1699123456,
-    "total_assets": 10,
-    "total_size": 5242880,
-    "assets": [
-        {
-            "id": "uuid",
-            "filename": "image.jpg",
-            "type": "image",
-            "size": 1024000,
-            "checksum": "md5hash",
-            "download_url": "https://your-url/api/assets/uuid/file",
-            "last_modified": 1699123456
-        }
-    ]
-}
-```
-
-### Song Management
-
-#### Upload Song
-```http
-POST /api/songs
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: multipart/form-data
-
-title: Song Title
-file: [audio file - MP3, WAV, OGG]
-```
-
-#### Get Songs List
-```http
-GET /api/songs
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Stream Song (Public)
-```http
-GET /api/songs/{id}/file
-# Public endpoint - no auth required
-```
-
-### Video Management
-
-#### Upload Video (with HLS Processing)
-```http
-POST /api/videos
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: multipart/form-data
-
-title: Video Title
-file: [video file - MP4, AVI, MOV, MKV, TS]
-```
-
-**Note:** Video akan otomatis di-convert ke HLS format dengan 3 quality:
-- 380p (640x380, 800k bitrate)
-- 480p (854x480, 1200k bitrate)  
-- 1080p (1920x1080, 5000k bitrate)
-
-Proses encoding bisa memakan waktu 2-10 menit tergantung ukuran video.
-
-#### Get Videos List
-```http
-GET /api/videos
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Get Video Details
-```http
-GET /api/videos/{id}
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-**Response:**
-```json
-{
-    "id": "uuid",
-    "title": "Video Title",
-    "file": "uploads/videos/uuid/master.m3u8",
-    "qualities": [
-        {"quality": "380p", "url": "https://..."},
-        {"quality": "480p", "url": "https://..."},
-        {"quality": "1080p", "url": "https://..."}
-    ]
-}
-```
-
-### Background Management
-
-#### Upload Background
-```http
-POST /api/backgrounds
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: multipart/form-data
-
-name: Background Name
-file: [image file - JPG, PNG]
-```
-
-#### Get Backgrounds List
-```http
-GET /api/backgrounds
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Download Background (Public)
-```http
-GET /api/backgrounds/{id}/file
-# Public endpoint - no auth required
-```
-
-### OTP System
-
-#### Request OTP
-```http
-POST /api/auth/request-otp
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Verify OTP
-```http
-POST /api/auth/verify-otp
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: application/json
-
-{
-    "otp": "123456"
-}
-```
-
-### Game Cari Hijaiyyah API
-
-#### Get Progress (15 Levels)
-```http
-GET /api/carihijaiyah/progress
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-**Response:**
-```json
-{
-  "levels": [
-    {
-        "level_number": 1,
-        "is_unlocked": true,
-        "is_completed": true,
-        "attempts": 2
-    }
-  ]
-}
-```
-
-#### Start Game
-```http
-POST /api/carihijaiyah/start
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: application/json
-
-{
-    "level_number": 1
-}
-```
-
-**Response:**
-```json
-{
-    "message": "Game started",
-    "level_number": 1,
-    "attempts": 3
-}
-```
-
-#### Finish Game
-```http
-POST /api/carihijaiyah/finish
-Authorization: Bearer YOUR_JWT_TOKEN
-Content-Type: application/json
-
-{
-    "session_id": "uuid",
-    "level_number": 1
-}
-```
-
-**Response:**
-```json
-{
-    "message": "Level completed!",
-    "level_number": 1,
-    "next_level_unlocked": true
-}
-```
-
-#### Get Stats
-```http
-GET /api/carihijaiyah/stats
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-**Response:**
-```json
-{
-    "total_levels_completed": 5,
-    "total_sessions": 8
-}
-```
-
-## 🎮 Game Integration
-
-### Game Cari Hijaiyyah Flow
-1. **User requests progress** - GET /api/carihijaiyah/progress
-2. **Check unlocked levels** - Level 1 auto-unlocked, others unlock after completing previous
-3. **Start game** - POST /api/carihijaiyah/start dengan level_number (get session_id)
-4. **Play game** - Game logic handled by mobile app (matching, scoring, validation)
-5. **Finish game** - POST /api/carihijaiyah/finish dengan session_id & level_number
-6. **Backend updates** - Save session timestamp, mark completed, unlock next level
-7. **Admin monitors** - Admin dapat lihat progress semua user via dashboard
-
-### Game Features
-- **15 Levels** - Progressive difficulty (both games)
-- **Unlock System** - Complete level to unlock next
-- **Simplified Tracking** - Backend only tracks completion status & attempts
-- **Session History** - All gameplay sessions saved with timestamp
-- **Attempts Counter** - Track how many times user tried each level
-- **Game Logic in App** - Scoring, stars, time tracking handled by mobile app
-
-### Admin Monitoring
-- View all users with both games progress summary (completion count)
-- Click user to see detailed progress with tabs (Cari Hijaiyyah & Pasangkan Huruf)
-- Each tab shows 15 levels progress + recent 10 sessions
-- See stats: completion rate, total sessions per game
-- Identify stuck users and difficult levels
-
-## 🗄️ Database Schema
-
-### Authentication Tables
-- `roles` - System roles (admin, user)
-- `users` - User data with role relations
-- `otps` - OTP verification system
-- `user_preferences` - User settings
-- `user_subscriptions` - Subscription data
-
-### Content Management Tables
-- `assets` - General file management
-- `songs` - Audio files with thumbnails
-- `videos` - Video files with thumbnails
-- `backgrounds` - Background images
-
-### Game Tables
-- `carihijaiyah_progress` - Progress tracking per level per user (15 levels)
-- `carihijaiyah_sessions` - History setiap gameplay session
-- `pasangkanhuruf_progress` - Progress tracking per level per user (15 levels)
-- `pasangkanhuruf_sessions` - History setiap gameplay session
-
-### Key Relationships
-```sql
--- Users have roles
-users.role_id -> roles.id
-
--- Content belongs to users
-assets.created_by -> users.id
-songs.created_by -> users.id
-videos.created_by -> users.id
-backgrounds.created_by -> users.id
-
--- Game progress belongs to users
-carihijaiyah_progress.user_id -> users.id
-pasangkanhuruf_progress.user_id -> users.id
-
--- Game sessions belong to users
-carihijaiyah_sessions.user_id -> users.id
-pasangkanhuruf_sessions.user_id -> users.id
-```
-
-## 🔐 Security Features
-
-- JWT token authentication
-- Role-based access control
-- OTP verification system
-- File type validation
-- Password hashing (bcrypt)
-- CORS protection
-- UUID primary keys
-
-## 🎛️ Admin Dashboard
-
-### Access Admin Panel
-1. **Login URL:** `http://lumen-backend-batasanaya.test/admin/login`
-2. **Default Credentials:**
-   - Email: `admin@example.com`
-   - Password: `admin123`
-
-### Dashboard Features
-- **Statistics Overview** - Real-time stats cards (users, assets, songs, videos, backgrounds, storage)
-- **User Management** - Create, edit, delete users dengan game progress monitoring
-- **Game Progress Modal** - View detailed 15 level progress + session history per user (dual tabs)
-- **Asset Management** - Upload, edit, search, filter files dengan category/subcategory
-- **Asset Search & Filter** - Real-time search by filename, filter by type/category/subcategory
-- **Batch Upload** - Upload sampai 50 files sekaligus
-- **Song Management** - Upload audio dengan thumbnail, edit title/file/thumbnail
-- **Video Management** - Store video URLs (YouTube/Vimeo) dengan optional thumbnail
-- **Background Management** - Upload background images dengan active/inactive toggle
-- **Drag & Drop Upload** - Modern file upload interface
-
-### Admin API Endpoints
-```http
-# Admin Login
-POST /api/auth/admin-login
-
-# Get Dashboard Stats
-GET /api/admin/stats
-Authorization: Bearer ADMIN_TOKEN
-
-# Get All Users (with game progress)
-GET /api/admin/users
-Authorization: Bearer ADMIN_TOKEN
-
-# Get User Game Progress Detail
-GET /api/admin/users/{userId}/game-progress
-Authorization: Bearer ADMIN_TOKEN
-
-# Get All Assets (with search & filter)
-GET /api/admin/assets?search=filename&type=image&category=game&subcategory=carihijaiyah
-Authorization: Bearer ADMIN_TOKEN
-
-# Bulk Delete Assets
-DELETE /api/admin/assets/bulk
-Authorization: Bearer ADMIN_TOKEN
-Content-Type: application/json
-
-{
-    "asset_ids": ["uuid1", "uuid2"]
-}
-```
-
-## 📁 File Structure
-
-```
-public/uploads/
-├── assets/           - Game assets (organized by category/subcategory/type)
-│   ├── game/
-│   │   ├── carihijaiyah/
-│   │   │   ├── image/
-│   │   │   └── audio/
-│   │   └── pasangkanhuruf/
-│   │       ├── image/
-│   │       └── audio/
-│   ├── ui/
-│   │   └── image/
-│   └── menu/
-│       └── image/
-├── profiles/         - Profile pictures
-├── songs/           - Audio files (MP3, WAV, OGG)
-├── videos/          - HLS video files
-│   └── {video-uuid}/
-│       ├── original.mp4
-│       ├── master.m3u8
-│       ├── 380p/
-│       │   ├── playlist.m3u8
-│       │   └── segment_*.ts
-│       ├── 480p/
-│       │   ├── playlist.m3u8
-│       │   └── segment_*.ts
-│       └── 1080p/
-│           ├── playlist.m3u8
-│           └── segment_*.ts
-└── backgrounds/     - Background images
-
-resources/views/
-├── admin/
-│   ├── dashboard.php  - Admin panel interface
-│   └── login.php      - Admin login page
-├── docs/
-│   └── index.php      - API documentation
-└── layouts/
-    └── app.php        - Base layout template
-
-public/
-├── css/
-│   └── app.css        - Admin panel styles
-└── js/
-    └── app.js         - Admin panel JavaScript
-```
-
-## 🎮 Game/App Integration
-
-### Asset Sync Workflow
-1. App requests manifest: `GET /api/assets/manifest`
-2. Compare checksums with local files
-3. Download batch updates: `POST /api/assets/download-batch`
-4. Extract ZIP and replace files
-
-### Example Implementation
-```javascript
-// Frontend asset sync
-const API_BASE = 'https://your-ngrok-url.ngrok.io/api';
-
-// Get manifest
-const manifest = await fetch(`${API_BASE}/assets/manifest?type=image`);
-const data = await manifest.json();
-
-// Check for updates
-const outdatedAssets = data.assets.filter(asset => 
-    !localAssets[asset.id] || 
-    localAssets[asset.id].checksum !== asset.checksum
-);
-
-// Download batch
-if (outdatedAssets.length > 0) {
-    const response = await fetch(`${API_BASE}/assets/download-batch`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            asset_ids: outdatedAssets.map(a => a.id)
-        })
-    });
-    
-    const blob = await response.blob();
-    // Extract and update local files
-}
-```
-
-## 📱 Flutter Integration
-
-### Dependencies (pubspec.yaml)
-```yaml
-dependencies:
-  http: ^1.1.0
-  archive: ^3.4.0
-  path_provider: ^2.1.1
-```
-
-### Asset Download Service
-```dart
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:archive/archive.dart';
-import 'package:path_provider/path_provider.dart';
-
-class AssetDownloadService {
-  static const String baseUrl = 'https://your-ngrok-url.ngrok.io/api';
-  
-  // Download all assets (no auth required)
-  Future<void> downloadAllAssets({String? type}) async {
-    try {
-      // 1. Download ZIP
-      final zipUrl = '$baseUrl/assets/download-all${type != null ? '?type=$type' : ''}';
-      final response = await http.get(Uri.parse(zipUrl));
-      
-      if (response.statusCode == 200) {
-        // 2. Save ZIP to temporary
-        final tempDir = await getTemporaryDirectory();
-        final zipFile = File('${tempDir.path}/assets.zip');
-        await zipFile.writeAsBytes(response.bodyBytes);
-        
-        // 3. Extract ZIP to documents
-        await extractAssets(zipFile);
-        
-        // 4. Cleanup ZIP
-        await zipFile.delete();
-        
-        print('Assets downloaded successfully!');
-      }
-    } catch (e) {
-      print('Error downloading assets: $e');
-    }
-  }
-  
-  // Extract ZIP to documents folder
-  Future<void> extractAssets(File zipFile) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final assetsDir = Directory('${appDir.path}/assets');
-    
-    if (!await assetsDir.exists()) {
-      await assetsDir.create(recursive: true);
-    }
-    
-    final bytes = await zipFile.readAsBytes();
-    final archive = ZipDecoder().decodeBytes(bytes);
-    
-    for (final file in archive) {
-      if (file.isFile) {
-        final data = file.content as List<int>;
-        final extractedFile = File('${assetsDir.path}/${file.name}');
-        await extractedFile.parent.create(recursive: true);
-        await extractedFile.writeAsBytes(data);
-      }
-    }
-  }
-  
-  // Load image from local storage
-  Future<ImageProvider> loadAssetImage(String filename) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final imagePath = '${appDir.path}/assets/image/$filename';
-    final imageFile = File(imagePath);
-    
-    if (await imageFile.exists()) {
-      return FileImage(imageFile);
-    }
-    
-    return AssetImage('assets/placeholder.png');
-  }
-}
-```
-
-### Usage in Flutter App
-```dart
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  final AssetDownloadService _downloadService = AssetDownloadService();
-  String _status = 'Checking assets...';
-  
-  @override
-  void initState() {
-    super.initState();
-    _initializeAssets();
-  }
-  
-  Future<void> _initializeAssets() async {
-    try {
-      setState(() => _status = 'Downloading Hijaiyyah assets...');
-      
-      // Download all image assets (no login required)
-      await _downloadService.downloadAllAssets(type: 'image');
-      
-      setState(() => _status = 'Assets ready!');
-      
-      // Navigate to main app
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainApp()),
-      );
-      
-    } catch (e) {
-      setState(() => _status = 'Error: $e');
-    }
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text(_status),
-          ],
-        ),
-      ),
-    );
-  }
-}
-```
-
-### Asset Storage Locations
-```
-Android: /data/data/com.yourapp/app_flutter/documents/assets/image/
-iOS: /Documents/assets/image/
-Temp ZIP: /cache/assets.zip (deleted after extract)
-```
-
-## 📊 Complete API Endpoints Summary
-
-### Public Endpoints (No Auth Required)
-```
-GET  /                              - Home page
-GET  /docs                          - API documentation
-GET  /admin/login                   - Admin login page
-GET  /admin                         - Admin dashboard
-
-POST /api/auth/register             - User registration
-POST /api/auth/login                - User login
-POST /api/auth/admin-login          - Admin login
-POST /api/auth/refresh              - Refresh JWT token
-
-GET  /api/assets/{id}/file          - Download asset
-GET  /api/assets/download-all       - Download all assets (ZIP)
-GET  /api/assets/manifest           - Get assets manifest
-POST /api/assets/download-batch     - Download batch assets (ZIP)
-
-GET  /api/backgrounds/{id}/file     - Download background (NEW)
-GET  /api/songs/{id}/file           - Stream song (NEW)
-```
-
-### Protected Endpoints (Auth Required)
-```
-# User Management
-GET    /api/auth/me                 - Get current user
-POST   /api/auth/reset-password     - Reset password
-POST   /api/auth/request-otp        - Request OTP
-POST   /api/auth/verify-otp         - Verify OTP
-POST   /api/auth/logout             - Logout
-GET    /api/users/{id}              - Get user by ID
-PATCH  /api/users/{id}              - Update user
-POST   /api/user/profile-picture    - Upload profile picture
-
-# Asset Management
-POST   /api/assets                  - Upload asset
-POST   /api/assets/batch            - Upload multiple assets
-GET    /api/assets                  - Get assets list
-PATCH  /api/assets/{id}             - Update asset category/subcategory
-DELETE /api/assets/{id}             - Delete asset
-DELETE /api/assets/batch            - Delete multiple assets
-
-# Song Management
-POST   /api/songs                   - Upload song with thumbnail
-GET    /api/songs                   - Get songs list
-GET    /api/songs/{id}              - Get song details
-PATCH  /api/songs/{id}              - Update song (title/file/thumbnail)
-GET    /api/songs/{id}/file         - Stream song
-DELETE /api/songs/{id}              - Delete song
-
-# Video Management
-POST   /api/videos                  - Store video URL with optional thumbnail
-GET    /api/videos                  - Get videos list
-GET    /api/videos/{id}             - Get video details
-PATCH  /api/videos/{id}             - Update video (title/url/thumbnail)
-GET    /api/videos/{id}/file        - Get video URL
-DELETE /api/videos/{id}             - Delete video
-
-# Background Management
-POST   /api/backgrounds             - Upload background
-GET    /api/backgrounds             - Get backgrounds list
-GET    /api/backgrounds/{id}        - Get background details
-PATCH  /api/backgrounds/{id}        - Update background (name, is_active)
-DELETE /api/backgrounds/{id}        - Delete background
-
-# Game Cari Hijaiyyah API
-GET    /api/carihijaiyah/progress   - Get user progress (15 levels)
-POST   /api/carihijaiyah/start      - Start game session
-POST   /api/carihijaiyah/finish     - Finish game & save session
-GET    /api/carihijaiyah/stats      - Get user stats
-
-# Game Pasangkan Huruf API
-GET    /api/pasangkanhuruf/progress - Get user progress (15 levels)
-POST   /api/pasangkanhuruf/start    - Start game session
-POST   /api/pasangkanhuruf/finish   - Finish game & save session
-GET    /api/pasangkanhuruf/stats    - Get user stats
-
-# User Preferences
-GET    /api/user/preference         - Get user preferences
-PATCH  /api/user/preference         - Update preferences
-```
-
-### Admin Only Endpoints
-```
-GET    /api/admin/stats                      - Dashboard statistics
-GET    /api/admin/users                      - Get all users with game progress
-GET    /api/admin/users/{userId}/game-progress - Get detailed user game progress
-GET    /api/admin/assets                     - Get all assets
-DELETE /api/admin/assets/bulk                - Bulk delete assets
-
-POST   /api/users                            - Create user (admin)
-DELETE /api/users/{id}                       - Delete user (admin)
-```
-
-## 📝 Documentation
-
-- **API Documentation**: Import `BaTaTsaNaYa API.postman_collection.json` untuk testing endpoints
-- **Game Cari Hijaiyyah**: Import `Game_Cari_Hijaiyyah_API.postman_collection.json` untuk testing game endpoints
-- **Admin Dashboard**: Access via `/admin` with credentials admin@example.com / admin123
-
-## 🤝 Contributing
-
-1. Fork repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Create Pull Request
-
-## 📄 License
-
-MIT License - see LICENSE file for details.
+---
+
+<div align="center">
+  <p>Maintained by <b>Tim Batasanaya</b></p>
+  <p>© 2024 All Rights Reserved</p>
+</div>

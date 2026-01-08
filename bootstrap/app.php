@@ -55,7 +55,9 @@ $app->configure('auth');
 | Register Middleware
 |--------------------------------------------------------------------------
 */
-// ... (bagian ini tidak perlu diubah) ...
+$app->middleware([
+    App\Http\Middleware\CorsMiddleware::class
+]);
 
 /*
 |--------------------------------------------------------------------------

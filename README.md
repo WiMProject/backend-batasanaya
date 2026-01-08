@@ -154,6 +154,22 @@ mkdir -p public/uploads/{assets,profiles,songs,videos,backgrounds}
 php -S localhost:8000 -t public
 ```
 
+### 🖥️ Instalasi Frontend (Admin Panel)
+
+Admin panel dibangun menggunakan **Vue 3 + Vite**.
+
+```bash
+# 1. Masuk ke direktori frontend
+cd frontend-admin
+
+# 2. Install Dependencies
+npm install
+
+# 3. Jalankan Development Server
+npm run dev
+# Akses di: http://localhost:5173
+```
+
 ---
 
 <div align="center">

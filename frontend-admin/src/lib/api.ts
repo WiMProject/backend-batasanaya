@@ -1,4 +1,6 @@
-const API_BASE = '/api';
+// Update for Ngrok:
+const API_BASE = 'https://989cfbb9aea7.ngrok-free.app/api';
+// const API_BASE = 'http://localhost:8000/api'; // Local fallback
 
 export const api = {
     get: async (endpoint: string) => {
@@ -7,7 +9,8 @@ export const api = {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
             }
         });
         if (res.status === 401) {
@@ -21,7 +24,8 @@ export const api = {
         const isFormData = body instanceof FormData;
         const headers: HeadersInit = {
             'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
         };
         if (!isFormData) {
             headers['Content-Type'] = 'application/json';
@@ -45,6 +49,7 @@ export const api = {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true',
                 ...(options.headers || {}) as any
             },
             body: options.body

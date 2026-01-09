@@ -11,6 +11,7 @@ export default defineConfig({
     },
   },
   server: {
+    allowedHosts: ['.ngrok-free.app'], // Allow Ngrok
     proxy: {
       '/api': {
         target: 'https://batasanaya.test', // Valet uses HTTPS

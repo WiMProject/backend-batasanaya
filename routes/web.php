@@ -9,11 +9,7 @@
 */
 
 // Web Pages
-$router->get('/', 'HomeController@index');
-$router->get('/docs', 'DocController@index');
-$router->get('/admin/login', 'AdminLoginController@index');
-$router->get('/admin', 'AdminDashboardController@index');
-$router->get('/test/upload', 'TestUploadController@index');
+$router->get('/', 'DocController@index'); // Home displays API Documentation
 
 // PHP Info Check
 $router->get('/phpinfo', function() {

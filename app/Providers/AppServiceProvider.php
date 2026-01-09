@@ -13,6 +13,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // Fix for Ngrok/Proxy: Force HTTPS for asset/route generation
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+            $this->app['url']->forceScheme('https');
+        }
     }
 }

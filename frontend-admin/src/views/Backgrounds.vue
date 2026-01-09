@@ -278,114 +278,118 @@ onMounted(fetchBackgrounds)
         </div>
 
         <!-- Upload Modal -->
-        <div v-if="isUploadOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Upload Background</h3>
-                    <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Name</label>
-                         <input v-model="uploadForm.name" type="text" placeholder="e.g. Forest Day" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+        <Teleport to="body">
+            <div v-if="isUploadOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Upload Background</h3>
+                        <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Image File</label>
-                         <div class="border-2 border-dashed border-input rounded-xl p-10 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative group">
-                             <input type="file" accept="image/*" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                             <div v-if="uploadForm.file" class="flex flex-col items-center gap-3">
-                                 <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                    <CheckCircle class="w-6 h-6" />
-                                 </div>
-                                 <p class="text-sm font-bold text-foreground">{{ uploadForm.file.name }}</p>
-                                 <p class="text-xs text-muted-foreground">Click to replace</p>
-                             </div>
-                             <div v-else class="flex flex-col items-center gap-3 text-muted-foreground">
-                                 <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                    <Upload class="w-6 h-6" />
-                                 </div>
-                                 <p class="text-sm font-medium">Drag & drop or click to upload</p>
-                             </div>
-                         </div>
-                    </div>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Name</label>
+                             <input v-model="uploadForm.name" type="text" placeholder="e.g. Forest Day" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
 
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
-                        </button>
-                        <button 
-                            @click="handleUpload" 
-                            :disabled="isUploading || !uploadForm.file || !uploadForm.name"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
-                            {{ isUploading ? 'Uploading...' : 'Upload' }}
-                        </button>
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Image File</label>
+                             <div class="border-2 border-dashed border-input rounded-xl p-10 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative group">
+                                 <input type="file" accept="image/*" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                 <div v-if="uploadForm.file" class="flex flex-col items-center gap-3">
+                                     <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                        <CheckCircle class="w-6 h-6" />
+                                     </div>
+                                     <p class="text-sm font-bold text-foreground">{{ uploadForm.file.name }}</p>
+                                     <p class="text-xs text-muted-foreground">Click to replace</p>
+                                 </div>
+                                 <div v-else class="flex flex-col items-center gap-3 text-muted-foreground">
+                                     <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                        <Upload class="w-6 h-6" />
+                                     </div>
+                                     <p class="text-sm font-medium">Drag & drop or click to upload</p>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4">
+                            <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="handleUpload" 
+                                :disabled="isUploading || !uploadForm.file || !uploadForm.name"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
+                                {{ isUploading ? 'Uploading...' : 'Upload' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <!-- Edit Modal -->
-        <div v-if="isEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold">Edit Background</h3>
-                    <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Name</label>
-                         <input v-model="editForm.name" type="text" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                    </div>
-
-                    <!-- File Input for Edit -->
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Replace Image (Optional)</label>
-                         <div class="border-2 border-dashed border-input rounded-xl p-6 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
-                             <input type="file" accept="image/*" @change="handleEditFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                             <div v-if="editForm.file" class="flex flex-col items-center gap-2">
-                                 <CheckCircle class="w-6 h-6 text-green-500" />
-                                 <p class="text-sm font-medium">{{ editForm.file.name }}</p>
-                                 <p class="text-xs text-muted-foreground">Click to replace</p>
-                             </div>
-                             <div v-else class="flex flex-col items-center gap-2 text-muted-foreground">
-                                 <Upload class="w-6 h-6" />
-                                 <p class="text-sm font-medium">Click to select new image</p>
-                             </div>
-                         </div>
-                    </div>
-
-                    <div class="flex items-center space-x-3 bg-muted/30 p-4 rounded-xl">
-                        <input type="checkbox" id="isActive" v-model="editForm.is_active" class="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary transition-all cursor-pointer" />
-                        <label for="isActive" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none">
-                            Set as Active (Visible in Game)
-                        </label>
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
+        <Teleport to="body">
+            <div v-if="isEditOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Edit Background</h3>
+                        <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
                         </button>
-                        <button 
-                            @click="updateBackground" 
-                            :disabled="isUpdating || !editForm.name"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
-                            {{ isUpdating ? 'Saving...' : 'Save Changes' }}
-                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Name</label>
+                             <input v-model="editForm.name" type="text" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
+
+                        <!-- File Input for Edit -->
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Replace Image (Optional)</label>
+                             <div class="border-2 border-dashed border-input rounded-xl p-6 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
+                                 <input type="file" accept="image/*" @change="handleEditFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                 <div v-if="editForm.file" class="flex flex-col items-center gap-2">
+                                     <CheckCircle class="w-6 h-6 text-green-500" />
+                                     <p class="text-sm font-medium">{{ editForm.file.name }}</p>
+                                     <p class="text-xs text-muted-foreground">Click to replace</p>
+                                 </div>
+                                 <div v-else class="flex flex-col items-center gap-2 text-muted-foreground">
+                                     <Upload class="w-6 h-6" />
+                                     <p class="text-sm font-medium">Click to select new image</p>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 bg-muted/30 p-4 rounded-xl">
+                            <input type="checkbox" id="isActive" v-model="editForm.is_active" class="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary transition-all cursor-pointer" />
+                            <label for="isActive" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none">
+                                Set as Active (Visible in Game)
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4">
+                            <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="updateBackground" 
+                                :disabled="isUpdating || !editForm.name"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
+                                {{ isUpdating ? 'Saving...' : 'Save Changes' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <ConfirmModal 
             :is-open="confirmState.isOpen"

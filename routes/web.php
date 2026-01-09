@@ -150,6 +150,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->patch('videos/{id}', ['middleware' => 'role:admin', 'uses' => 'VideoController@update']);
         // $router->get('videos/{id}/file', ['middleware' => 'role:admin', 'uses' => 'VideoController@stream']);
         $router->delete('videos/{id}', ['middleware' => 'role:admin', 'uses' => 'VideoController@destroy']);
+        $router->get('videos/progress/{id}', ['middleware' => 'role:admin', 'uses' => 'VideoController@progress']);
         
         // Admin - Game Progress Monitoring
         $router->group(['middleware' => 'role:admin', 'prefix' => 'admin'], function () use ($router) {

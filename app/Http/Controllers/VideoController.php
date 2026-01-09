@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class VideoController extends Controller
 {
@@ -32,7 +33,7 @@ class VideoController extends Controller
         $videoFile->move($videoDir, 'original.mp4');
         
         // Generate qualities (360p, 720p, 1080p)
-        $qualities = $this->generateQualities($videoId, $originalPath);
+        $qualities = $this->generateQualities($videoId, $originalPath, $request->upload_id);
 
         $video = Video::create([
             'id' => $videoId,
@@ -45,7 +46,7 @@ class VideoController extends Controller
         return response()->json(['message' => 'Video uploaded successfully', 'video' => $video], 201);
     }
     
-    private function generateQualities($videoId, $originalPath)
+    private function generateQualities($videoId, $originalPath, $uploadId = null)
     {
         // Requires FFmpeg installed
         $videoDir = base_path('public/uploads/videos/' . $videoId);
@@ -57,8 +58,21 @@ class VideoController extends Controller
             '720p' => ['width' => 1280, 'height' => 720, 'bitrate' => '3000k'],
             '1080p' => ['width' => 1920, 'height' => 1080, 'bitrate' => '5000k'],
         ];
+
+        $total = count($resolutions);
+        $current = 0;
         
         foreach ($resolutions as $quality => $config) {
+            $current++;
+
+            // Update Progress if ID is provided
+            if ($uploadId) {
+                // Determine progress (10-90% reserved for processing)
+                // We'll map 1..4 to 20%..90%
+                $percentage = 10 + intval(($current / $total) * 80); 
+                Cache::put('video_progress_' . $uploadId, $percentage, 300); // 5 mins
+            }
+
             $qualityDir = $videoDir . '/' . $quality;
             File::makeDirectory($qualityDir, 0755, true);
             
@@ -80,6 +94,10 @@ class VideoController extends Controller
                 'url' => url('uploads/videos/' . $videoId . '/' . $quality . '/playlist.m3u8')
             ];
         }
+
+        if ($uploadId) {
+            Cache::put('video_progress_' . $uploadId, 100, 300);
+        }
         
         // Create master playlist
         $this->createMasterPlaylist($videoDir, $resolutions);
@@ -90,6 +108,12 @@ class VideoController extends Controller
         }
         
         return $qualities;
+    }
+
+    public function progress($id)
+    {
+        $progress = Cache::get('video_progress_' . $id, 0);
+        return response()->json(['progress' => $progress]);
     }
     
     private function createMasterPlaylist($videoDir, $resolutions)

@@ -325,247 +325,253 @@ onMounted(fetchUsers)
         </div>
 
         <!-- Add User Modal -->
-        <div v-if="isAddUserOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-foreground">Add New User</h3>
-                    <button @click="isAddUserOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-5">
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Full Name</label>
-                         <div class="relative">
-                            <UserIcon class="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <input v-model="addUserForm.fullName" type="text" placeholder="John Doe" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                             <label class="text-sm font-semibold">Email</label>
-                             <input v-model="addUserForm.email" type="email" placeholder="john@example.com" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                        </div>
-                        <div class="space-y-2">
-                             <label class="text-sm font-semibold">Phone</label>
-                             <input v-model="addUserForm.phone_number" type="tel" placeholder="08..." class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                             <label class="text-sm font-semibold">Password</label>
-                             <input v-model="addUserForm.password" type="password" placeholder="Min. 6 chars" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                        </div>
-                        <div class="space-y-2">
-                             <label class="text-sm font-semibold">Role</label>
-                             <select v-model="addUserForm.role" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all appearance-none">
-                                 <option value="user">User</option>
-                                 <option value="admin">Admin</option>
-                             </select>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-6">
-                        <button @click="isAddUserOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
+        <Teleport to="body">
+            <div v-if="isAddUserOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-foreground">Add New User</h3>
+                        <button @click="isAddUserOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
                         </button>
-                        <button 
-                            @click="createUser" 
-                            :disabled="isCreatingUser"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isCreatingUser" class="w-4 h-4 animate-spin" />
-                            {{ isCreatingUser ? 'Creating...' : 'Create Account' }}
-                        </button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Full Name</label>
+                             <div class="relative">
+                                <UserIcon class="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <input v-model="addUserForm.fullName" type="text" placeholder="John Doe" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 pl-9 pr-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                 <label class="text-sm font-semibold">Email</label>
+                                 <input v-model="addUserForm.email" type="email" placeholder="john@example.com" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                            </div>
+                            <div class="space-y-2">
+                                 <label class="text-sm font-semibold">Phone</label>
+                                 <input v-model="addUserForm.phone_number" type="tel" placeholder="08..." class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                 <label class="text-sm font-semibold">Password</label>
+                                 <input v-model="addUserForm.password" type="password" placeholder="Min. 6 chars" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                            </div>
+                            <div class="space-y-2">
+                                 <label class="text-sm font-semibold">Role</label>
+                                 <select v-model="addUserForm.role" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all appearance-none">
+                                     <option value="user">User</option>
+                                     <option value="admin">Admin</option>
+                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-6">
+                            <button @click="isAddUserOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="createUser" 
+                                :disabled="isCreatingUser"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isCreatingUser" class="w-4 h-4 animate-spin" />
+                                {{ isCreatingUser ? 'Creating...' : 'Create Account' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <!-- Edit User Modal -->
-        <div v-if="isEditUserOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold">Edit User</h3>
-                    <button @click="isEditUserOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-5">
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Full Name</label>
-                         <input v-model="editUserForm.fullName" type="text" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                    </div>
-
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Email</label>
-                         <input v-model="editUserForm.email" type="email" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                    </div>
-                    
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold text-muted-foreground">Phone Number (Locked)</label>
-                         <input :value="editUserForm.phone_number" disabled type="text" class="flex h-10 w-full rounded-xl border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground cursor-not-allowed opacity-70" />
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-6">
-                        <button @click="isEditUserOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
+        <Teleport to="body">
+            <div v-if="isEditUserOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Edit User</h3>
+                        <button @click="isEditUserOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
                         </button>
-                        <button 
-                            @click="updateUser" 
-                            :disabled="isUpdatingUser"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isUpdatingUser" class="w-4 h-4 animate-spin" />
-                            {{ isUpdatingUser ? 'Saving...' : 'Save Changes' }}
-                        </button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Full Name</label>
+                             <input v-model="editUserForm.fullName" type="text" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
+
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Email</label>
+                             <input v-model="editUserForm.email" type="email" class="flex h-10 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
+                        
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold text-muted-foreground">Phone Number (Locked)</label>
+                             <input :value="editUserForm.phone_number" disabled type="text" class="flex h-10 w-full rounded-xl border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground cursor-not-allowed opacity-70" />
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-6">
+                            <button @click="isEditUserOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="updateUser" 
+                                :disabled="isUpdatingUser"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isUpdatingUser" class="w-4 h-4 animate-spin" />
+                                {{ isUpdatingUser ? 'Saving...' : 'Save Changes' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <!-- Game Data Modal -->
-        <div v-if="isGameModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border bg-card shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
-                <!-- Header -->
-                <div class="p-6 border-b flex items-center justify-between bg-muted/20">
-                    <div class="flex items-center gap-4">
-                        <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <Trophy class="w-6 h-6" />
+        <Teleport to="body">
+            <div v-if="isGameModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border bg-card shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+                    <!-- Header -->
+                    <div class="p-6 border-b flex items-center justify-between bg-muted/20">
+                        <div class="flex items-center gap-4">
+                            <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <Trophy class="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">Game Analysis</h3>
+                                <p class="text-sm text-muted-foreground">Detailed progress for <span class="text-foreground font-medium">{{ selectedUser?.full_name }}</span></p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-xl font-bold">Game Analysis</h3>
-                            <p class="text-sm text-muted-foreground">Detailed progress for <span class="text-foreground font-medium">{{ selectedUser?.full_name }}</span></p>
+                        <button @click="isGameModalOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div v-if="!loadingGameData && gameData" class="flex border-b px-6 bg-card shrink-0">
+                        <button 
+                            @click="activeGameTab = 'carihijaiyah'" 
+                            :class="['px-6 py-4 text-sm font-semibold border-b-2 transition-all', activeGameTab === 'carihijaiyah' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground']">
+                            Cari Hijaiyyah
+                        </button>
+                        <button 
+                             @click="activeGameTab = 'pasangkanhuruf'"
+                             :class="['px-6 py-4 text-sm font-semibold border-b-2 transition-all', activeGameTab === 'pasangkanhuruf' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground']">
+                            Pasangkan Huruf
+                        </button>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 overflow-y-auto p-8 space-y-10 bg-slate-50/50">
+                        <div v-if="loadingGameData" class="flex flex-col items-center justify-center h-64 gap-4">
+                            <Loader2 class="w-10 h-10 animate-spin text-primary" />
+                            <p class="text-muted-foreground font-medium">Fetching game records...</p>
+                        </div>
+                        
+                        <div v-else-if="gameData" class="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
+                             <!-- Stats Summary Cards -->
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="relative overflow-hidden p-6 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20">
+                                    <div class="relative z-10">
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-white/80">Levels Completed</p>
+                                        <div class="flex items-baseline gap-2 mt-2">
+                                            <span class="text-4xl font-extrabold">{{ gameData[activeGameTab].stats.total_completed }}</span>
+                                            <span class="text-lg opacity-60">/ 15</span>
+                                        </div>
+                                        <div class="w-full bg-black/20 h-1.5 rounded-full mt-4 overflow-hidden">
+                                            <div class="bg-white h-full rounded-full" :style="`width: ${(gameData[activeGameTab].stats.total_completed / 15) * 100}%`"></div>
+                                        </div>
+                                    </div>
+                                    <Trophy class="absolute right-4 bottom-4 w-24 h-24 text-white/10 rotate-12" />
+                                </div>
+
+                                <div class="p-6 rounded-2xl bg-card border border-border flex items-center gap-6 shadow-sm">
+                                    <div class="h-14 w-14 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
+                                        <Gamepad2 class="w-7 h-7" />
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total Sessions Played</p>
+                                        <p class="text-3xl font-extrabold text-foreground mt-1">{{ gameData[activeGameTab].stats.total_sessions }}</p>
+                                    </div>
+                                </div>
+                             </div>
+
+                             <!-- Level Grid -->
+                             <div class="space-y-4">
+                                <h4 class="font-bold text-lg flex items-center gap-2">
+                                    <Trophy class="w-5 h-5 text-yellow-500" />
+                                    Level Progress
+                                </h4>
+                                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                    <div 
+                                        v-for="level in gameData[activeGameTab].progress" 
+                                        :key="level.level_number" 
+                                        class="relative group rounded-xl border p-3 flex flex-col items-center justify-center gap-2 transition-all hover:shadow-md h-24"
+                                        :class="[
+                                            level.is_completed ? 'bg-green-50 border-green-200' : 
+                                            level.is_unlocked ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200 opacity-60'
+                                        ]"
+                                    >
+                                        <div class="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider opacity-50">#{{ level.level_number }}</div>
+                                        
+                                        <div v-if="level.is_completed" class="h-8 w-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow-sm mt-1">
+                                            <CheckCircle class="w-5 h-5" />
+                                        </div>
+                                        <div v-else-if="level.is_unlocked" class="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm animate-pulse mt-1">
+                                            <Unlock class="w-4 h-4" />
+                                        </div>
+                                        <div v-else class="h-8 w-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center mt-1">
+                                            <Lock class="w-4 h-4" />
+                                        </div>
+
+                                        <div class="text-[10px] font-medium text-muted-foreground">
+                                            {{ level.attempts }} tries
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Sessions Table -->
+                             <div class="space-y-4">
+                                <h4 class="font-bold text-lg flex items-center gap-2">
+                                    <Clock class="w-5 h-5 text-blue-500" />
+                                    Recent Activity Log
+                                </h4>
+                                <div class="rounded-xl border bg-card overflow-hidden shadow-sm">
+                                    <table class="w-full text-sm">
+                                        <thead class="bg-muted/30">
+                                            <tr>
+                                                <th class="p-4 text-left font-semibold w-24">Level</th>
+                                                <th class="p-4 text-left font-semibold">Completed At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y">
+                                            <tr v-for="session in gameData[activeGameTab].recent_sessions" :key="session.id" class="hover:bg-muted/50 transition-colors">
+                                                <td class="p-4 font-bold text-primary">Map #{{ session.level_number }}</td>
+                                                <td class="p-4 text-muted-foreground">{{ formatDate(session.completed_at) }}</td>
+                                            </tr>
+                                            <tr v-if="gameData[activeGameTab].recent_sessions.length === 0">
+                                                <td colspan="2" class="p-8 text-center text-muted-foreground italic">
+                                                    No recent activity recorded.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button @click="isGameModalOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <!-- Tabs -->
-                <div v-if="!loadingGameData && gameData" class="flex border-b px-6 bg-card shrink-0">
-                    <button 
-                        @click="activeGameTab = 'carihijaiyah'" 
-                        :class="['px-6 py-4 text-sm font-semibold border-b-2 transition-all', activeGameTab === 'carihijaiyah' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground']">
-                        Cari Hijaiyyah
-                    </button>
-                    <button 
-                         @click="activeGameTab = 'pasangkanhuruf'"
-                         :class="['px-6 py-4 text-sm font-semibold border-b-2 transition-all', activeGameTab === 'pasangkanhuruf' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground']">
-                        Pasangkan Huruf
-                    </button>
-                </div>
-
-                <!-- Content -->
-                <div class="flex-1 overflow-y-auto p-8 space-y-10 bg-slate-50/50">
-                    <div v-if="loadingGameData" class="flex flex-col items-center justify-center h-64 gap-4">
-                        <Loader2 class="w-10 h-10 animate-spin text-primary" />
-                        <p class="text-muted-foreground font-medium">Fetching game records...</p>
+                    <div class="p-4 border-t bg-muted/20 text-center text-xs text-muted-foreground">
+                        Data is synced in real-time.
                     </div>
-                    
-                    <div v-else-if="gameData" class="space-y-8 animate-in slide-in-from-bottom-2 duration-500">
-                         <!-- Stats Summary Cards -->
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="relative overflow-hidden p-6 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/20">
-                                <div class="relative z-10">
-                                    <p class="text-xs font-semibold uppercase tracking-wider text-white/80">Levels Completed</p>
-                                    <div class="flex items-baseline gap-2 mt-2">
-                                        <span class="text-4xl font-extrabold">{{ gameData[activeGameTab].stats.total_completed }}</span>
-                                        <span class="text-lg opacity-60">/ 15</span>
-                                    </div>
-                                    <div class="w-full bg-black/20 h-1.5 rounded-full mt-4 overflow-hidden">
-                                        <div class="bg-white h-full rounded-full" :style="`width: ${(gameData[activeGameTab].stats.total_completed / 15) * 100}%`"></div>
-                                    </div>
-                                </div>
-                                <Trophy class="absolute right-4 bottom-4 w-24 h-24 text-white/10 rotate-12" />
-                            </div>
-
-                            <div class="p-6 rounded-2xl bg-card border border-border flex items-center gap-6 shadow-sm">
-                                <div class="h-14 w-14 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
-                                    <Gamepad2 class="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <p class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total Sessions Played</p>
-                                    <p class="text-3xl font-extrabold text-foreground mt-1">{{ gameData[activeGameTab].stats.total_sessions }}</p>
-                                </div>
-                            </div>
-                         </div>
-
-                         <!-- Level Grid -->
-                         <div class="space-y-4">
-                            <h4 class="font-bold text-lg flex items-center gap-2">
-                                <Trophy class="w-5 h-5 text-yellow-500" />
-                                Level Progress
-                            </h4>
-                            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                <div 
-                                    v-for="level in gameData[activeGameTab].progress" 
-                                    :key="level.level_number" 
-                                    class="relative group rounded-xl border p-3 flex flex-col items-center justify-center gap-2 transition-all hover:shadow-md h-24"
-                                    :class="[
-                                        level.is_completed ? 'bg-green-50 border-green-200' : 
-                                        level.is_unlocked ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200 opacity-60'
-                                    ]"
-                                >
-                                    <div class="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider opacity-50">#{{ level.level_number }}</div>
-                                    
-                                    <div v-if="level.is_completed" class="h-8 w-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow-sm mt-1">
-                                        <CheckCircle class="w-5 h-5" />
-                                    </div>
-                                    <div v-else-if="level.is_unlocked" class="h-8 w-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm animate-pulse mt-1">
-                                        <Unlock class="w-4 h-4" />
-                                    </div>
-                                    <div v-else class="h-8 w-8 rounded-full bg-gray-300 text-gray-500 flex items-center justify-center mt-1">
-                                        <Lock class="w-4 h-4" />
-                                    </div>
-
-                                    <div class="text-[10px] font-medium text-muted-foreground">
-                                        {{ level.attempts }} tries
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recent Sessions Table -->
-                         <div class="space-y-4">
-                            <h4 class="font-bold text-lg flex items-center gap-2">
-                                <Clock class="w-5 h-5 text-blue-500" />
-                                Recent Activity Log
-                            </h4>
-                            <div class="rounded-xl border bg-card overflow-hidden shadow-sm">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-muted/30">
-                                        <tr>
-                                            <th class="p-4 text-left font-semibold w-24">Level</th>
-                                            <th class="p-4 text-left font-semibold">Completed At</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y">
-                                        <tr v-for="session in gameData[activeGameTab].recent_sessions" :key="session.id" class="hover:bg-muted/50 transition-colors">
-                                            <td class="p-4 font-bold text-primary">Map #{{ session.level_number }}</td>
-                                            <td class="p-4 text-muted-foreground">{{ formatDate(session.completed_at) }}</td>
-                                        </tr>
-                                        <tr v-if="gameData[activeGameTab].recent_sessions.length === 0">
-                                            <td colspan="2" class="p-8 text-center text-muted-foreground italic">
-                                                No recent activity recorded.
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4 border-t bg-muted/20 text-center text-xs text-muted-foreground">
-                    Data is synced in real-time.
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <ConfirmModal 
             :is-open="confirmState.isOpen"

@@ -434,138 +434,142 @@ onMounted(() => fetchAssets(1))
         </div>
 
         <!-- Upload Modal -->
-        <div v-if="isUploadOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-3xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-primary/10 rounded-full text-primary">
-                            <Upload class="w-5 h-5" />
+        <Teleport to="body">
+            <div v-if="isUploadOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-3xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-primary/10 rounded-full text-primary">
+                                <Upload class="w-5 h-5" />
+                            </div>
+                            <h3 class="text-xl font-bold">Upload Assets</h3>
                         </div>
-                        <h3 class="text-xl font-bold">Upload Assets</h3>
-                    </div>
-                    <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                             <label class="text-sm font-bold">Category</label>
-                             <select v-model="uploadForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all">
-                                 <option value="" disabled>Select Category</option>
-                                 <option v-for="(_subs, cat) in categories" :key="cat" :value="cat">{{ cat.toUpperCase() }}</option>
-                             </select>
-                        </div>
-                        <div class="space-y-2">
-                             <label class="text-sm font-bold">Subcategory</label>
-                             <select v-model="uploadForm.subcategory" :disabled="!uploadForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all disabled:opacity-50">
-                                 <option value="">Any / None</option>
-                                 <option v-for="sub in availableSubcategories" :key="sub" :value="sub">{{ sub }}</option>
-                             </select>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                         <label class="text-sm font-bold">Files</label>
-                         <div class="border-2 border-dashed border-input rounded-2xl p-10 text-center bg-muted/20 hover:bg-muted/30 transition-colors relative group">
-                             <input type="file" multiple @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                             <div v-if="uploadForm.files.length > 0" class="flex flex-col items-center gap-3">
-                                 <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 shadow-sm">
-                                    <CheckCircle class="w-6 h-6" />
-                                 </div>
-                                 <p class="text-lg font-bold text-foreground">{{ uploadForm.files.length }} files selected</p>
-                                 <p class="text-xs text-muted-foreground">Click to add more or change</p>
-                             </div>
-                             <div v-else class="flex flex-col items-center gap-3 text-muted-foreground">
-                                 <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                    <Upload class="w-6 h-6" />
-                                 </div>
-                                 <p class="text-base font-bold text-foreground">Drag & drop files here</p>
-                                 <p class="text-xs opacity-60">or click to browse</p>
-                             </div>
-                         </div>
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
+                        <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
                         </button>
-                        <button 
-                            @click="handleUpload" 
-                            :disabled="isUploading || uploadForm.files.length === 0 || !uploadForm.category"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
-                            {{ isUploading ? 'Uploading...' : 'Upload Files' }}
-                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                 <label class="text-sm font-bold">Category</label>
+                                 <select v-model="uploadForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all">
+                                     <option value="" disabled>Select Category</option>
+                                     <option v-for="(_subs, cat) in categories" :key="cat" :value="cat">{{ cat.toUpperCase() }}</option>
+                                 </select>
+                            </div>
+                            <div class="space-y-2">
+                                 <label class="text-sm font-bold">Subcategory</label>
+                                 <select v-model="uploadForm.subcategory" :disabled="!uploadForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all disabled:opacity-50">
+                                     <option value="">Any / None</option>
+                                     <option v-for="sub in availableSubcategories" :key="sub" :value="sub">{{ sub }}</option>
+                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                             <label class="text-sm font-bold">Files</label>
+                             <div class="border-2 border-dashed border-input rounded-2xl p-10 text-center bg-muted/20 hover:bg-muted/30 transition-colors relative group">
+                                 <input type="file" multiple @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                 <div v-if="uploadForm.files.length > 0" class="flex flex-col items-center gap-3">
+                                     <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 shadow-sm">
+                                        <CheckCircle class="w-6 h-6" />
+                                     </div>
+                                     <p class="text-lg font-bold text-foreground">{{ uploadForm.files.length }} files selected</p>
+                                     <p class="text-xs text-muted-foreground">Click to add more or change</p>
+                                 </div>
+                                 <div v-else class="flex flex-col items-center gap-3 text-muted-foreground">
+                                     <div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                        <Upload class="w-6 h-6" />
+                                     </div>
+                                     <p class="text-base font-bold text-foreground">Drag & drop files here</p>
+                                     <p class="text-xs opacity-60">or click to browse</p>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4">
+                            <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="handleUpload" 
+                                :disabled="isUploading || uploadForm.files.length === 0 || !uploadForm.category"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
+                                {{ isUploading ? 'Uploading...' : 'Upload Files' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <!-- Edit Asset Modal -->
-        <div v-if="isEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-3xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold">Edit Asset</h3>
-                    <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-5">
-                    <div class="space-y-2">
-                         <label class="text-sm font-bold">Filename</label>
-                         <input v-model="editForm.filename" type="text" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
-                             <label class="text-sm font-bold">Category</label>
-                             <select v-model="editForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all">
-                                 <option value="" disabled>Select Category</option>
-                                 <option v-for="(_subs, cat) in categories" :key="cat" :value="cat">{{ cat.toUpperCase() }}</option>
-                             </select>
-                        </div>
-                        <div class="space-y-2">
-                             <label class="text-sm font-bold">Subcategory</label>
-                             <select v-model="editForm.subcategory" :disabled="!editForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all disabled:opacity-50">
-                                 <option value="">Any / None</option>
-                                 <option v-for="sub in availableEditSubcategories" :key="sub" :value="sub">{{ sub }}</option>
-                             </select>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                         <label class="text-sm font-bold">Replace File</label>
-                         <div class="flex items-center gap-3">
-                             <label class="flex-1 cursor-pointer">
-                                 <div class="flex items-center gap-2 p-3 border rounded-xl hover:bg-muted transition-colors border-dashed">
-                                     <Upload class="w-4 h-4 text-muted-foreground" />
-                                     <span class="text-sm text-muted-foreground truncate">{{ editForm.file ? editForm.file.name : 'Choose a new file...' }}</span>
-                                 </div>
-                                 <input type="file" @change="handleEditFileChange" class="hidden" />
-                             </label>
-                         </div>
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
+        <Teleport to="body">
+            <div v-if="isEditOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-3xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Edit Asset</h3>
+                        <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
                         </button>
-                        <button 
-                            @click="updateAsset" 
-                            :disabled="isUpdating || !editForm.category"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
-                            {{ isUpdating ? 'Saving...' : 'Save Changes' }}
-                        </button>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="space-y-2">
+                             <label class="text-sm font-bold">Filename</label>
+                             <input v-model="editForm.filename" type="text" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                 <label class="text-sm font-bold">Category</label>
+                                 <select v-model="editForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all">
+                                     <option value="" disabled>Select Category</option>
+                                     <option v-for="(_subs, cat) in categories" :key="cat" :value="cat">{{ cat.toUpperCase() }}</option>
+                                 </select>
+                            </div>
+                            <div class="space-y-2">
+                                 <label class="text-sm font-bold">Subcategory</label>
+                                 <select v-model="editForm.subcategory" :disabled="!editForm.category" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all disabled:opacity-50">
+                                     <option value="">Any / None</option>
+                                     <option v-for="sub in availableEditSubcategories" :key="sub" :value="sub">{{ sub }}</option>
+                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                             <label class="text-sm font-bold">Replace File</label>
+                             <div class="flex items-center gap-3">
+                                 <label class="flex-1 cursor-pointer">
+                                     <div class="flex items-center gap-2 p-3 border rounded-xl hover:bg-muted transition-colors border-dashed">
+                                         <Upload class="w-4 h-4 text-muted-foreground" />
+                                         <span class="text-sm text-muted-foreground truncate">{{ editForm.file ? editForm.file.name : 'Choose a new file...' }}</span>
+                                     </div>
+                                     <input type="file" @change="handleEditFileChange" class="hidden" />
+                                 </label>
+                             </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4">
+                            <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="updateAsset" 
+                                :disabled="isUpdating || !editForm.category"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
+                                {{ isUpdating ? 'Saving...' : 'Save Changes' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <ConfirmModal 
             :is-open="confirmState.isOpen"

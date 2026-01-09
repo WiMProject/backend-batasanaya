@@ -343,110 +343,114 @@ onMounted(fetchSongs)
         </div>
 
         <!-- Upload Modal -->
-        <div v-if="isUploadOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-foreground">Upload Audio</h3>
-                    <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Name</label>
-                         <input v-model="uploadForm.title" type="text" placeholder="e.g. Background Menu Music" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+        <Teleport to="body">
+            <div v-if="isUploadOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-foreground">Upload Audio</h3>
+                        <button @click="isUploadOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Audio File</label>
-                         <div class="border-2 border-dashed border-primary/20 hover:border-primary/50 rounded-2xl p-10 text-center bg-primary/5 hover:bg-primary/10 transition-colors relative cursor-pointer group">
-                             <input type="file" accept="audio/*" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                             <div v-if="uploadForm.file" class="flex flex-col items-center gap-3">
-                                 <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                    <CheckCircle class="w-6 h-6" />
-                                 </div>
-                                 <div>
-                                     <p class="text-sm font-bold text-foreground">{{ uploadForm.file.name }}</p>
-                                     <p class="text-xs text-muted-foreground mt-1">Click to replace</p>
-                                 </div>
-                             </div>
-                             <div v-else class="flex flex-col items-center gap-3 text-muted-foreground group-hover:text-primary transition-colors">
-                                 <div class="p-3 bg-background rounded-full shadow-sm">
-                                     <Upload class="w-6 h-6" />
-                                 </div>
-                                 <div>
-                                    <p class="text-sm font-bold text-foreground mb-1">Click to upload</p>
-                                    <p class="text-xs">MP3, WAV, OGG (Max 5MB)</p>
-                                 </div>
-                             </div>
-                         </div>
-                    </div>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Name</label>
+                             <input v-model="uploadForm.title" type="text" placeholder="e.g. Background Menu Music" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
 
-                    <div class="flex justify-end gap-3 pt-6">
-                        <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
-                        </button>
-                        <button 
-                            @click="handleUpload" 
-                            :disabled="isUploading || !uploadForm.file || !uploadForm.title"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
-                        >
-                            <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
-                            {{ isUploading ? 'Uploading...' : 'Upload Audio' }}
-                        </button>
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Audio File</label>
+                             <div class="border-2 border-dashed border-primary/20 hover:border-primary/50 rounded-2xl p-10 text-center bg-primary/5 hover:bg-primary/10 transition-colors relative cursor-pointer group">
+                                 <input type="file" accept="audio/*" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                 <div v-if="uploadForm.file" class="flex flex-col items-center gap-3">
+                                     <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                        <CheckCircle class="w-6 h-6" />
+                                     </div>
+                                     <div>
+                                         <p class="text-sm font-bold text-foreground">{{ uploadForm.file.name }}</p>
+                                         <p class="text-xs text-muted-foreground mt-1">Click to replace</p>
+                                     </div>
+                                 </div>
+                                 <div v-else class="flex flex-col items-center gap-3 text-muted-foreground group-hover:text-primary transition-colors">
+                                     <div class="p-3 bg-background rounded-full shadow-sm">
+                                         <Upload class="w-6 h-6" />
+                                     </div>
+                                     <div>
+                                        <p class="text-sm font-bold text-foreground mb-1">Click to upload</p>
+                                        <p class="text-xs">MP3, WAV, OGG (Max 5MB)</p>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-6">
+                            <button @click="isUploadOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="handleUpload" 
+                                :disabled="isUploading || !uploadForm.file || !uploadForm.title"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
+                            >
+                                <Loader2 v-if="isUploading" class="w-4 h-4 animate-spin" />
+                                {{ isUploading ? 'Uploading...' : 'Upload Audio' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <!-- Edit Modal -->
-        <div v-if="isEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold">Edit Audio</h3>
-                    <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Name</label>
-                         <input v-model="editForm.title" type="text" placeholder="Song Name" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+        <Teleport to="body">
+            <div v-if="isEditOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                <div class="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold">Edit Audio</h3>
+                        <button @click="isEditOpen = false" class="p-2 hover:bg-muted rounded-full text-muted-foreground transition-colors">
+                            <X class="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div class="space-y-2">
-                         <label class="text-sm font-semibold">Replace Audio (Optional)</label>
-                         <div class="border-2 border-dashed border-input hover:border-primary/50 rounded-2xl p-6 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
-                             <input type="file" accept="audio/*" @change="handleEditFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                             <div v-if="editForm.file" class="flex items-center justify-center gap-2">
-                                 <CheckCircle class="w-5 h-5 text-green-500" />
-                                 <span class="text-sm font-medium">{{ editForm.file.name }}</span>
-                             </div>
-                             <div v-else class="flex flex-col items-center gap-1 text-muted-foreground">
-                                 <Upload class="w-5 h-5" />
-                                 <span class="text-sm">Click to replace file</span>
-                             </div>
-                         </div>
-                    </div>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Name</label>
+                             <input v-model="editForm.title" type="text" placeholder="Song Name" class="flex h-11 w-full rounded-xl border border-input bg-muted/30 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition-all" />
+                        </div>
 
-                    <div class="flex justify-end gap-3 pt-6">
-                        <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
-                            Cancel
-                        </button>
-                        <button 
-                            @click="updateSong" 
-                            :disabled="isUpdating || !editForm.title"
-                            class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                        >
-                            <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
-                            {{ isUpdating ? 'Saving...' : 'Save Changes' }}
-                        </button>
+                        <div class="space-y-2">
+                             <label class="text-sm font-semibold">Replace Audio (Optional)</label>
+                             <div class="border-2 border-dashed border-input hover:border-primary/50 rounded-2xl p-6 text-center bg-muted/20 hover:bg-muted/40 transition-colors relative">
+                                 <input type="file" accept="audio/*" @change="handleEditFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                 <div v-if="editForm.file" class="flex items-center justify-center gap-2">
+                                     <CheckCircle class="w-5 h-5 text-green-500" />
+                                     <span class="text-sm font-medium">{{ editForm.file.name }}</span>
+                                 </div>
+                                 <div v-else class="flex flex-col items-center gap-1 text-muted-foreground">
+                                     <Upload class="w-5 h-5" />
+                                     <span class="text-sm">Click to replace file</span>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-6">
+                            <button @click="isEditOpen = false" class="px-5 py-2.5 text-sm font-medium border rounded-xl hover:bg-muted transition-colors">
+                                Cancel
+                            </button>
+                            <button 
+                                @click="updateSong" 
+                                :disabled="isUpdating || !editForm.title"
+                                class="px-5 py-2.5 text-sm font-bold bg-primary text-white rounded-xl hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Loader2 v-if="isUpdating" class="w-4 h-4 animate-spin" />
+                                {{ isUpdating ? 'Saving...' : 'Save Changes' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Teleport>
 
         <ConfirmModal 
             :is-open="confirmState.isOpen"
